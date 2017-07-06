@@ -6,8 +6,8 @@ using namespace std;
 
 AcquisitionDeviceManager::AcquisitionDeviceManager()
 {
-	VimbaSystem &sistema=VimbaSystem::GetInstance();
-	VmbErrorType    err;
+	sistema = &VimbaSystem::GetInstance();
+	err = sistema->Startup();
 }
 
 

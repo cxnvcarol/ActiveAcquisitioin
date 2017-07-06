@@ -10,6 +10,8 @@ public:
 	~AcquisitionDeviceManager();
 
 private:
-	int what;
+	VimbaSystem* sistema;
+	VmbErrorType    err;
+	
 };
 
