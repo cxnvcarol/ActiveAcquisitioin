@@ -114,6 +114,7 @@ void StandardProjector::showInFullProjection()
 	QRect rec2 = QApplication::desktop()->screenGeometry(1);
 	int x = rec.center().rx();
 	int x2 = rec2.center().rx();
+	//TODO Select rec according to the right-est x coordinate
 	setGeometry(rec);
 
 	this->loadFile("C:\\Users\\naranjo\\Pictures\\IMG_0001.JPG");//TODO Parametrize

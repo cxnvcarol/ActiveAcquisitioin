@@ -60,6 +60,7 @@ class QMenu;
 class QScrollArea;
 
 class StandardProjector : public QMainWindow
+//class StandardProjector : public QWidget
 {
 
 public:

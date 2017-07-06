@@ -79,6 +79,9 @@
     <ClCompile Include="WorkingSession.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AcquisitionDeviceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WorkingSession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AcquisitionDeviceManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
