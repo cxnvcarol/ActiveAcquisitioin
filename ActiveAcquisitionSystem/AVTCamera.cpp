@@ -20,8 +20,3 @@ bool AVTCamera::loadSettings()
 
 	return true;
 }
-
-bool AVTCamera::detectCameras(AVTCamera* avtList)
-{
-	return true;
-}

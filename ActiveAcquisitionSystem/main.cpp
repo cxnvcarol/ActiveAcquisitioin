@@ -21,26 +21,43 @@ c. when buttons: load projections-sequence, load caera-settings for selected cam
 #include "EDSWrapper.h"
 
 #include "StandardProjector.h"
+
+#include "AcquisitionDeviceManager.h"
+
 using namespace std;
 
-void testShowFullScreen();
+
 int testIdentifyCameras();
+void testCanonTakingPicture();
 
-
-int main(int argc, char *argv[])
+int main2(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 	ActiveAcquisitionSystem w;
 	w.show();
-	//testShowFullScreen();
+
+	//testShowFullScreen():
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)
 	iv.showInFullProjection();
 
-	string wharever = "yea";
+
+	qDebug("main print");
 	return a.exec();
 
 }
+int main(int argc, char *argv[])
+{
+	QApplication a(argc, argv);
 
+	/* 
+	//The following is working fine so far.
+
+	AcquisitionDeviceManager *mng=new AcquisitionDeviceManager();
+	mng->detectCameras();
+	testCanonTakingPicture();
+	*/
+	return a.exec();
+}
 
 int testIdentifyCameras()
 {

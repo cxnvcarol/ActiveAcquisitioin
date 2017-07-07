@@ -1,7 +1,7 @@
 #include "AcquisitionDeviceManager.h"
+#include <qdebug.h>
 
-
-//using namespace AVT::VmbAPI;
+using namespace AVT::VmbAPI;
 using namespace std;
 
 AcquisitionDeviceManager::AcquisitionDeviceManager()
@@ -20,6 +20,7 @@ bool AcquisitionDeviceManager::initializeAPIs()
 	sistema = &AVT::VmbAPI::VimbaSystem::GetInstance();
 	err = sistema->Startup();
 
+	
 	//texas dlp
 
 
@@ -37,6 +38,8 @@ void AcquisitionDeviceManager::endAPIs()
 
 void AcquisitionDeviceManager::detectCameras()
 {
+	AVTCamera* list;
+	detectAVTCameras(list);
 
 }
 
@@ -60,4 +63,18 @@ Projector* AcquisitionDeviceManager::getProjectors()
 Projector* AcquisitionDeviceManager::getProjector(string dev_id)
 {
 	return NULL;
+}
+
+
+void AcquisitionDeviceManager::detectAVTCameras(AVTCamera* avtList)
+{
+	//TODO 
+	if (!vimbaError)
+	{
+		CameraPtrVector cameras;
+
+		sistema->GetCameras(cameras);
+		qDebug("Num cameras: %d\n", cameras.size());
+	}
+
 }
