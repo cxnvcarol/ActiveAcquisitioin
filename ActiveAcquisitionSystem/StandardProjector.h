@@ -53,13 +53,14 @@
 
 #include <QMainWindow>
 #include <QImage>
+#include "Projector.h"
 
 class QAction;
 class QLabel;
 class QMenu;
 class QScrollArea;
 
-class StandardProjector : public QMainWindow
+class StandardProjector : public QMainWindow, public Projector
 //class StandardProjector : public QWidget
 {
 

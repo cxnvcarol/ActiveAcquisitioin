@@ -79,6 +79,9 @@
     <ClCompile Include="WorkingSession.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Projector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="AcquisitionDeviceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -114,6 +117,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WorkingSession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Projector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AcquisitionDeviceManager.h">

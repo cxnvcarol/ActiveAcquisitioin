@@ -1,12 +1,17 @@
 #include "Camera.h"
+#include <string>
+using namespace std;
 
 
+ActiveCamera::ActiveCamera(string dev_id)
+{
+	
+}
 
 ActiveCamera::ActiveCamera()
 {
+
 }
-
-
 ActiveCamera::~ActiveCamera()
 {
 }

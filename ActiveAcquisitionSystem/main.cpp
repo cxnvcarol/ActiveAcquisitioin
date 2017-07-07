@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)
 	iv.showInFullProjection();
 
-
+	string wharever = "yea";
 	return a.exec();
 
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 struct CameraSettings {
 
@@ -8,6 +9,7 @@ class ActiveCamera
 {
 
 public:
+	ActiveCamera(std::string dev_id);
 	ActiveCamera();
 	virtual ~ActiveCamera();
 
@@ -15,6 +17,9 @@ public:
 
 	virtual int takePicture();
 	virtual void loadSettings(CameraSettings cs);
+
+private:
+	std::string dev_id;
 };
 
 

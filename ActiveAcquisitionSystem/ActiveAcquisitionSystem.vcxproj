@@ -158,6 +158,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Projector.cpp" />
     <ClCompile Include="StandardProjector.cpp" />
     <ClCompile Include="WorkingSession.cpp" />
   </ItemGroup>
@@ -208,6 +209,7 @@
     <ClInclude Include="CanonCamera.h" />
     <ClInclude Include="EDSWrapper.h" />
     <ClInclude Include="GeneratedFiles\ui_ActiveAcquisitionSystem.h" />
+    <ClInclude Include="Projector.h" />
     <ClInclude Include="WorkingSession.h" />
     <CustomBuild Include="StandardProjector.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
