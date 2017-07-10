@@ -27,18 +27,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings" />
@@ -125,6 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\External\Nikon\Header Files\CtrlSample.cpp" />
     <ClCompile Include="AcquisitionDeviceManager.cpp" />
     <ClCompile Include="ActiveAcquisitionSystem.cpp" />
     <ClCompile Include="AVTCamera.cpp" />
@@ -203,6 +208,10 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\External\Nikon\Header Files\CtrlSample.h" />
+    <ClInclude Include="..\External\Nikon\Header Files\Maid3.h" />
+    <ClInclude Include="..\External\Nikon\Header Files\Maid3d1.h" />
+    <ClInclude Include="..\External\Nikon\Header Files\NkTypes.h" />
     <ClInclude Include="AcquisitionDeviceManager.h" />
     <ClInclude Include="AVTCamera.h" />
     <ClInclude Include="Camera.h" />
