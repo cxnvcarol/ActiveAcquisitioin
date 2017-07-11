@@ -6,16 +6,29 @@
 
 #if defined( _WIN32 )
 	#include <io.h>
+	#include <windows.h>
+#elif defined(__APPLE__)
+	#include <signal.h>
 #endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <string>
 
 #include "maid3.h"
 #include "maid3d1.h"
 #include "CtrlSample.h"
 
 extern ULONG	g_ulCameraType;	// CameraType
+#define VIDEO_SIZE_BLOCK  0x500000		// movie data read block size : 5MB
+
+BOOL g_bCancel = false;
+
+#if defined( _WIN32 )
+	BOOL WINAPI	cancelhandler(DWORD dwCtrlType);
+#elif defined(__APPLE__)
+	void	cancelhandler(int sig);
+#endif
 
 //------------------------------------------------------------------------------------------------
 //
@@ -41,12 +54,25 @@ BOOL Search_Module( void* Path )
 	intptr_t	hFile;
 
 	// Search a module file in the current directory.
-	GetCurrentDirectory( MAX_PATH - 11, TempPath );
-	strcat( TempPath, "\\Type0001.md3" );
+	//GetCurrentDirectory( MAX_PATH - 11, TempPath );//todo Current path is != path from the executable!
+	//LPSTR buffer;
+	GetModuleFileName(NULL, TempPath, MAX_PATH);
+	std::string filename(TempPath);
+	const size_t last_slash_idx = filename.rfind('\\');
+	if (std::string::npos != last_slash_idx)
+	{
+		strcpy_s(TempPath, MAX_PATH, filename.substr(0, last_slash_idx).c_str());
+	}
+
+	
+	printf(TempPath);
+	
+	strcat( TempPath, "\\Type0009.md3" );//TODO the output executable file  is not the typical path!
+	
 	if ( (hFile = _findfirst( TempPath, &c_file )) == -1L ) {
 		return false;
 	}
-	strcpy( (char *)Path, TempPath );
+	strcpy( (char*)Path, TempPath );
 #elif defined(__APPLE__)
 	OSStatus err = noErr;
 	FSRef fileRef;
@@ -73,7 +99,7 @@ BOOL Search_Module( void* Path )
 		return false;
 	}
 	
-	CFStringRef		fileName = CFSTR("Type0001 Module.bundle");
+	CFStringRef		fileName = CFSTR("Type0009 Module.bundle");
 	HFSUniStr255	hfsName;
 	hfsName.length = CFStringGetLength( fileName );
 	CFStringGetCharacters( fileName, CFRangeMake( 0, hfsName.length ), hfsName.unicode );
@@ -97,7 +123,7 @@ BOOL Search_Module( void* Path )
 BOOL Load_Module( void* Path )
 {
 #if defined( _WIN32 )
-	g_hInstModule = LoadLibrary((LPCSTR)Path);
+	g_hInstModule = LoadLibrary( (LPCSTR)Path );
 
 	if (g_hInstModule) {
 		g_pMAIDEntryPoint = (LPMAIDEntryPointProc)GetProcAddress( g_hInstModule, "MAIDEntryPoint" );
@@ -109,31 +135,26 @@ BOOL Load_Module( void* Path )
 	}
 	return (g_hInstModule != NULL) && (g_pMAIDEntryPoint != NULL);
 #elif defined(__APPLE__)
-	Ptr	pCFragMain;
 	// Create CFURLRef from FSRef
 	CFURLRef urlRef = CFURLCreateFromFSRef( kCFAllocatorDefault, (FSRefPtr)Path);
 	if ( urlRef == nil ) {
 		return FALSE;
 	}
 	// Create CFByundle object from CFURLRef.
-	CFBundleRef bundleRef = CFBundleCreate( kCFAllocatorDefault, urlRef );
+	gBundle = CFBundleCreate( kCFAllocatorDefault, urlRef );
 	CFRelease( urlRef );
-	if ( bundleRef == nil ) {
+	if ( gBundle == nil ) {
 		return FALSE;
 	}
 	// Load and link dynamic CFBundle object 
-	if ( !CFBundleLoadExecutable(bundleRef) ) {
-		CFRelease( bundleRef );
+	if ( !CFBundleLoadExecutable(gBundle) ) {
+		CFRelease( gBundle );
+		gBundle = NULL;
 		return FALSE;
 	}
 	// Get entry point from BundleRef
-	pCFragMain = (Ptr)CFBundleGetFunctionPointerForName( bundleRef, CFSTR("MAIDEntryPoint") );
-	if ( pCFragMain == nil ) {
-		CFRelease( bundleRef );		
-		return FALSE;
-	}
-	// Set the pointer for Maid entry point LPMAIDEntryPointProc type variable
-	g_pMAIDEntryPoint = LPMAIDEntryPointProc( pCFragMain );	
+	// Set the pointer for Maid entry point LPMAIDEntryPointProc type variabl
+	g_pMAIDEntryPoint = (LPMAIDEntryPointProc)CFBundleGetFunctionPointerForName( gBundle, CFSTR("MAIDEntryPoint") );
 	return (g_pMAIDEntryPoint != NULL);
 #endif
 }
@@ -245,7 +266,7 @@ BOOL IdleLoop( LPNkMAIDObject pObject, ULONG* pulCount, ULONG ulEndCount )
             t.tv_sec = 0;
             t.tv_nsec = 10 * 1000;// 10 msec == 10 * 1000 nsec
             nanosleep(&t, NULL);
-		}
+        }
 	#endif
 	}
 	return true;
@@ -257,7 +278,7 @@ void WaitEvent()
 	#if defined( _WIN32 )
 		// Do nothing
 	#elif defined(__APPLE__)
-    // Do nothing
+		// Do nothing
 	#endif
 }
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -437,8 +458,25 @@ BOOL Command_CapStart(LPNkMAIDObject pobject, ULONG ulParam, LPNKFUNC pfnComplet
 													refComplete );
 	if ( pnResult != NULL ) *pnResult = nResult;
 
+	return ( nResult == kNkMAIDResult_NoError || nResult == kNkMAIDResult_Pending || nResult == kNkMAIDResult_BulbReleaseBusy || 
+		     nResult == kNkMAIDResult_SilentReleaseBusy || nResult == kNkMAIDResult_MovieFrameReleaseBusy );
+}
+//------------------------------------------------------------------------------------------------------------------------------------
+//
+BOOL Command_CapStartGeneric( LPNkMAIDObject pObject, ULONG ulParam, NKPARAM pData, LPNKFUNC pfnComplete, NKREF refComplete, SLONG* pnResult )
+{
+	SLONG nResult = CallMAIDEntryPoint( pObject,
+													kNkMAIDCommand_CapStart, 
+													ulParam,
+													kNkMAIDDataType_GenericPtr,
+													pData,
+													pfnComplete,
+													refComplete );
+	if ( pnResult != NULL ) *pnResult = nResult;
+
 	return ( nResult == kNkMAIDResult_NoError || nResult == kNkMAIDResult_Pending );
 }
+
 //------------------------------------------------------------------------------------------------------------------------------------
 //
 BOOL Command_Abort(LPNkMAIDObject pobject, LPNKFUNC pfnComplete, NKREF refComplete)
@@ -610,6 +648,11 @@ BOOL SelectData( LPRefObj pRefObj, ULONG *pulDataType )
 		DataTypes[i++] = kNkMAIDDataObjType_Image;
 		printf( "%d. Image\n", i );
 	}
+	if ( ulDataTypes & kNkMAIDDataObjType_Video ) {
+	
+		DataTypes[i++] = kNkMAIDDataObjType_Video;
+		printf( "%d. Movie\n", i );
+	}
 	if ( ulDataTypes & kNkMAIDDataObjType_Thumbnail ) {
 		DataTypes[i++] = kNkMAIDDataObjType_Thumbnail;
 		printf( "%d. Thumbnail\n", i );
@@ -627,6 +670,29 @@ BOOL SelectData( LPRefObj pRefObj, ULONG *pulDataType )
 
 	if ( wSel > 0 && wSel <= i )
 		*pulDataType = DataTypes[wSel - 1];
+
+	return true;
+}
+//------------------------------------------------------------------------------------------------------------------------------------
+//
+BOOL CheckDataType( LPRefObj pRefObj, ULONG *pulDataType )
+{
+	BOOL	bRet;
+	ULONG	ulDataTypes, i = 0;
+	LPNkMAIDCapInfo pCapInfo = GetCapInfo( pRefObj, kNkMAIDCapability_DataTypes );
+	if ( pCapInfo == NULL ) return false;
+
+	// check if this capability suports CapGet operation.
+	if ( !CheckCapabilityOperation( pRefObj, kNkMAIDCapability_DataTypes, kNkMAIDCapOperation_Get ) ) return false;
+
+	bRet = Command_CapGet( pRefObj->pObject, kNkMAIDCapability_DataTypes, kNkMAIDDataType_UnsignedPtr, (NKPARAM)&ulDataTypes, NULL, NULL );
+	if( bRet == false ) return false;
+
+	// show the list of selectable Data type object.
+	if ( ulDataTypes & kNkMAIDDataObjType_Video )
+	{
+		return false;
+	}
 
 	return true;
 }
@@ -691,11 +757,17 @@ char* GetEnumString( ULONG ulCapID, ULONG ulValue, char *psString )
 				case kNkMAIDExposureMode_Sports:
 					strcpy( psString, "Sports" );
 					break;
-				case kNkMAIDExposureMode_NightPortrait:
-					strcpy( psString, "NightPortrait" );
+				case kNkMAIDExposureMode_Child:
+					strcpy( psString, "Child" );
 					break;
 				case kNkMAIDExposureMode_FlashOff:
 					strcpy( psString, "FlashOff" );
+					break;
+				case kNkMAIDExposureMode_Scene:
+					strcpy( psString, "Scene" );
+					break;
+				case kNkMAIDExposureMode_Effects:
+					strcpy( psString, "Effects" );
 					break;
 				default:
 					sprintf( psString, "ExposureMode %u", ulValue );
@@ -730,15 +802,15 @@ char* GetEnumString( ULONG ulCapID, ULONG ulValue, char *psString )
 				case kNkMAIDFocusMode_AFa:
 					strcpy( psString, "AF-A" );
 					break;
+				case kNkMAIDFocusMode_AFf:
+					strcpy( psString, "AF-F" );
+					break;
 				default:
 					sprintf( psString, "FocusMode %u", ulValue );
 			}
 			break;
 		case kNkMAIDCapability_FocusPreferredArea:
 			sprintf( psString, "FocusPreferredArea :%u", ulValue );
-			break;
-		case kNkMAIDCapability_CurrentDirID:
-			sprintf( psString, "0x%08x", ulValue );
 			break;
 		case kNkMAIDCapability_PictureControl:
 			switch( ulValue ){
@@ -762,18 +834,6 @@ char* GetEnumString( ULONG ulCapID, ULONG ulValue, char *psString )
 					break;
 				case kNkMAIDPictureControl_Landscape:
 					strcpy( psString, "Landscape" );
-					break;
-				case kNkMAIDPictureControl_Option1:
-					strcpy( psString, "Option Picture Contol 1" );
-					break;
-				case kNkMAIDPictureControl_Option2:
-					strcpy( psString, "Option Picture Contol 2" );
-					break;
-				case kNkMAIDPictureControl_Option3:
-					strcpy( psString, "Option Picture Contol 3" );
-					break;
-				case kNkMAIDPictureControl_Option4:
-					strcpy( psString, "Option Picture Contol 4" );
 					break;
 				case kNkMAIDPictureControl_Custom1:
 				case kNkMAIDPictureControl_Custom2:
@@ -810,15 +870,21 @@ char* GetEnumString( ULONG ulCapID, ULONG ulValue, char *psString )
 				case kNkMAIDLiveViewImageZoomRate_100:
 					strcpy( psString, "100%" );
 					break;
-				case kNkMAIDLiveViewImageZoomRate_200:
-					strcpy( psString, "200%" );
-					break;
 				default:
 					sprintf( psString, "LiveViewImageZoomRate %u", ulValue );
 			}
 			break;
-		case kNkMAIDCapability_WBTuneColorTemp:
-			sprintf( psString, "%u", ulValue );
+		case kNkMAIDCapability_LiveViewImageSize:
+			switch( ulValue ){
+				case kNkMAIDLiveViewImageSize_QVGA:
+					strcpy( psString, "QVGA" );
+					break;
+				case kNkMAIDLiveViewImageSize_VGA:
+					strcpy( psString, "VGA" );
+					break;
+				default:
+					sprintf( psString, "LiveViewImageSize %u", ulValue );
+			}
 			break;
 		default:
 			strcpy( psString, "Undefined String" ); 
@@ -845,35 +911,17 @@ char*	GetUnsignedString( ULONG ulCapID, ULONG ulValue, char *psString )
 		strcpy( psString, buff );
 		sprintf( buff, "%d : AF-S\n", kNkMAIDFocusMode_AFs );
 		strcat( psString, buff );
-		sprintf( buff, "%d : AF-C\n", kNkMAIDFocusMode_AFc );
+		sprintf( buff, "%d : AF-C\n", kNkMAIDFocusMode_AFc );		
+		strcat( psString, buff );
+		sprintf( buff, "%d : AF-A\n", kNkMAIDFocusMode_AFa );		
+		strcat( psString, buff );
+		sprintf( buff, "%d : AF-F\n", kNkMAIDFocusMode_AFf );
 		strcat( psString, buff );
 		break;
 	case kNkMAIDCapability_RawJpegImageStatus:
 		sprintf( buff, "%d : Single\n", eNkMAIDRawJpegImageStatus_Single );
 		strcpy( psString, buff );
 		sprintf( buff, "%d : Raw + Jpeg\n", eNkMAIDRawJpegImageStatus_RawJpeg );
-		strcat( psString, buff );
-		break;
-	case kNkMAIDCapability_CameraType:
-		sprintf( buff, "%d : D3\n", kNkMAIDCameraType_D3 );
-		strcpy( psString, buff );
-		sprintf( buff, "%d : D300\n", kNkMAIDCameraType_D300 );
-		strcat( psString, buff );
-		sprintf( buff, "%d : D700\n", kNkMAIDCameraType_D700 );
-		strcat( psString, buff );
-		sprintf( buff, "%d : D3 Firmup1\n", kNkMAIDCameraType_D3_FU1 );
-		strcat( psString, buff );
-		sprintf( buff, "%d : D3 Firmup2\n", kNkMAIDCameraType_D3_FU2 );
-		strcat( psString, buff );
-		sprintf( buff, "%d : D300 Firmup\n", kNkMAIDCameraType_D300_FU );
-		strcat( psString, buff );
-		sprintf( buff, "%d : D300S\n", kNkMAIDCameraType_D300S );
-		strcat( psString, buff );
-		sprintf( buff, "%d : D3S\n", kNkMAIDCameraType_D3S );
-		strcat( psString, buff );
-		sprintf( buff, "%d : D3 Firmup3\n", kNkMAIDCameraType_D3_FU3 );
-		strcat( psString, buff );
-		sprintf( buff, "%d : D700 Firmup\n", kNkMAIDCameraType_D700_FU1 );
 		strcat( psString, buff );
 		break;
 	case kNkMAIDCapability_DataTypes:
@@ -924,6 +972,30 @@ char*	GetUnsignedString( ULONG ulCapID, ULONG ulValue, char *psString )
 		break;
 	case kNkMAIDCapability_LiveViewProhibit:
 		strcpy( psString, "\0" );
+		if ( ulValue & kNkMAIDLiveViewProhibit_ExpModeScene )
+		{
+			strcat( psString, "ExposureMode other than P,S,A,M, " );
+		}
+		if ( ulValue & kNkMAIDLiveViewProhibit_BulbWarning )
+		{
+			strcat( psString, "Bulb warning, " );
+		}
+		if ( ulValue & kNkMAIDLiveViewProhibit_CardUnformat )
+		{
+			strcat( psString, "Card No Formatted, " );
+		}
+		if ( ulValue & kNkMAIDLiveViewProhibit_CardError )
+		{
+			strcat( psString, "Card Error, " );
+		}
+		if ( ulValue & kNkMAIDLiveViewProhibit_CardProtect )
+		{
+			strcat( psString, "Card Protected, " );
+		}
+		if ( ulValue & kNkMAIDLiveViewProhibit_TempRise )
+		{
+			strcat( psString, "High Temperature, " );
+		}
 		if ( ulValue & kNkMAIDLiveViewProhibit_Capture )
 		{
 			strcat( psString, "Executing Capture, " );
@@ -931,10 +1003,6 @@ char*	GetUnsignedString( ULONG ulCapID, ULONG ulValue, char *psString )
 		if ( ulValue & kNkMAIDLiveViewProhibit_NoCardLock )
 		{
 			strcat( psString, "No Card, " );
-		}
-		if ( ulValue & kNkMAIDLiveViewProhibit_MirrorMode )
-		{
-			strcat( psString, "MirrorMode, " );
 		}
 		if ( ulValue & kNkMAIDLiveViewProhibit_SdramImg )
 		{
@@ -944,10 +1012,6 @@ char*	GetUnsignedString( ULONG ulCapID, ULONG ulValue, char *psString )
 		{
 			strcat( psString, "NonCPU Lens and Manual mode, " );
 		}
-		if ( ulValue & kNkMAIDLiveViewProhibit_ApertureRing )
-		{
-			strcat( psString, "ApertureRing, " );
-		}
 		if ( ulValue & kNkMAIDLiveViewProhibit_TTL )
 		{
 			strcat( psString, "TTL, " );
@@ -955,14 +1019,6 @@ char*	GetUnsignedString( ULONG ulCapID, ULONG ulValue, char *psString )
 		if ( ulValue & kNkMAIDLiveViewProhibit_Battery )
 		{
 			strcat( psString, "Battery, " );
-		}
-		if ( ulValue & kNkMAIDLiveViewProhibit_Mirrorup )
-		{
-			strcat( psString, "Mirrorup, " );
-		}
-		if ( ulValue & kNkMAIDLiveViewProhibit_Bulb )
-		{
-			strcat( psString, "Bulb, " );
 		}
 		if ( ulValue & kNkMAIDLiveViewProhibit_FEE )
 		{
@@ -976,37 +1032,53 @@ char*	GetUnsignedString( ULONG ulCapID, ULONG ulValue, char *psString )
 		{
 			strcat( psString, "Sequence, " );
 		}
-		if ( ulValue & kNkMAIDLiveViewProhibit_CF )
-		{
-			strcat( psString, "CF, " );
-		}
 		strcat( psString, "\n" );
 		break;
-	case kNkMAIDCapability_LiveViewMode:
-		sprintf( buff, "%d : Hand-held\n", kNkMAIDLiveViewMode_Handheld );
-		strcpy( psString, buff );
-		sprintf( buff, "%d : Tripod\n", kNkMAIDLiveViewMode_Tripod );
-		strcat( psString, buff );
-		break;
 	case kNkMAIDCapability_LiveViewStatus:
+	case kNkMAIDCapability_MovRecInCardStatus:
 		sprintf( buff, "%d : OFF\n", kNkMAIDLiveViewStatus_OFF );
 		strcpy( psString, buff );
 		sprintf( buff, "%d : ON\n", kNkMAIDLiveViewStatus_ON );
 		strcat( psString, buff );
 		break;
-	case kNkMAIDCapability_ExchangeDialsEx:
-		sprintf( buff, "%d : OFF\n", kNkMAIDExchangeDialsEx_Off );
-		strcpy( psString, buff );
-		sprintf( buff, "%d : ON\n", kNkMAIDExchangeDialsEx_On );
-		strcat( psString, buff );
-		if ( g_ulCameraType == kNkMAIDCameraType_D3S )
+	case kNkMAIDCapability_MovRecInCardProhibit:
+		strcpy( psString, "\0" );
+		if ( ulValue & kNkMAIDMovRecInCardProhibit_LVImageZoom )
 		{
-			sprintf( buff, "%d : ON (A mode)\n", kNkMAIDExchangeDialsEx_On_Amode );
-			strcat( psString, buff );
+			strcat( psString, "LiveViewZoom, " );
 		}
+		if ( ulValue & kNkMAIDMovRecInCardProhibit_CardProtect )
+		{
+			strcat( psString, "Card protected, " );
+		}
+		if ( ulValue & kNkMAIDMovRecInCardProhibit_RecMov )
+		{
+			strcat( psString, "Recording movie, " );
+		}
+		if ( ulValue & kNkMAIDMovRecInCardProhibit_MovInBuf )
+		{
+			strcat( psString, "Movie in buffer, " );
+		}
+		if ( ulValue & kNkMAIDMovRecInCardProhibit_CardFull )
+		{
+			strcat( psString, "Card full, " );
+		}
+		if ( ulValue & kNkMAIDMovRecInCardProhibit_NoFormat )
+		{
+			strcat( psString, "Card unformatted, " );
+		}
+		if ( ulValue & kNkMAIDMovRecInCardProhibit_CardErr )
+		{
+			strcat( psString, "Card error, " );
+		}
+		if ( ulValue & kNkMAIDMovRecInCardProhibit_NoCard )
+		{
+			strcat( psString, "No card, " );
+		}
+		strcat( psString, "\n" );
 		break;
 	default:
-		psString = NULL;
+		psString[0] = '\0';
 		break; 
 	}
 	return psString;
@@ -1115,7 +1187,7 @@ BOOL SetEnumPackedStringCapability( LPRefObj pRefObj, ULONG ulCapID, LPNkMAIDEnu
 	BOOL	bRet;
 	char	*psStr, buf[256];
 	UWORD	wSel;
-	size_t	i;
+	size_t  i;
 	ULONG	ulCount = 0;
 	LPNkMAIDCapInfo pCapInfo = GetCapInfo( pRefObj, ulCapID );
 	if ( pCapInfo == NULL ) return false;
@@ -1604,34 +1676,12 @@ BOOL SetWBPresetDataCapability( LPRefObj pRefSrc )
 	NkMAIDWBPresetData	stPresetData;
 	LPNkMAIDCapInfo		pCapInfo = NULL;
 	FILE	*stream;
-	ULONG		count = 0;
+	ULONG	count = 0;
 	ULONG   ulTotal = 0;
 	char	*ptr = NULL;
 	BOOL	bRet;
 
 	strcpy( filename, "PresetData.jpg" );
-
-	while (1)
-	{
-		// Preset Number
-		printf( "\nSelect Preset Number(1-5, 0)\n");
-		printf( " 1. d-0\n");
-		printf( " 2. d-1\n");
-		printf( " 3. d-2\n");
-		printf( " 4. d-3\n");
-		printf( " 5. d-4\n");
-		printf( " 0. Exit\n>" );
-		scanf( "%s", buf );
-		stPresetData.ulPresetNumber = atoi( buf );
-		if (stPresetData.ulPresetNumber == 0) return true; //Exit
-		if ( 1 > stPresetData.ulPresetNumber || stPresetData.ulPresetNumber > 5 ) 
-		{
-			printf("Invalid Preset Number.\n");
-			continue;
-		}
-		break;
-	}
-	stPresetData.ulPresetNumber -= 1;// PresetNo start from 0.
 
 	// Preset gain
 	printf( "\nSet preset gain value by decimal, or Exit(0).\n>" );
@@ -1766,8 +1816,8 @@ BOOL DeleteDramCapability( LPRefObj pRefItem, ULONG ulItmID )
 		bRet = Command_Abort( pRefDat->pObject, NULL, NULL);
 		if ( bRet == false ) return false;
 		
-		// 6. Set Preview ID
-		bRet = Command_CapSet( pRefSrc->pObject, kNkMAIDCapability_CurrentPreviewID, kNkMAIDDataType_Unsigned, (NKPARAM)ulItmID, NULL, NULL );
+		// 6. Set Item ID
+		bRet = Command_CapSet( pRefSrc->pObject, kNkMAIDCapability_CurrentItemID, kNkMAIDDataType_Unsigned, (NKPARAM)ulItmID, NULL, NULL );
 		if ( bRet == false ) return false;
 
 		// 7. Delete DRAM (Delete timing No.2)
@@ -1808,13 +1858,9 @@ BOOL GetLiveViewImageCapability( LPRefObj pRefSrc )
 
 
 	// Set header size of LiveView
-	if ( g_ulCameraType == kNkMAIDCameraType_D3S )
+	if ( g_ulCameraType == kNkMAIDCameraType_D5200 )
 	{
-		ulHeaderSize = 128;
-	}
-	else
-	{
-		ulHeaderSize = 64;
+		ulHeaderSize = 384;
 	}
 
 	memset( &stArray, 0, sizeof(NkMAIDArray) );		
@@ -1904,41 +1950,33 @@ BOOL PictureControlDataCapability( LPRefObj pRefSrc )
 		{
 			case 1://Set Picture Control data 
 			{
-				printf( "\nSelect Picture Control(1-17, 0)\n");
+				printf( "\nSelect Picture Control(1-15, 0)\n");
 				printf( " 1. Standard                    2. Neutral\n");
 				printf( " 3. Vivid                       4. Monochrome\n");
-				printf( " 5. Option Picture Contol 1     6. Option Picture Contol 2 \n");
-				printf( " 7. Option Picture Contol 3     8. Option Picture Contol 4 \n");
-				printf( " 9. Custom Picture Contol 1    10. Custom Picture Contol 2 \n");
-				printf( "11. Custom Picture Contol 3    12. Custom Picture Contol 4 \n");
-				printf( "13. Custom Picture Contol 5    14. Custom Picture Contol 6 \n");
-				printf( "15. Custom Picture Contol 7    16. Custom Picture Contol 8 \n");
-				printf( "17. Custom Picture Contol 9\n");
+				printf( " 5. Portrait                    6. Landscape\n");
+				printf( " 7. Custom Picture Contol 1     8. Custom Picture Contol 2 \n");
+				printf( " 9. Custom Picture Contol 3    10. Custom Picture Contol 4 \n");
+				printf( "11. Custom Picture Contol 5    12. Custom Picture Contol 6 \n");
+				printf( "13. Custom Picture Contol 7    14. Custom Picture Contol 8 \n");
+				printf( "15. Custom Picture Contol 9\n");
 				printf( " 0. Exit\n>" );
 				scanf( "%s", buf );
 				ulSubSel = atoi( buf );
 				if ( ulSubSel == 0 ) break; //Exit
-				if ( ulSubSel < 1 || ulSubSel > 17 ) 
+				if ( ulSubSel < 1 || ulSubSel > 15 ) 
 				{
 					printf("Invalid Picture Control\n");
 					break;
 				}
-
-				if ( ulSubSel >= 5 && ulSubSel <= 8 )
+				if ( ulSubSel >= 7 )
 				{
-					ulSubSel += 96; // Option 101 - 104
-				}
-				else
-				if ( ulSubSel >= 9 )
-				{
-					ulSubSel += 192; // Custom 201 - 209
+					ulSubSel += 194; // Custom 201 - 209
 				}
 				// set target Picture Control
 				stPicCtrlData.ulPicCtrlItem = ulSubSel;
 
-				// initial registration is not supported about 1-4, 101-104 
-				if ( (stPicCtrlData.ulPicCtrlItem >= 1 && stPicCtrlData.ulPicCtrlItem <= 4) 
-					 || (stPicCtrlData.ulPicCtrlItem >= 101 && stPicCtrlData.ulPicCtrlItem <= 104) )
+				// initial registration is not supported about 1-6, 101-104 
+				if (stPicCtrlData.ulPicCtrlItem >= 1 && stPicCtrlData.ulPicCtrlItem <= 6)
 				{
 					printf( "\nSelect ModifiedFlag (1, 0)\n");
 					printf( " 1. edit\n");
@@ -1975,34 +2013,27 @@ BOOL PictureControlDataCapability( LPRefObj pRefSrc )
 				break;
 
 			case 2://Get Picture Control data
-				printf( "\nSelect Picture Control(1-17, 0)\n");
+				printf( "\nSelect Picture Control(1-15, 0)\n");
 				printf( " 1. Standard                    2. Neutral\n");
 				printf( " 3. Vivid                       4. Monochrome\n");
-				printf( " 5. Option Picture Contol 1     6. Option Picture Contol 2 \n");
-				printf( " 7. Option Picture Contol 3     8. Option Picture Contol 4 \n");
-				printf( " 9. Custom Picture Contol 1    10. Custom Picture Contol 2 \n");
-				printf( "11. Custom Picture Contol 3    12. Custom Picture Contol 4 \n");
-				printf( "13. Custom Picture Contol 5    14. Custom Picture Contol 6 \n");
-				printf( "15. Custom Picture Contol 7    16. Custom Picture Contol 8 \n");
-				printf( "17. Custom Picture Contol 9\n");
+				printf( " 5. Portrait                    6. Landscape\n");
+				printf( " 7. Custom Picture Contol 1     8. Custom Picture Contol 2 \n");
+				printf( " 9. Custom Picture Contol 3    10. Custom Picture Contol 4 \n");
+				printf( "11. Custom Picture Contol 5    12. Custom Picture Contol 6 \n");
+				printf( "13. Custom Picture Contol 7    14. Custom Picture Contol 8 \n");
+				printf( "15. Custom Picture Contol 9\n");
 				printf( " 0. Exit\n>" );
 				scanf( "%s", buf );
 				ulSubSel = atoi( buf );
 				if ( ulSubSel == 0 ) break; //Exit
-				if ( ulSubSel < 1 || ulSubSel > 17 ) 
+				if ( ulSubSel < 1 || ulSubSel > 15 ) 
 				{
 					printf("Invalid Picture Control\n");
 					break;
 				}
-
-				if ( ulSubSel >= 5 && ulSubSel <= 8 )
+				if ( ulSubSel >= 7 )
 				{
-					ulSubSel += 96; // Option 101 - 104
-				}
-				else
-				if ( ulSubSel >= 9 )
-				{
-					ulSubSel += 192; // Custom 201 - 209
+					ulSubSel += 194; // Custom 201 - 209
 				}
 				// set target Picture Control
 				stPicCtrlData.ulPicCtrlItem = ulSubSel;
@@ -2027,7 +2058,7 @@ BOOL SetPictureControlDataCapability( LPRefObj pRefObj, NkMAIDPicCtrlData* pPicC
 {
 	BOOL	bRet = TRUE;
 	FILE	*stream;
-	ULONG		count = 0;
+	ULONG	count = 0;
 	ULONG   ulTotal = 0;
 	char	*ptr = NULL;
 
@@ -2159,34 +2190,27 @@ BOOL GetPictureControlInfoCapability( LPRefObj pRefSrc )
 
 	memset( &stPicCtrlInfo, 0, sizeof(NkMAIDGetPicCtrlInfo) );
 
-	printf( "\nSelect Picture Control(1-17, 0)\n");
+	printf( "\nSelect Picture Control(1-15, 0)\n");
 	printf( " 1. Standard                    2. Neutral\n");
 	printf( " 3. Vivid                       4. Monochrome\n");
-	printf( " 5. Option Picture Contol 1     6. Option Picture Contol 2 \n");
-	printf( " 7. Option Picture Contol 3     8. Option Picture Contol 4 \n");
-	printf( " 9. Custom Picture Contol 1    10. Custom Picture Contol 2 \n");
-	printf( "11. Custom Picture Contol 3    12. Custom Picture Contol 4 \n");
-	printf( "13. Custom Picture Contol 5    14. Custom Picture Contol 6 \n");
-	printf( "15. Custom Picture Contol 7    16. Custom Picture Contol 8 \n");
-	printf( "17. Custom Picture Contol 9\n");
+	printf( " 5. Portrait                    6. Landscape\n");
+	printf( " 7. Custom Picture Contol 1     8. Custom Picture Contol 2 \n");
+	printf( " 9. Custom Picture Contol 3    10. Custom Picture Contol 4 \n");
+	printf( "11. Custom Picture Contol 5    12. Custom Picture Contol 6 \n");
+	printf( "13. Custom Picture Contol 7    14. Custom Picture Contol 8 \n");
+	printf( "15. Custom Picture Contol 9\n");
 	printf( " 0. Exit\n>" );
 	scanf( "%s", buf );
 	ulSel = atoi( buf );
 	if ( ulSel == 0 ) return true; // Exit
-	if ( ulSel < 1 || ulSel > 17 ) 
+	if ( ulSel < 1 || ulSel > 15 ) 
 	{
 		printf("Invalid Picture Control\n");
 		return false;
 	}
-
-	if ( ulSel >= 5 && ulSel <= 8 )
+	if ( ulSel >= 7 )
 	{
-		ulSel += 96; // Option 101 - 104
-	}
-	else
-	if ( ulSel >= 9 )
-	{
-		ulSel += 192; // Custom 201 - 209
+		ulSel += 194; // Custom 201 - 209
 	}
 	// set target Picture Control
 	stPicCtrlInfo.ulPicCtrlItem = ulSel;
@@ -2317,8 +2341,6 @@ BOOL ShowArrayCapability( LPRefObj pRefObj, ULONG ulCapID )
 }
 //------------------------------------------------------------------------------------------------------------------------------------
 // read the array data from the camera and save it on a storage(hard drive)
-//	for kNkMAIDCapability_GetPreviewImageLow, 
-//  for kNkMAIDCapability_GetPreviewImageNormal
 //  for kNkMAIDCapability_GetLiveViewImage
 BOOL GetArrayCapability( LPRefObj pRefObj, ULONG ulCapID, LPNkMAIDArray pstArray )
 {
@@ -2480,6 +2502,39 @@ BOOL IssueProcess( LPRefObj pRefSrc, ULONG ulCapID )
 
 	return true;
 }
+
+//------------------------------------------------------------------------------------------------------------------------------------
+//
+BOOL TerminateCaptureCapability( LPRefObj pRefSrc )
+{
+	LPNkMAIDObject pSourceObject = pRefSrc->pObject;
+	LPNkMAIDCapInfo pCapInfo;
+	ULONG	ulCount = 0L;
+	BOOL bRet;
+	NkMAIDTerminateCapture Param;
+	LPRefCompletionProc pRefCompletion;
+
+	Param.ulParameter1 = 0;
+	Param.ulParameter2 = 0;
+
+	pRefCompletion = (LPRefCompletionProc)malloc( sizeof(RefCompletionProc) );
+	pRefCompletion->pulCount = &ulCount;
+	pRefCompletion->pRef = NULL;
+
+	// Confirm whether this capability is supported or not.
+	pCapInfo =	GetCapInfo( pRefSrc, kNkMAIDCapability_TerminateCapture );
+	// check if the CapInfo is available.
+	if ( pCapInfo == NULL ) return false;
+
+	printf( "[%s]\n", pCapInfo->szDescription );
+
+	// Start the process
+	bRet = Command_CapStartGeneric( pSourceObject, kNkMAIDCapability_TerminateCapture, (NKPARAM)&Param,(LPNKFUNC)CompletionProc, (NKREF)pRefCompletion, NULL );
+	if ( bRet == false ) return false;
+
+	return true;
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------
 //
 BOOL IssueProcessSync( LPRefObj pRefSrc, ULONG ulCapID )
@@ -2545,6 +2600,122 @@ BOOL IssueAcquire( LPRefObj pRefDat )
 
 	return true;
 }
+//------------------------------------------------------------------------------------------------------------------------------------
+// Get Video image
+BOOL GetVideoImageCapability( LPRefObj pRefDat, ULONG ulCapID )
+{
+	BOOL	bRet = true;
+	char	MovieFileName[256];
+	FILE*	hFileMovie = NULL;		// Movie file name
+	unsigned char* pucData = NULL;	// Movie data pointer
+	ULONG	ulTotalSize = 0;
+	int i = 0;
+	NkMAIDGetVideoImage	stVideoImage;
+
+#if defined( _WIN32 )
+	SetConsoleCtrlHandler(cancelhandler, TRUE);
+#elif defined(__APPLE__)
+	struct sigaction action,oldaction;
+	memset(&action, 0, sizeof(action));
+	action.sa_handler = cancelhandler;
+	action.sa_flags = SA_RESETHAND;
+	sigaction(SIGINT, &action, &oldaction);
+#endif
+
+	memset( &stVideoImage, 0, sizeof(NkMAIDGetVideoImage) );		
+
+	// get total size
+	stVideoImage.ulDataSize = 0;
+	bRet = Command_CapGet( pRefDat->pObject, ulCapID, kNkMAIDDataType_GenericPtr, (NKPARAM)&stVideoImage, NULL, NULL );
+	if( bRet == false ) return false;
+
+	ulTotalSize = stVideoImage.ulDataSize;
+	if ( ulTotalSize == 0 ) return false;
+
+	// get movie data
+	stVideoImage.ulType = kNkMAIDArrayType_Unsigned;
+	stVideoImage.ulDataSize = VIDEO_SIZE_BLOCK;		// read block size : 5MB
+	stVideoImage.ulReadSize = 0;
+	stVideoImage.ulOffset = 0;
+
+	// allocate memory for array data
+	stVideoImage.pData = malloc( VIDEO_SIZE_BLOCK );
+	if ( stVideoImage.pData == NULL ) return false;
+
+	// create file name
+	while( true )
+	{
+		sprintf( MovieFileName, "MovieData%03d.%s", ++i, "mov" );
+		if ( (hFileMovie  = fopen(MovieFileName, "r") )  != NULL )
+		{
+			// this file name is already used.
+			fclose( hFileMovie );
+			hFileMovie = NULL;
+		}	 
+		else
+		{
+			break;
+		}
+	}
+		
+	// open file
+	hFileMovie = fopen( MovieFileName, "wb" );
+	if ( hFileMovie == NULL )
+	{
+		fclose( hFileMovie );
+		printf("file open error.\n");
+		return false;
+	}
+	
+	// Get data pointer
+	pucData = (unsigned char*)stVideoImage.pData;
+
+	printf("Please press the Ctrl+C to cancel.\n");
+
+	// write file
+	while ( ( stVideoImage.ulOffset < ulTotalSize ) && ( bRet == TRUE )  )
+	{
+		if(TRUE == g_bCancel)
+		{
+			stVideoImage.ulDataSize = 0;
+			bRet = Command_CapGetArray( pRefDat->pObject, ulCapID, kNkMAIDDataType_GenericPtr, (NKPARAM)&stVideoImage, NULL, NULL );
+			break;			
+		}
+		
+		bRet = Command_CapGetArray( pRefDat->pObject, ulCapID, kNkMAIDDataType_GenericPtr, (NKPARAM)&stVideoImage, NULL, NULL );
+
+		stVideoImage.ulOffset += (stVideoImage.ulReadSize);
+					
+		fwrite( pucData, stVideoImage.ulReadSize, 1, hFileMovie );		
+		
+		if( bRet == false ) {
+			free( stVideoImage.pData );
+			return false;
+		}
+
+	}
+#if defined( _WIN32 )
+	SetConsoleCtrlHandler(cancelhandler, FALSE);
+#elif defined(__APPLE__)
+	sigaction(SIGINT, &oldaction, NULL);
+#endif
+
+	if(stVideoImage.ulOffset < ulTotalSize && TRUE == g_bCancel)
+	{
+		printf("Get Video image was canceled.\n");
+	}
+	else {
+		printf("%s was saved.\n", MovieFileName);
+	}
+	g_bCancel = false;
+		
+	// close file
+	fclose( hFileMovie );
+	free( stVideoImage.pData );
+
+	return true;
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------
 //
 BOOL IssueThumbnail( LPRefObj pRefSrc )
@@ -2908,4 +3079,20 @@ LPRefObj GetRefChildPtr_Index( LPRefObj pRefParent, ULONG ulIndex )
 		return NULL;
 }
 //------------------------------------------------------------------------------------------------------------------------------------
-
+//  
+#if defined( _WIN32 )
+BOOL WINAPI	cancelhandler(DWORD dwCtrlType)
+{
+	if (dwCtrlType == CTRL_C_EVENT) {
+		g_bCancel = true;
+		return TRUE;
+	}
+	return FALSE;
+}
+#elif defined(__APPLE__)
+void	cancelhandler(int sig)
+{
+	g_bCancel = true;
+}
+#endif
+//------------------------------------------------------------------------------------------------------------------------------------

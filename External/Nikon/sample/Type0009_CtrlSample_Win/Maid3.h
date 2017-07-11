@@ -28,20 +28,20 @@
 #ifndef RC_INVOKED		// exclude this section for Windows resource compiler
 	#include "NkTypes.h"		// Special cross-platform typedefs and macros
 
-	#if defined( _WIN32 )
-		#ifndef WIN32
-			#error MAID3 requires WIN32 compilation.
-		#endif
+	#ifdef _WIN32
+//		#ifndef WIN32
+//			#error MAID3 requires WIN32 compilation.
+//		#endif
 		
 		#include <crtdbg.h>	// debug memory use
 		#pragma pack(push,2)
-		#define W32EXPORT __declspec(dllexport)
-		#define CALLPASCAL
+		#define W32EXPORT	__declspec(dllexport)
+		#define CALLPASCAL	
 		#include <windowsx.h>
-	#elif defined(__APPLE__)
-		#define CALLPASCAL pascal
-		#define W32EXPORT	
-		#define WINAPI	
+	#else
+		#define CALLPASCAL	
+		#define W32EXPORT
+		#define WINAPI		
 		#define CALLBACK	
 	#endif
 
@@ -612,7 +612,7 @@ enum eNkMAIDFlashMode
 
 
 
-#if defined( _WIN32 )
+#ifdef _WIN32
 	#pragma pack(pop)
 #endif
 

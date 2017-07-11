@@ -44,11 +44,11 @@ void CALLPASCAL CALLBACK ModEventProc( NKREF refProc, ULONG ulEvent, NKPARAM dat
 			if ( bRet == false ) return;
 			break;
 		case kNkMAIDEvent_WarmingUp:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_WarmingUp to Module object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_WarmedUp:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_WarmedUp to Module object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_CapChange:
@@ -94,11 +94,11 @@ void CALLPASCAL CALLBACK SrcEventProc( NKREF refProc, ULONG ulEvent, NKPARAM dat
 			if ( bRet == false ) return;
 			break;
 		case kNkMAIDEvent_WarmingUp:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_WarmingUp to Source object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_WarmedUp:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_WarmedUp to Source object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_CapChange:
@@ -120,18 +120,18 @@ void CALLPASCAL CALLBACK SrcEventProc( NKREF refProc, ULONG ulEvent, NKPARAM dat
 			// ToDo: Close children(Item Objects).
 			break;
 		case kNkMAIDEvent_AddPreviewImage:
-			// A Preview data is a specification deleted from the inside of the camera after reading a main image is finished. 
-			// Current module is a specification that immediately begins the acquisition of a main image regardless of 
-			// the request of the client when the creation completion notification of a main image is received from the camera.
-			// After module read the image, the image data is deleted from the inside of the camera.
-			// Therefore, the acquisition of a Preview data  is not a function secured 100%. 
-			// However, if client could read a Preview data even once, the module generates the Preview cache internally, 
-			// so the client can get data after receiving kNkMAIDEvent_AddChild even, until Item object is closed.
+			// The Type0009 Module does not use this event.
+			puts( "Event_AddPreviewImage to Item object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_CaptureComplete:
 			// ToDo: Show the image transfer finished.
 			break;
-
+		case kNkMAIDEvent_AddChildInCard:
+			printf( "a Video object(ID=0x%llX) added in card.\n", data );
+			break;
+		case kNkMAIDEvent_RecordingInterrupted:
+			printf( "Recording was stopped by error(%lld).\n", data );
+			break;
 		default:
 			puts( "Detected unknown Event to the Source object.\n" );
 		}
@@ -153,11 +153,11 @@ void CALLPASCAL CALLBACK ItmEventProc( NKREF refProc, ULONG ulEvent, NKPARAM dat
 			if ( bRet == false ) return;
 			break;
 		case kNkMAIDEvent_WarmingUp:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_WarmingUp to Item object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_WarmedUp:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_WarmedUp to Item object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_CapChange:
@@ -191,19 +191,19 @@ void CALLPASCAL CALLBACK DatEventProc( NKREF refProc, ULONG ulEvent, NKPARAM dat
 
 	switch(ulEvent){
 		case kNkMAIDEvent_AddChild:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_AddChild to Data object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_RemoveChild:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_RemoveChild to Data object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_WarmingUp:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_WarmingUp to Data object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_WarmedUp:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_WarmedUp to Data object is not supported.\n" );
 			break;
 		case kNkMAIDEvent_CapChange:// module notify that a capability is changed.
@@ -221,7 +221,7 @@ void CALLPASCAL CALLBACK DatEventProc( NKREF refProc, ULONG ulEvent, NKPARAM dat
 			printf( "The value of Capability(CapID=0x%llX) was changed.\n", data );
 			break;
 		case kNkMAIDEvent_OrphanedChildren:
-			// The Type0001 Module does not use this event.
+			// The Type0009 Module does not use this event.
 			puts( "Event_OrphanedChildren to Data object is not supported.\n" );
 			break;
 		default:
@@ -308,7 +308,7 @@ NKERROR CALLPASCAL CALLBACK DataProc( NKREF ref, LPVOID pInfo, LPVOID pData )
 			return kNkMAIDResult_OutOfMemory;
 		}
 		ulOffset = ((LPRefDataProc)ref)->ulOffset;
-		pCurrentBuffer = (LPVOID)( ((char*)((LPRefDataProc)ref)->pBuffer) + ulOffset );
+		pCurrentBuffer = (LPVOID)( ((char*)((LPRefDataProc)ref)->pBuffer) + ((LPRefDataProc)ref)->ulOffset );
 		ulByte = pImageInfo->ulRowBytes * pImageInfo->rData.h;
 		memmove( pCurrentBuffer, pData, ulByte );
 		ulOffset += ulByte;
@@ -386,11 +386,11 @@ void CALLPASCAL CALLBACK ProgressProc(
 		ULONG				ulTotal )			// Denominator
 {
 #if defined( _WIN32 )
-	ULONG	ulNewProgressValue, ulCount;
+    ULONG ulNewProgressValue, ulCount;
 #elif defined(__APPLE__)
-    unsigned long	ulNewProgressValue, ulCount;
+    unsigned long ulNewProgressValue, ulCount;
 #endif
-    if ( ulTotal == 0 ) {
+	if ( ulTotal == 0 ) {
 		// when we don't know how long this process is, we show such as barber's pole.
 		if ( ulDone == 1 ) {
 		#if defined( _WIN32 )

@@ -1,5 +1,5 @@
 /*****************************************************************************/
-//	MAID3D1.H    Rev. 2.36
+//	MAID3D1.H    Rev. 2.42
 //		Extra definition of maid3.h
 /*****************************************************************************/
 #ifndef _MAID3D1_H
@@ -312,6 +312,8 @@ enum eNkMAIDCapabilityD1
 	kNkMAIDCapability_ExchangeDialsEx			= kNkMAIDCapability_VendorBaseD1 + 0x179,
 	kNkMAIDCapability_CenterButtonOnLiveView    = kNkMAIDCapability_VendorBaseD1 + 0x180,
 	kNkMAIDCapability_ZoomRateOnLiveView        = kNkMAIDCapability_VendorBaseD1 + 0x181,
+	kNkMAIDCapability_AutoDistortion			= kNkMAIDCapability_VendorBaseD1 + 0x182,
+	kNkMAIDCapability_SceneMode					= kNkMAIDCapability_VendorBaseD1 + 0x183,
 	kNkMAIDCapability_MovieRecMicrophone		= kNkMAIDCapability_VendorBaseD1 + 0x185,
 	kNkMAIDCapability_MovieRecDestination		= kNkMAIDCapability_VendorBaseD1 + 0x186,
 	kNkMAIDCapability_PrimarySlot				= kNkMAIDCapability_VendorBaseD1 + 0x187,
@@ -321,9 +323,58 @@ enum eNkMAIDCapabilityD1
 	kNkMAIDCapability_AEAFLockButton2CapAreaCrop= kNkMAIDCapability_VendorBaseD1 + 0x193,
 	kNkMAIDCapability_BracketButton             = kNkMAIDCapability_VendorBaseD1 + 0x194,
 	kNkMAIDCapability_RemainCountInMedia        = kNkMAIDCapability_VendorBaseD1 + 0x195,
+	kNkMAIDCapability_AngleLevelPitch           = kNkMAIDCapability_VendorBaseD1 + 0x196,
+	kNkMAIDCapability_AngleLevelYaw             = kNkMAIDCapability_VendorBaseD1 + 0x197,
+	kNkMAIDCapability_MovRecInCardStatus        = kNkMAIDCapability_VendorBaseD1 + 0x198,
+	kNkMAIDCapability_MovRecInCardProhibit      = kNkMAIDCapability_VendorBaseD1 + 0x199,
 	kNkMAIDCapability_ActiveSlot                = kNkMAIDCapability_VendorBaseD1 + 0x204,
 	kNkMAIDCapability_SaveMedia                 = kNkMAIDCapability_VendorBaseD1 + 0x205,
-	kNkMAIDCapability_MovieRecHiISO				= kNkMAIDCapability_VendorBaseD1 + 0x206
+	kNkMAIDCapability_MovieRecHiISO				= kNkMAIDCapability_VendorBaseD1 + 0x206,
+	kNkMAIDCapability_UserMode1			    	= kNkMAIDCapability_VendorBaseD1 + 0x207,
+	kNkMAIDCapability_UserMode2				    = kNkMAIDCapability_VendorBaseD1 + 0x208,
+	kNkMAIDCapability_MovieManualSetting		= kNkMAIDCapability_VendorBaseD1 + 0x209,
+	kNkMAIDCapability_AFModeAtLiveView			= kNkMAIDCapability_VendorBaseD1 + 0x210,
+	kNkMAIDCapability_SelfTimerShootInterval	= kNkMAIDCapability_VendorBaseD1 + 0x211,
+	kNkMAIDCapability_AutoOffLiveView			= kNkMAIDCapability_VendorBaseD1 + 0x212,
+	kNkMAIDCapability_RemoteCtrlWaitTime		= kNkMAIDCapability_VendorBaseD1 + 0x213,
+	kNkMAIDCapability_BeepVolume				= kNkMAIDCapability_VendorBaseD1 + 0x214,
+	kNkMAIDCapability_VideoMode			    	= kNkMAIDCapability_VendorBaseD1 + 0x215,
+	kNkMAIDCapability_WBAutoType	    		= kNkMAIDCapability_VendorBaseD1 + 0x216,
+	kNkMAIDCapability_GetVideoImage	    		= kNkMAIDCapability_VendorBaseD1 + 0x217,
+    kNkMAIDCapability_TerminateCapture          = kNkMAIDCapability_VendorBaseD1 + 0x218,
+    kNkMAIDCapability_EffectMode		        = kNkMAIDCapability_VendorBaseD1 + 0x219,
+    kNkMAIDCapability_HDRMode					= kNkMAIDCapability_VendorBaseD1 + 0x220,
+    kNkMAIDCapability_HDRExposure				= kNkMAIDCapability_VendorBaseD1 + 0x221,
+    kNkMAIDCapability_HDRSmoothing				= kNkMAIDCapability_VendorBaseD1 + 0x222,
+    kNkMAIDCapability_BlinkingStatus			= kNkMAIDCapability_VendorBaseD1 + 0x223,
+    kNkMAIDCapability_AutoSceneModeStatus		= kNkMAIDCapability_VendorBaseD1 + 0x224,
+	kNkMAIDCapability_WBTuneColorTempEx			= kNkMAIDCapability_VendorBaseD1 + 0x225,
+    kNkMAIDCapability_WBPresetProtect1			= kNkMAIDCapability_VendorBaseD1 + 0x226,
+    kNkMAIDCapability_WBPresetProtect2			= kNkMAIDCapability_VendorBaseD1 + 0x227,
+    kNkMAIDCapability_WBPresetProtect3			= kNkMAIDCapability_VendorBaseD1 + 0x228,
+    kNkMAIDCapability_WBPresetProtect4			= kNkMAIDCapability_VendorBaseD1 + 0x229,
+    kNkMAIDCapability_ISOAutoShutterTimeAutoValue = kNkMAIDCapability_VendorBaseD1 + 0x230,
+    kNkMAIDCapability_MovieImageQuality			= kNkMAIDCapability_VendorBaseD1 + 0x231,
+    kNkMAIDCapability_MovieRecMicrophoneValue	= kNkMAIDCapability_VendorBaseD1 + 0x232,
+    kNkMAIDCapability_LiveViewExposurePreview	= kNkMAIDCapability_VendorBaseD1 + 0x233,
+    kNkMAIDCapability_LiveViewSelector			= kNkMAIDCapability_VendorBaseD1 + 0x234,
+    kNkMAIDCapability_LiveViewWBMode			= kNkMAIDCapability_VendorBaseD1 + 0x235,
+    kNkMAIDCapability_MovieShutterSpeed			= kNkMAIDCapability_VendorBaseD1 + 0x236,
+    kNkMAIDCapability_MovieAperture				= kNkMAIDCapability_VendorBaseD1 + 0x237,
+    kNkMAIDCapability_MovieSensitivity			= kNkMAIDCapability_VendorBaseD1 + 0x238,
+    kNkMAIDCapability_MovieExposureComp			= kNkMAIDCapability_VendorBaseD1 + 0x239,
+    kNkMAIDCapability_ADLBracketingStep			= kNkMAIDCapability_VendorBaseD1 + 0x243,
+    kNkMAIDCapability_ResetWBMode				= kNkMAIDCapability_VendorBaseD1 + 0x244,
+    kNkMAIDCapability_ExpCompFlashUsed			= kNkMAIDCapability_VendorBaseD1 + 0x245,
+    kNkMAIDCapability_LiveViewPhotoShootingMode	= kNkMAIDCapability_VendorBaseD1 + 0x246,
+    kNkMAIDCapability_ExposureDelayEx			= kNkMAIDCapability_VendorBaseD1 + 0x247,
+    kNkMAIDCapability_MovieISORange				= kNkMAIDCapability_VendorBaseD1 + 0x248,
+	kNkMAIDCapability_MovieReleaseButton		= kNkMAIDCapability_VendorBaseD1 + 0x249,
+    kNkMAIDCapability_MovieRecFrameCount		= kNkMAIDCapability_VendorBaseD1 + 0x250,
+	kNkMAIDCapability_CurrentItemID				= kNkMAIDCapability_VendorBaseD1 + 0x251,
+	kNkMAIDCapability_GetIPTCInfo				= kNkMAIDCapability_VendorBaseD1 + 0x252,
+	kNkMAIDCapability_LiveViewImageSize			= kNkMAIDCapability_VendorBaseD1 + 0x253,
+	kNkMAIDCapability_RemoteControlMode			= kNkMAIDCapability_VendorBaseD1 + 0x254
 };
 
 // The module will deliver one of these values to the nResult parameter of the client 
@@ -363,14 +414,21 @@ enum eNkMAIDResultD1
 	kNkMAIDResult_CpxPlaybackMode				= 158,
 	kNkMAIDResult_NotLiveView					= 159,
 	kNkMAIDResult_MFDriveEnd					= 160,
-	kNkMAIDResult_UnformattedMedia				= 161
+	kNkMAIDResult_UnformattedMedia				= 161,
+	kNkMAIDResult_MediaReadOnly					= 162,
+	kNkMAIDResult_DuringUpdate					= 163,
+	kNkMAIDResult_BulbReleaseBusy				= 164,
+	kNkMAIDResult_SilentReleaseBusy				= 165,
+	kNkMAIDResult_MovieFrameReleaseBusy			= 166
 };
 
 // the verdor unique event code.
 enum eNkMAIDEventDX2
 {
 	kNkMAIDEvent_AddPreviewImage		= kNkMAIDEvent_D1Origin + 1, //0x107
-	kNkMAIDEvent_CaptureComplete		= kNkMAIDEvent_D1Origin + 2  //0x108
+	kNkMAIDEvent_CaptureComplete		= kNkMAIDEvent_D1Origin + 2, //0x108
+	kNkMAIDEvent_AddChildInCard			= kNkMAIDEvent_D1Origin + 3, //0x109
+	kNkMAIDEvent_RecordingInterrupted	= kNkMAIDEvent_D1Origin + 4  //0x10A
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -427,7 +485,11 @@ enum eNkMAIDExposureMode
 	kNkMAIDExposureMode_NightPortrait,
 	kNkMAIDExposureMode_NightView,
 	kNkMAIDExposureMode_Child,
-	kNkMAIDExposureMode_FlashOff
+	kNkMAIDExposureMode_FlashOff,
+	kNkMAIDExposureMode_Scene,
+	kNkMAIDExposureMode_UserMode1,
+	kNkMAIDExposureMode_UserMode2,
+	kNkMAIDExposureMode_Effects
 };
 
 // kNkMAIDCapability_MeteringMode(0x8116)
@@ -436,7 +498,6 @@ enum eNkMAIDMeteringMode
 	kNkMAIDMeteringMode_Matrix,
 	kNkMAIDMeteringMode_CenterWeighted,
 	kNkMAIDMeteringMode_Spot,
-
 	kNkMAIDMeteringMode_AfSpot
 };
 
@@ -447,6 +508,7 @@ enum eNkMAIDFocusMode
 	kNkMAIDFocusMode_AFs,
 	kNkMAIDFocusMode_AFc,
 	kNkMAIDFocusMode_AFa,
+	kNkMAIDFocusMode_AFf,
 	kNkMAIDFocusMode_AF = 0x10,
 	kNkMAIDFocusMode_Macro,
 	kNkMAIDFocusMode_Infinity
@@ -587,6 +649,7 @@ enum eNkMAIDShootingMode
 	eNkMAIDShootingMode_RemoteTimer_2sec,
 	eNkMAIDShootingMode_LiveView,
 	eNkMAIDShootingMode_Quiet,
+	eNkMAIDShootingMode_RemoteCtrl,
 	eNkMAIDShootingMode_Unknown = 0xff
 };
 
@@ -640,7 +703,8 @@ enum eNkMAIDFmmManual
 enum eNkMAIDUSBSpeed
 {
 	eNkMAIDUSBSpeed_FullSpeed,
-	eNkMAIDUSBSpeed_HighSpeed
+	eNkMAIDUSBSpeed_HighSpeed,
+	eNkMAIDUSBSpeed_SuperSpeed
 };
 
 //kNkMAIDCapability_FocusGroupPreferredArea(0x818a)
@@ -676,7 +740,8 @@ enum eNkMAIDAEBracketingStep
 	eNkMAIDAEBracketingStep_4_3EV,
 	eNkMAIDAEBracketingStep_3_2EV,
 	eNkMAIDAEBracketingStep_5_3EV,
-	eNkMAIDAEBracketingStep_2EV
+	eNkMAIDAEBracketingStep_2EV,
+	eNkMAIDAEBracketingStep_3EV
 };
 
 //kNkMAIDCapability_WBBracketingStep(0x81b2)
@@ -707,7 +772,9 @@ enum eNkMAIDRawJpegImageStatus
 enum eNkMAIDFileDataTypesDX2
 {
 	kNkMAIDFileDataType_VendorBaseDx2 = kNkMAIDFileDataType_UserType, //0x100
-	kNkMAIDFileDataType_NDF
+	kNkMAIDFileDataType_NDF,
+	kNkMAIDFileDataType_AVI,
+	kNkMAIDFileDataType_MOV
 };
 
 //	kNkMAIDCapability_AfGroupAreaPatternType(0x81b8)
@@ -795,7 +862,14 @@ enum eNkMAIDCameraType
 	kNkMAIDCameraType_D300S = 0x2A,	// D300S
 	kNkMAIDCameraType_D3S,		    // D3S
 	kNkMAIDCameraType_D3_FU3,		// D3 Firmup 3
-	kNkMAIDCameraType_D700_FU1		// D700 Firmup 1
+	kNkMAIDCameraType_D700_FU1,		// D700 Firmup 1
+	kNkMAIDCameraType_D7000,	    // D7000
+	kNkMAIDCameraType_D5100,		// D5100
+	kNkMAIDCameraType_D800  = 0x30,	// D800
+	kNkMAIDCameraType_D4    = 0x31,	// D4
+	kNkMAIDCameraType_D800E = 0x32,	// D800E
+	kNkMAIDCameraType_D600	= 0x33,	// D600
+	kNkMAIDCameraType_D5200 = 0x34	// D5200
 };
 
 //	kNkMAIDCapability_EasyExposureCompMode(0x81d9)
@@ -867,7 +941,8 @@ enum eNkMAIDISOAutoShutterTime
 	kNkMAIDISOAutoShutterTime_28,	// 1/640
 	kNkMAIDISOAutoShutterTime_29,	// 1/500
 	kNkMAIDISOAutoShutterTime_30,	// 1/400
-	kNkMAIDISOAutoShutterTime_31	// 1/320
+	kNkMAIDISOAutoShutterTime_31,	// 1/320
+	kNkMAIDISOAutoShutterTime_32	// auto
 };
 
 //	kNkMAIDCapability_ISOAutoHiLimit(0x81f2)
@@ -913,7 +988,41 @@ enum eNkMAIDISOAutoHiLimit2
 	kNkMAIDISOAutoHiLimit2_ISOHi20,
 	kNkMAIDISOAutoHiLimit2_ISOHi30
 };
-
+enum eNkMAIDISOAutoHiLimit3
+{
+	kNkMAIDISOAutoHiLimit3_ISO200 = 0,
+	kNkMAIDISOAutoHiLimit3_ISO250,
+	kNkMAIDISOAutoHiLimit3_ISO280,
+	kNkMAIDISOAutoHiLimit3_ISO320,
+	kNkMAIDISOAutoHiLimit3_ISO400,
+	kNkMAIDISOAutoHiLimit3_ISO500,
+	kNkMAIDISOAutoHiLimit3_ISO560,
+	kNkMAIDISOAutoHiLimit3_ISO640,
+	kNkMAIDISOAutoHiLimit3_ISO800,
+	kNkMAIDISOAutoHiLimit3_ISO1000,
+	kNkMAIDISOAutoHiLimit3_ISO1100,
+	kNkMAIDISOAutoHiLimit3_ISO1250,
+	kNkMAIDISOAutoHiLimit3_ISO1600,
+	kNkMAIDISOAutoHiLimit3_ISO2000,
+	kNkMAIDISOAutoHiLimit3_ISO2200,
+	kNkMAIDISOAutoHiLimit3_ISO2500,
+	kNkMAIDISOAutoHiLimit3_ISO3200,
+	kNkMAIDISOAutoHiLimit3_ISO4000,
+	kNkMAIDISOAutoHiLimit3_ISO4500,
+	kNkMAIDISOAutoHiLimit3_ISO5000,
+	kNkMAIDISOAutoHiLimit3_ISO6400,
+	kNkMAIDISOAutoHiLimit3_ISOHi03,
+	kNkMAIDISOAutoHiLimit3_ISOHi05,
+	kNkMAIDISOAutoHiLimit3_ISOHi07,
+	kNkMAIDISOAutoHiLimit3_ISOHi10,
+	kNkMAIDISOAutoHiLimit3_ISOHi20,
+	kNkMAIDISOAutoHiLimit3_ISO8000,
+	kNkMAIDISOAutoHiLimit3_ISO9000,
+	kNkMAIDISOAutoHiLimit3_ISO10000,
+	kNkMAIDISOAutoHiLimit3_ISO12800,
+	kNkMAIDISOAutoHiLimit3_ISOHi30,
+	kNkMAIDISOAutoHiLimit3_ISOHi40
+};
 
 // kNkMAIDCapability_AFMode(0x81c3)
 enum eNkMAIDAFMode
@@ -1226,7 +1335,8 @@ enum eNkMAIDInternalSplValue
 	kNkMAIDInternalSplValue_40,			// 1/40
 	kNkMAIDInternalSplValue_50,			// 1/50
 	kNkMAIDInternalSplValue_80,			// 1/80
-	kNkMAIDInternalSplValue_100			// 1/100
+	kNkMAIDInternalSplValue_100,		// 1/100
+	kNkMAIDInternalSplValue_256			// 1/256
 };
 
 // kNkMAIDCapability_MonochromeSettingType(0x8224)
@@ -1340,6 +1450,51 @@ enum eNkMAIDFocusPreferred3
 	kNkMAIDFocusPreferred3_RightEnd
 };
 
+// kNkMAIDCapability_FocusPreferredArea(0x8122)
+enum eNkMAIDFocusPreferred4
+{
+	kNkMAIDFocusPreferred4_Unknown = 0,
+	kNkMAIDFocusPreferred4_C = 1,
+	kNkMAIDFocusPreferred4_CT,
+	kNkMAIDFocusPreferred4_CTT,
+	kNkMAIDFocusPreferred4_CB,
+	kNkMAIDFocusPreferred4_CBB,
+	kNkMAIDFocusPreferred4_CR,
+	kNkMAIDFocusPreferred4_CRT,
+	kNkMAIDFocusPreferred4_CRTT,
+	kNkMAIDFocusPreferred4_CRB,
+	kNkMAIDFocusPreferred4_CRBB,
+	kNkMAIDFocusPreferred4_CL,
+	kNkMAIDFocusPreferred4_CLT,
+	kNkMAIDFocusPreferred4_CLTT,
+	kNkMAIDFocusPreferred4_CLB,
+	kNkMAIDFocusPreferred4_CLBB,
+	kNkMAIDFocusPreferred4_RA,
+	kNkMAIDFocusPreferred4_RAT,
+	kNkMAIDFocusPreferred4_RAB,
+	kNkMAIDFocusPreferred4_RB,
+	kNkMAIDFocusPreferred4_RBT,
+	kNkMAIDFocusPreferred4_RBB,
+	kNkMAIDFocusPreferred4_RC,
+	kNkMAIDFocusPreferred4_RCT,
+	kNkMAIDFocusPreferred4_RCB,
+	kNkMAIDFocusPreferred4_RD,
+	kNkMAIDFocusPreferred4_RDT,
+	kNkMAIDFocusPreferred4_RDB,
+	kNkMAIDFocusPreferred4_LA,
+	kNkMAIDFocusPreferred4_LAT,
+	kNkMAIDFocusPreferred4_LAB,
+	kNkMAIDFocusPreferred4_LB,
+	kNkMAIDFocusPreferred4_LBT,
+	kNkMAIDFocusPreferred4_LBB,
+	kNkMAIDFocusPreferred4_LC,
+	kNkMAIDFocusPreferred4_LCT,
+	kNkMAIDFocusPreferred4_LCB,
+	kNkMAIDFocusPreferred4_LD,
+	kNkMAIDFocusPreferred4_LDT,
+	kNkMAIDFocusPreferred4_LDB
+};
+
 // kNkMAIDCapability_CompressRAWEx(0x824b)
 enum eNkMAIDCompressRAWEx
 {
@@ -1391,13 +1546,14 @@ enum eNkMAIDPictureControl
 // kNkMAIDCapability_Active_D_Lighting(0x8232)
 enum eNkMAIDActive_D_Lighting
 {
-	kNkMAIDActive_D_Lighting_High	   = 0,
-	kNkMAIDActive_D_Lighting_Normal    = 1,
-	kNkMAIDActive_D_Lighting_Low	   = 2,
-	kNkMAIDActive_D_Lighting_Off	   = 3,
-	kNkMAIDActive_D_Lighting_On		   = 4,
-	kNkMAIDActive_D_Lighting_ExtraHigh = 5,
-	kNkMAIDActive_D_Lighting_Auto	   = 6
+	kNkMAIDActive_D_Lighting_High	    = 0,
+	kNkMAIDActive_D_Lighting_Normal     = 1,
+	kNkMAIDActive_D_Lighting_Low	    = 2,
+	kNkMAIDActive_D_Lighting_Off	    = 3,
+	kNkMAIDActive_D_Lighting_On		    = 4,
+	kNkMAIDActive_D_Lighting_ExtraHigh  = 5,
+	kNkMAIDActive_D_Lighting_Auto	    = 6,
+	kNkMAIDActive_D_Lighting_ExtraHigh2	= 7
 };
 
 // kNkMAIDCapability_LiveViewMode(0x823c)
@@ -1443,12 +1599,13 @@ enum eNkMAIDIndicatorDisplay
 enum eNkMAIDLiveViewImageZoomRate
 {
 	kNkMAIDLiveViewImageZoomRate_All	= 0, //Full
-	kNkMAIDLiveViewImageZoomRate_25		= 1, //25Åì
-	kNkMAIDLiveViewImageZoomRate_33		= 2, //33Åì
-	kNkMAIDLiveViewImageZoomRate_50		= 3, //50Åì
-	kNkMAIDLiveViewImageZoomRate_66		= 4, //66.7Åì
-	kNkMAIDLiveViewImageZoomRate_100	= 5, //100Åì
-	kNkMAIDLiveViewImageZoomRate_200	= 6  //200Åì
+	kNkMAIDLiveViewImageZoomRate_25		= 1, //25%
+	kNkMAIDLiveViewImageZoomRate_33		= 2, //33%
+	kNkMAIDLiveViewImageZoomRate_50		= 3, //50%
+	kNkMAIDLiveViewImageZoomRate_66		= 4, //66.7%
+	kNkMAIDLiveViewImageZoomRate_100	= 5, //100%
+	kNkMAIDLiveViewImageZoomRate_200	= 6, //200%
+	kNkMAIDLiveViewImageZoomRate_17		= 8  //17%
 };
 
 // kNkMAIDCapability_MFDrive(0x8249)
@@ -1469,14 +1626,16 @@ enum eNkMAIDLiveViewStatus
 enum eNkMAIDCellKindPriority
 {
 	kNkMAIDCellKindPriority_MB_D10 = 0,
-	kNkMAIDCellKindPriority_Camera
+	kNkMAIDCellKindPriority_Camera,
+	kNkMAIDCellKindPriority_MB_D11 = 0
 };
 
 // kNkMAIDCapability_AFAreaPoint(0x8254)
 enum eNkMAIDAFAreaPoint
 {
 	kNkMAIDAFAreaPoint_51 = 0,
-	kNkMAIDAFAreaPoint_11
+	kNkMAIDAFAreaPoint_11,
+	kNkMAIDAFAreaPoint_39
 };
 
 // kNkMAIDCapability_WBFluorescentType(0x824d)
@@ -1507,12 +1666,23 @@ enum eNkMAIDLensType
 	kNkMAIDLensType_D		= 0x00000001,	//D type
 	kNkMAIDLensType_G		= 0x00000010,	//G type
 	kNkMAIDLensType_VR		= 0x00000100,	//VR
-	kNkMAIDLensType_DX		= 0x00001000	//DX
+	kNkMAIDLensType_DX		= 0x00001000,	//DX
+	kNkMAIDLensType_AFS		= 0x00010000,	//AF-S
+	kNkMAIDLensType_AD		= 0x00100000	//Auto Distortion
 };
 
 // kNkMAIDCapability_LiveViewProhibit(0x825e)
 enum eNkMAIDLiveViewProhibit
 {
+	kNkMAIDLiveViewProhibit_ExpModeScene = 0x80000000,
+	kNkMAIDLiveViewProhibit_DuringLiveView = 0x800000,
+	kNkMAIDLiveViewProhibit_DuringMirrorup = 0x400000,
+	kNkMAIDLiveViewProhibit_BulbWarning	= 0x200000,
+	kNkMAIDLiveViewProhibit_CardUnformat= 0x100000,
+	kNkMAIDLiveViewProhibit_CardError   = 0x80000,
+	kNkMAIDLiveViewProhibit_CardProtect = 0x40000,
+	kNkMAIDLiveViewProhibit_TempRise    = 0x20000,
+	kNkMAIDLiveViewProhibit_EffectMode  = 0x10000,
 	kNkMAIDLiveViewProhibit_Capture     = 0x8000,
 	kNkMAIDLiveViewProhibit_NoCardLock	= 0x4000,
 	kNkMAIDLiveViewProhibit_MirrorMode	= 0x2000,
@@ -1587,7 +1757,44 @@ enum eNkMAIDMovieScreenSize
 {
 	kNkMAIDMovieScreenSize_QVGA = 0,
 	kNkMAIDMovieScreenSize_VGA,
-	kNkMAIDMovieScreenSize_720p
+	kNkMAIDMovieScreenSize_720p,
+	kNkMAIDMovieScreenSize_VGA_Normal,
+	kNkMAIDMovieScreenSize_VGA_Fine,
+	kNkMAIDMovieScreenSize_720p_Normal_Lowfps,
+	kNkMAIDMovieScreenSize_720p_Fine_Lowfps,
+	kNkMAIDMovieScreenSize_720p_Normal_Highfps,
+	kNkMAIDMovieScreenSize_720p_Fine_Highfps,
+	kNkMAIDMovieScreenSize_FullHD_Normal,
+	kNkMAIDMovieScreenSize_FullHD_Fine,
+	kNkMAIDMovieScreenSize_FullHD_Normal_Highfps,
+	kNkMAIDMovieScreenSize_FullHD_Fine_Highfps
+};
+
+// kNkMAIDCapability_MovieScreenSize(0x8272)
+enum eNkMAIDMovieScreenSize2
+{
+	kNkMAIDMovieScreenSize2_FullHD_30fps = 0,
+	kNkMAIDMovieScreenSize2_FullHD_25fps,
+	kNkMAIDMovieScreenSize2_FullHD_24fps,
+	kNkMAIDMovieScreenSize2_720p_60fps,
+	kNkMAIDMovieScreenSize2_720p_50fps,
+	kNkMAIDMovieScreenSize2_720p_30fps,
+	kNkMAIDMovieScreenSize2_720p_25fps,
+	kNkMAIDMovieScreenSize_VGA_30fps,
+	kNkMAIDMovieScreenSize_VGA_25fps,
+	kNkMAIDMovieScreenSize2_FullHD_30fps_Crop,
+	kNkMAIDMovieScreenSize2_FullHD_25fps_Crop,
+	kNkMAIDMovieScreenSize2_FullHD_24fps_Crop
+};
+
+// kNkMAIDCapability_MovieScreenSize(0x8272)
+enum eNkMAIDMovieScreenSize3
+{
+	kNkMAIDMovieScreenSize3_FullHD_1 = 0,	  // FullHD (1920Å~1080):60i/50i
+	kNkMAIDMovieScreenSize2_FullHD_2,		  // FullHD (1920Å~1080):30p/25p
+	kNkMAIDMovieScreenSize3_FullHD_3,		  // FullHD (1920Å~1080):24p/24p
+	kNkMAIDMovieScreenSize3_720p,			  // 720p (1280Å~720):60p/50p
+	kNkMAIDMovieScreenSize3_VGA				  // VGA  (640Å~424) :30p/25p
 };
 
 // kNkMAIDCapability_MovieVoice(0x8273)
@@ -1602,7 +1809,8 @@ enum eNkMAIDLiveViewAF
 {
 	kNkMAIDLiveViewAF_Face = 0,
 	kNkMAIDLiveViewAF_Wide,
-	kNkMAIDLiveViewAF_Normal
+	kNkMAIDLiveViewAF_Normal,
+	kNkMAIDLiveViewAF_SubjectTracking
 };
 
 // kNkMAIDCapability_SelfTimerShootNum(0x8276)
@@ -1634,21 +1842,24 @@ enum eNkMAIDMovRecMicrophone
 	kNkMAIDMovRecMicrophone_High,
 	kNkMAIDMovRecMicrophone_Medium,
 	kNkMAIDMovRecMicrophone_Low,
-	kNkMAIDMovRecMicrophone_Off
+	kNkMAIDMovRecMicrophone_Off,
+	kNkMAIDMovRecMicrophone_Manual
 };
 
 // kNkMAIDCapability_MovieRecDestination(0x8286)
 enum eNkMAIDMovRecDestination
 {
 	kNkMAIDMovRecDestination_CF = 0,
-	kNkMAIDMovRecDestination_SD
+	kNkMAIDMovRecDestination_SD,
+	kNkMAIDMovRecDestination_XQD
 };
 
 // kNkMAIDCapability_PrimarySlot(0x8287)
 enum eNkMAIDPrimarySlot
 {
 	kNkMAIDPrimarySlot_CF = 0,
-	kNkMAIDPrimarySlot_SD
+	kNkMAIDPrimarySlot_SD,
+	kNkMAIDPrimarySlot_XQD
 };
 
 // kNkMAIDCapability_ADLBracketingType(0x8288)
@@ -1657,7 +1868,8 @@ enum eNkMAIDADLBracketingType
 	kNkMAIDADLBracketingType_2 = 0,
 	kNkMAIDADLBracketingType_3,
 	kNkMAIDADLBracketingType_4,
-	kNkMAIDADLBracketingType_5
+	kNkMAIDADLBracketingType_5,
+	kNkMAIDADLBracketingType_5_Max_ExHi2
 };
 
 // kNkMAIDCapability_MovieRecHiISO(0x8306)
@@ -1710,6 +1922,336 @@ enum eNkMAIDExchangeDialsEx
 	kNkMAIDExchangeDialsEx_On_Amode
 };
 
+// kNkMAIDCapability_AutoDistortion(0x8282)
+enum eNkMAIDAutoDistortion
+{
+	kNkMAIDAutoDistortion_Off = 0,
+	kNkMAIDAutoDistortion_On,
+};
+
+// kNkMAIDCapability_SceneMode(0x8283)
+enum eNkMAIDSceneMode
+{
+	kNkMAIDSceneMode_NightLandscape = 0,
+	kNkMAIDSceneMode_PartyIndoor,
+	kNkMAIDSceneMode_BeachSnow,
+	kNkMAIDSceneMode_Sunset,
+	kNkMAIDSceneMode_Duskdawn,
+	kNkMAIDSceneMode_Petportrait,
+	kNkMAIDSceneMode_Candlelight,
+	kNkMAIDSceneMode_Blossom,
+	kNkMAIDSceneMode_AutumnColors,
+	kNkMAIDSceneMode_Food,
+	kNkMAIDSceneMode_Silhouette,
+	kNkMAIDSceneMode_Highkey,
+	kNkMAIDSceneMode_Lowkey,
+	kNkMAIDSceneMode_Portrait,
+	kNkMAIDSceneMode_Landscape,
+	kNkMAIDSceneMode_Child,
+	kNkMAIDSceneMode_Sports,
+	kNkMAIDSceneMode_Closeup,
+	kNkMAIDSceneMode_NightPortrait
+};
+
+// kNkMAIDCapability_MovRecInCardStatus(0x8298)
+enum eNkMAIDMovRecInCardStatus
+{
+	kNkMAIDMovRecInCardStatus_Off = 0,
+	kNkMAIDMovRecInCardStatus_On
+};
+
+// kNkMAIDCapability_MovRecInCardProhibit(0x8299)
+enum eNkMAIDMovRecInCardProhibit
+{
+	kNkMAIDMovRecInCardProhibit_LVPhoto	   = 0x00002000,
+	kNkMAIDMovRecInCardProhibit_LVImageZoom= 0x00001000,
+	kNkMAIDMovRecInCardProhibit_CardProtect= 0x00000800,
+	kNkMAIDMovRecInCardProhibit_RecMov     = 0x00000400,
+	kNkMAIDMovRecInCardProhibit_MovInBuf   = 0x00000200,
+	kNkMAIDMovRecInCardProhibit_PCInBuf    = 0x00000100,
+	kNkMAIDMovRecInCardProhibit_CardInBuf  = 0x00000080,
+	kNkMAIDMovRecInCardProhibit_CardFull   = 0x00000008,
+	kNkMAIDMovRecInCardProhibit_NoFormat   = 0x00000004,
+	kNkMAIDMovRecInCardProhibit_CardErr    = 0x00000002,
+	kNkMAIDMovRecInCardProhibit_NoCard     = 0x00000001
+};
+
+// kNkMAIDCapability_UserMode1(0x8307)
+// kNkMAIDCapability_UserMode2(0x8308)
+enum eNkMAIDUserMode
+{
+	kNkMAIDUserMode_NightLandscape = 0,
+	kNkMAIDUserMode_PartyIndoor,
+	kNkMAIDUserMode_BeachSnow,
+	kNkMAIDUserMode_Sunset,
+	kNkMAIDUserMode_Duskdawn,
+	kNkMAIDUserMode_Petportrait,
+	kNkMAIDUserMode_Candlelight,
+	kNkMAIDUserMode_Blossom,
+	kNkMAIDUserMode_AutumnColors,
+	kNkMAIDUserMode_Food,
+	kNkMAIDUserMode_Silhouette,
+	kNkMAIDUserMode_Highkey,
+	kNkMAIDUserMode_Lowkey,
+	kNkMAIDUserMode_Portrait,
+	kNkMAIDUserMode_Landscape,
+	kNkMAIDUserMode_Child,
+	kNkMAIDUserMode_Sports,
+	kNkMAIDUserMode_Closeup,
+	kNkMAIDUserMode_NightPortrait,
+	kNkMAIDUserMode_Program,
+	kNkMAIDUserMode_SpeedPriority,
+	kNkMAIDUserMode_AperturePriority,
+	kNkMAIDUserMode_Manual,
+	kNkMAIDUserMode_Auto,
+	kNkMAIDUserMode_FlashOff
+};
+
+// kNkMAIDCapability_MovieManualSetting(0x8309)
+enum eNkMAIDMovManualSetting
+{
+	kNkMAIDMovManualSetting_OFF = 0,
+	kNkMAIDMovManualSetting_ON
+};
+
+// kNkMAIDCapability_AFModeAtLiveView(0x830A)
+enum eNkMAIDAFModeAtLiveView
+{
+	kNkMAIDAFModeAtLiveView_S = 0,
+	kNkMAIDAFModeAtLiveView_C,
+	kNkMAIDAFModeAtLiveView_F,
+	kNkMAIDAFModeAtLiveView_M_FIX,
+	kNkMAIDAFModeAtLiveView_M_SEL
+};
+
+// kNkMAIDCapability_BeepVolume(0x8314)
+enum eNkMAIDBeepVolume
+{
+	kNkMAIDBeepVolume_Off = 0,
+	kNkMAIDBeepVolume_1,
+	kNkMAIDBeepVolume_2,
+	kNkMAIDBeepVolume_3
+};
+
+// kNkMAIDCapability_VideoMode(0x8315)
+enum eNkMAIDVideoMode
+{
+	kNkMAIDVideoMode_NTSC = 0,
+	kNkMAIDVideoMode_PAL
+};
+
+// kNkMAIDCapability_WBAutoType(0x8316)
+enum eNkWBAutoType
+{
+	kNkWBAutoType_Normal = 0,
+	kNkWBAutoType_WarmWhite
+};
+
+// kNkMAIDCapability_EffectMode(0x8319)
+enum eNkMAIDEffectMode
+{
+	kNkMAIDEffectMode_NightVision = 0,
+	kNkMAIDEffectMode_ColorSketch,
+	kNkMAIDEffectMode_Miniature,
+	kNkMAIDEffectMode_SelectColor,
+	kNkMAIDEffectMode_Silhouette,
+	kNkMAIDEffectMode_Highkey,
+	kNkMAIDEffectMode_Lowkey
+};
+
+// kNkMAIDCapability_HDRMode(0x8320)
+enum eNkMAIDHDRMode
+{
+	kNkMAIDHDRMode_Off = 0,
+	kNkMAIDHDRMode_On,
+	kNkMAIDHDRMode_Continuous
+};
+
+enum eNkMAIDHDRMode2
+{
+	kNkMAIDHDRMode2_Off = 0,
+	kNkMAIDHDRMode2_Low,
+	kNkMAIDHDRMode2_Normal,
+	kNkMAIDHDRMode2_High,
+	kNkMAIDHDRMode2_ExtraHigh,
+	kNkMAIDHDRMode2_Auto
+};
+
+// kNkMAIDCapability_HDRExposure(0x8321)
+enum eNkMAIDHDRExposure
+{
+	kNkMAIDHDRExposure_Auto = 0,
+	kNkMAIDHDRExposure_1EV,
+	kNkMAIDHDRExposure_2EV,
+	kNkMAIDHDRExposure_3EV
+};
+
+// kNkMAIDCapability_HDRSmoothing(0x8322)
+enum eNkMAIDHDRSmoothing
+{
+	kNkMAIDHDRSmoothing_High = 0,
+	kNkMAIDHDRSmoothing_Normal,
+	kNkMAIDHDRSmoothing_Low
+};
+
+// kNkMAIDCapability_BlinkingStatus(0x8323)
+enum eNkMAIDBlinkingStatus
+{
+	kNkMAIDBlinkingStatus_None = 0,
+	kNkMAIDBlinkingStatus_Sp_Blink,
+	kNkMAIDBlinkingStatus_Ap_Blink,
+	kNkMAIDBlinkingStatus_Both
+};
+
+// kNkMAIDCapability_WBPresetProtect1(0x8326)
+enum eNkMAIDWBPresetProtect1
+{
+	kNkMAIDWBPresetProtect1_Off = 0,
+	kNkMAIDWBPresetProtect1_On
+};
+
+// kNkMAIDCapability_WBPresetProtect2(0x8327)
+enum eNkMAIDWBPresetProtect2
+{
+	kNkMAIDWBPresetProtect2_Off = 0,
+	kNkMAIDWBPresetProtect2_On
+};
+
+// kNkMAIDCapability_WBPresetProtect3(0x8328)
+enum eNkMAIDWBPresetProtect3
+{
+	kNkMAIDWBPresetProtect3_Off = 0,
+	kNkMAIDWBPresetProtect3_On
+};
+
+// kNkMAIDCapability_WBPresetProtect4(0x8329)
+enum eNkMAIDWBPresetProtect4
+{
+	kNkMAIDWBPresetProtect4_Off = 0,
+	kNkMAIDWBPresetProtect4_On
+};
+
+// kNkMAIDCapability_ISOAutoShutterTimeAutoValue(0x8330)
+enum eNkMAIDISOAutoShutterTimeAutoValue
+{
+	eNkMAIDISOAutoShutterTimeAutoValue_Minus2,
+	eNkMAIDISOAutoShutterTimeAutoValue_Minus1,
+	eNkMAIDISOAutoShutterTimeAutoValue_0,
+	eNkMAIDISOAutoShutterTimeAutoValue_Plus1,
+	eNkMAIDISOAutoShutterTimeAutoValue_Plus2
+};
+
+// kNkMAIDCapability_MovieImageQuality(0x8331)
+enum eNkMAIDMovieImageQuality
+{
+	kNkMAIDMovieImageQuality_Normal = 0,
+	kNkMAIDMovieImageQuality_Fine
+};
+
+// kNkMAIDCapability_MovieRecMicrophoneValue(0x8332)
+enum eNkMAIDMovieRecMicrophoneValue
+{
+	kNkMAIDMovieRecMicrophoneValue_Off = 0,
+	kNkMAIDMovieRecMicrophoneValue_1,
+	kNkMAIDMovieRecMicrophoneValue_2,
+	kNkMAIDMovieRecMicrophoneValue_3,
+	kNkMAIDMovieRecMicrophoneValue_4,
+	kNkMAIDMovieRecMicrophoneValue_5,
+	kNkMAIDMovieRecMicrophoneValue_6,
+	kNkMAIDMovieRecMicrophoneValue_7,
+	kNkMAIDMovieRecMicrophoneValue_8,
+	kNkMAIDMovieRecMicrophoneValue_9,
+	kNkMAIDMovieRecMicrophoneValue_10,
+	kNkMAIDMovieRecMicrophoneValue_11,
+	kNkMAIDMovieRecMicrophoneValue_12,
+	kNkMAIDMovieRecMicrophoneValue_13,
+	kNkMAIDMovieRecMicrophoneValue_14,
+	kNkMAIDMovieRecMicrophoneValue_15,
+	kNkMAIDMovieRecMicrophoneValue_16,
+	kNkMAIDMovieRecMicrophoneValue_17,
+	kNkMAIDMovieRecMicrophoneValue_18,
+	kNkMAIDMovieRecMicrophoneValue_19,
+	kNkMAIDMovieRecMicrophoneValue_20
+};
+
+// kNkMAIDCapability_LiveViewExposurePreview(0x8333)
+enum eNkMAIDLiveViewExposurePreview
+{
+	kNkMAIDLiveViewExposurePreview_Off = 0,
+	kNkMAIDLiveViewExposurePreview_On
+};
+
+// kNkMAIDCapability_LiveViewSelector(0x8334)
+enum eNkMAIDLiveViewSelector
+{
+	kNkMAIDLiveViewSelector_Photo = 0,
+	kNkMAIDLiveViewSelector_Movie
+};
+
+// kNkMAIDCapability_ADLBracketingStep(0x8340)
+enum eNkMAIDADLBracketingStep
+{
+	kNkMAIDADLBracketingStep_Auto	     = 0,
+	kNkMAIDADLBracketingStep_Low         = 1,
+	kNkMAIDADLBracketingStep_Normal	     = 2,
+	kNkMAIDADLBracketingStep_High	     = 3,
+	kNkMAIDADLBracketingStep_ExtraHigh_1 = 4,
+	kNkMAIDADLBracketingStep_ExtraHigh_2 = 5
+};
+
+// kNkMAIDCapability_LiveViewPhotoShootingMode(0x8346)
+enum eNkMAIDLiveViewPhotoShootingMode
+{
+	kNkMAIDLiveViewPhotoShootingMode_Quiet = 0,
+	kNkMAIDLiveViewPhotoShootingMode_Silent
+};
+
+// kNkMAIDCapability_ExposureDelayEx(0x8347)
+enum eNkMAIDExposureDelayEx
+{
+	kNkMAIDExposureDelayEx_3sec = 0,
+	kNkMAIDExposureDelayEx_2sec,
+	kNkMAIDExposureDelayEx_1sec,
+	kNkMAIDExposureDelayEx_Off
+};
+
+// kNkMAIDCapability_MovieISORange(0x8348)
+enum eNkMAIDMovieISORange
+{
+	kNkMAIDMovieISORange_200to12800 = 0,
+	kNkMAIDMovieISORange_200toHi40
+};
+
+// kNkMAIDCapability_MovieReleaseButton(0x8349)
+enum eNkMAIDMovieReleaseButton
+{
+	kNkMAIDMovieReleaseButton_Photo = 0,
+	kNkMAIDMovieReleaseButton_Movie,
+	kNkMAIDMovieReleaseButton_SaveFrame
+};
+
+// kNkMAIDCapability_GetIPTCInfo(0x8352)
+enum eNkMAIDGetIPTCInfo
+{
+	kNkMAIDGetIPTCInfo_None		= 0,
+	kNkMAIDGetIPTCInfo_Attached
+};
+
+// kNkMAIDCapability_LiveViewImageSize(0x8353)
+enum eNkMAIDLiveViewImageSize
+{
+	kNkMAIDLiveViewImageSize_QVGA = 1,
+	kNkMAIDLiveViewImageSize_VGA
+};
+
+// kNkMAIDCapability_RemoteControlMode(0x8354)
+enum eNkMAIDRemoteControlMode
+{
+	kNkMAIDRemoteControlMode_Delayed = 0,
+	kNkMAIDRemoteControlMode_QuickResponse,
+	kNkMAIDRemoteControlMode_MirrorUp
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // Definition of structure
 
@@ -1719,7 +2261,7 @@ typedef struct tagNkMAIDWBPresetData
 	ULONG  ulPresetNumber;		// Preset Number
 	ULONG  ulPresetGain;		// Preset Gain
 	ULONG  ulThumbnailSize;		// Thumbnail size of pThumbnailData
-	ULONG  ulThumbnailRotate;	// add for D70 One of eNkMAIDThumbnailRotate
+	ULONG  ulThumbnailRotate;	// One of eNkMAIDThumbnailRotate
 	void*  pThumbnailData;		// The pointer to Thumbnail Data
 } NkMAIDWBPresetData, FAR* LPNkMAIDWBPresetData;
 
@@ -1740,6 +2282,22 @@ typedef struct tagNkMAIDGetPicCtrlInfo
 	void*  pData;			// The pointer to Quick Adjust Param
 } NkMAIDGetPicCtrlInfo, FAR* LPNkMAIDGetPicCtrlInfo;
 
+// kNkMAIDCapability_GetVideoImage(0x8317)
+typedef struct tagNkMAIDGetVideoImage
+{
+	ULONG  ulType;			// one of eNkMAIDArrayType
+	ULONG  ulOffset;		// Offset
+	ULONG  ulReadSize;		// size of get data
+	ULONG  ulDataSize;		// size of "pData" 
+	LPVOID pData;			// allocated by the client
+} NkMAIDGetVideoImage, FAR* LPNkMAIDGetVideoImage;
+
+// kNkMAIDCapability_TerminateCapture(0x8318)
+typedef struct tagNkMAIDTerminateCapture
+{
+	ULONG  ulParameter1;
+	ULONG  ulParameter2;
+} NkMAIDTerminateCapture, FAR* LPNkMAIDTerminateCapture;
 
 ///////////////////////////////////////////////////////////////////////////////
 #endif

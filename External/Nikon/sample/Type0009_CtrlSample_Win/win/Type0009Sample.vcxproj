@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>Type0001Ctrl</ProjectName>
+    <ProjectName>Type0009Ctrl</ProjectName>
     <ProjectGuid>{E269F2F4-06B3-4DFD-9475-D6D10DD52F24}</ProjectGuid>
     <RootNamespace>MDSample</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>

@@ -45,8 +45,9 @@ BOOL Search_Module( void* Path )
 	intptr_t	hFile;
 
 	// Search a module file in the current directory.
-	//GetCurrentDirectory(MAX_PATH - 11,
-	GetCurrentDirectory( MAX_PATH - 11, TempPath );
+	
+	//GetCurrentDirectory( MAX_PATH - 11, (LPWSTR)TempPath );//TODO Uncomment
+	//TempPath = "anystring to compile";
 	strcat( TempPath, "\\Type0001.md3" );
 	if ( (hFile = _findfirst( TempPath, &c_file )) == -1L ) {
 		return false;
@@ -102,8 +103,7 @@ BOOL Search_Module( void* Path )
 BOOL Load_Module( void* Path )
 {
 #if defined( _WIN32 )
-	g_hInstModule = LoadLibrary((LPCSTR)Path);
-
+	//g_hInstModule = LoadLibrary((LPCWSTR)Path);//todo uncomment!
 	if (g_hInstModule) {
 		g_pMAIDEntryPoint = (LPMAIDEntryPointProc)GetProcAddress( g_hInstModule, "MAIDEntryPoint" );
 		if ( g_pMAIDEntryPoint == NULL )

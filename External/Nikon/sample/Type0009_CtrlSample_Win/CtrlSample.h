@@ -80,6 +80,7 @@ BOOL	Command_Async( LPNkMAIDObject pObject);
 BOOL	Command_CapSet( LPNkMAIDObject pObject, ULONG ulParam, ULONG ulDataType, NKPARAM pData, LPNKFUNC pfnComplete, NKREF refComplete );
 BOOL	Command_CapGet( LPNkMAIDObject pObject, ULONG ulParam, ULONG ulDataType, NKPARAM pData, LPNKFUNC pfnComplete, NKREF refComplete );
 BOOL	Command_CapStart( LPNkMAIDObject pObject, ULONG ulParam, LPNKFUNC pfnComplete, NKREF refComplete, SLONG* pnResult );
+BOOL	Command_CapStartGeneric( LPNkMAIDObject pObject, ULONG ulParam, NKPARAM pData, LPNKFUNC pfnComplete, NKREF refComplete, SLONG* pnResult );
 BOOL	Command_CapGetArray( LPNkMAIDObject pObject, ULONG ulParam, ULONG ulDataType, NKPARAM pData, LPNKFUNC pfnComplete, NKREF refComplete );
 BOOL	Command_CapGetDefault( LPNkMAIDObject pObject, ULONG ulParam, ULONG ulDataType, NKPARAM pData, LPNKFUNC pfnComplete, NKREF refComplete );
 BOOL	Command_Abort(LPNkMAIDObject pobject, LPNKFUNC pfnComplete, NKREF refComplete);
@@ -111,10 +112,12 @@ void WaitEvent(void);
 BOOL	SourceCommandLoop( LPRefObj pRefMod, ULONG ulSrcID );
 BOOL	ItemCommandLoop( LPRefObj pRefSrc, ULONG ulItemID );
 BOOL	ImageCommandLoop( LPRefObj pRefItm, ULONG ulDatID );
+BOOL	MovieCommandLoop( LPRefObj pRefItm, ULONG ulDatID );
 BOOL	ThumbnailCommandLoop( LPRefObj pRefItm, ULONG ulDatID );
 BOOL	SelectSource( LPRefObj pRefMod, ULONG *pulSrcID );
 BOOL	SelectItem( LPRefObj pRefSrc, ULONG *pulItemID );
 BOOL	SelectData( LPRefObj pRefItm, ULONG *pulDataType );
+BOOL	CheckDataType( LPRefObj pRefItm, ULONG *pulDataType );
 BOOL	SetUpCamera1( LPRefObj pRefSrc );
 BOOL	SetUpCamera2( LPRefObj pRefSrc );
 BOOL	SetShootingMenu( LPRefObj pRefSrc );
@@ -148,7 +151,9 @@ char*	GetUnsignedString( ULONG ulCapID, ULONG ulValue, char *psString );
 BOOL	IssueProcess( LPRefObj pRefSrc, ULONG ulCapID );
 BOOL	IssueProcessSync( LPRefObj pRefSrc, ULONG ulCapID );
 BOOL	IssueAcquire( LPRefObj pRefDat );
+BOOL	GetVideoImageCapability( LPRefObj pRefObj, ULONG ulCapID );
 BOOL	IssueThumbnail( LPRefObj pRefSrc );
+BOOL	TerminateCaptureCapability( LPRefObj pRefSrc );
 
 LPNkMAIDCapInfo	GetCapInfo( LPRefObj pRef, ULONG ulID );
 BOOL	CheckCapabilityOperation( LPRefObj pRef, ULONG ulID, ULONG ulOperations );
@@ -165,5 +170,5 @@ extern BOOL		g_bFirstCall;	// used in ProgressProc, and DoDeleteDramImage
 #if defined( _WIN32 )
 	extern HINSTANCE	g_hInstModule;
 #elif defined(__APPLE__)
-	extern CFBundleRef gBundle;
+	extern CFBundleRef	gBundle;
 #endif

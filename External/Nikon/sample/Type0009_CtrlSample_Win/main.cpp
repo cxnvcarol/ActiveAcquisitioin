@@ -17,7 +17,7 @@ ULONG	g_ulCameraType = 0;	// CameraType
 #if defined( _WIN32 )
 	HINSTANCE	g_hInstModule = NULL;
 #elif defined(__APPLE__)
- CFBundleRef gBundle = NULL;
+	CFBundleRef gBundle = NULL;
 #endif
 
 //------------------------------------------------------------------------------------------------------------------------------------
@@ -35,14 +35,14 @@ int main()
 	UWORD	wSel;
 	BOOL	bRet;
 
-	// Search for a Module-file like "Type0001.md3".
+	// Search for a Module-file like "Type0009.md3".
 #if defined( _WIN32 )
 	bRet = Search_Module( ModulePath );
 #elif defined(__APPLE__)
 	bRet = Search_Module( &ModuleRef );
 #endif
 	if ( bRet == false ) {
-		puts( "\"Type0001 Module\" is not found.\n" );
+		puts( "\"Type0009 Module\" is not found.\n" );
 		return -1;
 	}
 
@@ -53,7 +53,7 @@ int main()
 	bRet = Load_Module( &ModuleRef );
 #endif
 	if ( bRet == false ) {
-		puts( "Failed in loading \"Type0001 Module\".\n" );
+		puts( "Failed in loading \"Type0009 Module\".\n" );
 		return -1;
 	}
 
@@ -167,12 +167,12 @@ int main()
 	FreeLibrary( g_hInstModule );
 	g_hInstModule = NULL;
 #elif defined(__APPLE__)
-    if (gBundle != NULL)
-    {
-        CFBundleUnloadExecutable(gBundle);
-        CFRelease(gBundle);
-        gBundle = NULL;
-    }
+	if (gBundle != NULL)
+	{
+		CFBundleUnloadExecutable(gBundle);
+		CFRelease(gBundle);
+		gBundle = NULL;
+	}
 #endif
 
 	// Free memory blocks allocated in this function.
@@ -212,8 +212,8 @@ BOOL SourceCommandLoop( LPRefObj pRefMod, ULONG ulSrcID )
 		printf( "\nSelect (1-10, 0)\n" );
 		printf( " 1. Select Item Object       2. Camera settings(1)       3. Camera settings(2)\n" );
 		printf( " 4. Shooting Menu            5. Custom Menu              6. Async\n" );
-		printf( " 7. Autofocus                8. Capture                  9. PreCapture\n" );
-		printf( "10. CameraType\n" );
+		printf( " 7. Autofocus                8. Capture                  9. TerminateCapture\n" );
+		printf( "10. PreCapture\n" );
 		printf( " 0. Exit\n>" );
 		scanf( "%s", buf );
 		wSel = atoi( buf );
@@ -226,7 +226,7 @@ BOOL SourceCommandLoop( LPRefObj pRefMod, ULONG ulSrcID )
 				bRet = SelectItem( pRefSrc, &ulItemID );
 				if( bRet == TRUE && ulItemID > 0 )
 					bRet = ItemCommandLoop( pRefSrc, ulItemID );
-				break;   				
+				break;
 			case 2:// Camera setting 1
 				bRet = SetUpCamera1( pRefSrc );
 				break;
@@ -249,11 +249,11 @@ BOOL SourceCommandLoop( LPRefObj pRefMod, ULONG ulSrcID )
 				bRet = IssueProcess( pRefSrc, kNkMAIDCapability_Capture );
 				Command_Async( pRefSrc->pObject );
 				break;
-			case 9:// PreCapture
-				bRet = IssueProcess( pRefSrc, kNkMAIDCapability_PreCapture );
+			case 9:// TerminateCapture
+				bRet = TerminateCaptureCapability( pRefSrc );
 				break;
-			case 10:// CameraType
-				bRet = SetUnsignedCapability( pRefSrc, kNkMAIDCapability_CameraType );
+			case 10:// PreCapture
+				bRet = IssueProcess( pRefSrc, kNkMAIDCapability_PreCapture );
 				break;
 			default:
 				wSel = 0;
@@ -288,7 +288,7 @@ BOOL SetUpCamera1( LPRefObj pRefSrc )
 		printf( "10. ExposureMode            11. ShutterSpeed             12. Aperture\n" );
 		printf( "13. FlexibleProgram         14. ExposureComp             15. MeteringMode\n" );
 		printf( "16. FocusMode               17. FocusAreaMode            18. FocusPreferredArea\n" );
-		printf( "19. FocalLength             20. ClockDateTime            21. CustomSettings\n" );
+		printf( "19. FocalLength             20. ClockDateTime\n" );
 		printf( " 0. Exit\n>" );
 		scanf( "%s", buf );
 		wSel = atoi( buf );
@@ -354,9 +354,6 @@ BOOL SetUpCamera1( LPRefObj pRefSrc )
 				break;
 			case 20:// ClockDateTime
 				bRet = SetDateTimeCapability( pRefSrc, kNkMAIDCapability_ClockDateTime );
-				break;
-			case 21:// CustomSettings
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_CustomSettings );
 				break;
 			default:
 				wSel = 0;
@@ -433,127 +430,93 @@ BOOL SetShootingMenu( LPRefObj pRefSrc )
 	do {
 		// Wait for selection by user
 		printf( "\nSelect the item you want to set up\n" );
-		printf( " 1. MenuBank                2. CompressionLevel    3. ImageSize\n" );
-		printf( " 4. WBMode                  5. Sensitivity         6. WBTuneAuto\n" );
-		printf( " 7. WBTuneIncandescent      8. WBFluorescentType   9. WBTuneFluorescent\n" );
-		printf( "10. WBTuneSunny            11. WBTuneFlash        12. WBTuneShade\n" );
-		printf( "13. WBTuneCloudy           14. WBTuneColorTemp    15. WBTuneColorAdjust\n" );
-		printf( "16. WBTunePreset           17. WBPresetData       18. PictureControl\n" );
-		printf( "19. PictureControlData     20. GetPicCtrlInfo     21. DeleteCustomPicCtrl\n" );
-		printf( "22. LiveViewProhibit       23. LiveViewMode       24. LiveViewStatus\n" );
-		printf( "25. LiveViewImageZoomRate  26. GetLiveViewImage\n" );
+		printf( " 1. CompressionLevel         2. ImageSize               3. WBMode\n" );
+		printf( " 4. Sensitivity              5. WBTuneAuto              6. WBTuneIncandescent\n" );
+		printf( " 7. WBFluorescentType        8. WBTuneFluorescent       9. WBTuneSunny\n" );
+		printf( "10. WBTuneFlash             11. WBTuneShade            12. WBTuneCloudy\n" );
+		printf( "13. WBPresetData            14. PictureControl         15. PictureControlData\n" );
+		printf( "16. GetPicCtrlInfo          17. DeleteCustomPicCtrl    18. LiveViewProhibit\n" );
+		printf( "19. LiveViewStatus          20. LiveViewImageZoomRate  21. GetLiveViewImage\n" );
+		printf( "22. LiveViewImageSize       23. MovRecInCardProhibit   24. MovRecInCardStatus\n" );
 		printf( " 0. Exit\n>" );
 		scanf( "%s", buf );
 		wSel = atoi( buf );
 
 		switch( wSel )
 		{
-			case 1:// MenuBank
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_MenuBank );
-				break;
-			case 2:// Compression Level
+			case 1:// Compression Level
 				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_CompressionLevel );
 				break;
-			case 3:// ImageSize
+			case 2:// ImageSize
 				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_ImageSize );
 				break;
-			case 4:// WBMode
+			case 3:// WBMode
 				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_WBMode );
 				break;
-			case 5:// Sensitivity
+			case 4:// Sensitivity
 				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_Sensitivity );
 				break;
-			case 6:// WBTuneAuto
+			case 5:// WBTuneAuto
 				bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTuneAuto );
 				break;
-			case 7:// WBTuneIncandescent
+			case 6:// WBTuneIncandescent
 				bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTuneIncandescent );
 				break;
-			case 8:// WBFluorescentType
+			case 7:// WBFluorescentType
 				bRet = SetUnsignedCapability( pRefSrc, kNkMAIDCapability_WBFluorescentType );
 				break;
-			case 9:// WBTuneFluorescent
+			case 8:// WBTuneFluorescent
 				bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTuneFluorescent );
 				break;
-			case 10:// WBTuneSunny 
+			case 9:// WBTuneSunny 
 				bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTuneSunny );
 				break;
-			case 11:// WBTuneFlash
+			case 10:// WBTuneFlash
 				bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTuneFlash );
 				break;
-			case 12:// WBTuneShade
+			case 11:// WBTuneShade
 				bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTuneShade );
 				break;
-			case 13:// WBTuneCloudy
+			case 12:// WBTuneCloudy
 				bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTuneCloudy );
 				break;
-			case 14:// WBTuneColorTemp
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_WBTuneColorTemp );
-				break;
-			case 15:// WBTuneColorAdjust
-				bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTuneColorAdjust );
-				break;
-			case 16:// WBTunePreset1-5
-				printf( "\nSelect Preset Number(1-5, 0)\n");
-				printf( " 1. d-0\n");
-				printf( " 2. d-1\n");
-				printf( " 3. d-2\n");
-				printf( " 4. d-3\n");
-				printf( " 5. d-4\n");
-				printf( " 0. Exit\n>" );
-				scanf( "%s", buf );
-				ulPresetNumber = atoi( buf );
-				if ( ulPresetNumber == 0 ) break;
-				if ( 1 > ulPresetNumber || ulPresetNumber > 5 ) break;
-				switch ( ulPresetNumber )
-				{
-				case 1:
-					bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTunePreset1 );
-					break;
-				case 2:
-					bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTunePreset2 );
-					break;
-				case 3:
-					bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTunePreset3 );
-					break;
-				case 4:
-					bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTunePreset4 );
-					break;
-				case 5:
-					bRet = SetRangeCapability( pRefSrc, kNkMAIDCapability_WBTunePreset5 );
-					break;
-				}
-				break;
-			case 17:// WBPresetData
+			case 13:// WBPresetData
 				bRet = SetWBPresetDataCapability( pRefSrc );
 				break;
-			case 18:// PictureControl
+			case 14:// PictureControl
 				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_PictureControl );
 				break;
-			case 19:// PictureControlData
+			case 15:// PictureControlData
 				bRet = PictureControlDataCapability( pRefSrc );
 				break;
-			case 20:// GetPicCtrlInfo 
+			case 16:// GetPicCtrlInfo 
 				bRet = GetPictureControlInfoCapability( pRefSrc );
 				break;
-			case 21:// DeleteCustomPictureControl
+			case 17:// DeleteCustomPictureControl
 				bRet = DeleteCustomPictureControlCapability( pRefSrc );
 				break;
-			case 22:// LiveViewProhibit
+			case 18:// LiveViewProhibit
 				bRet = SetUnsignedCapability( pRefSrc, kNkMAIDCapability_LiveViewProhibit );
 				break;
-			case 23:// LiveViewMode
-				bRet = SetUnsignedCapability( pRefSrc, kNkMAIDCapability_LiveViewMode );
-				break;
-			case 24:// LiveViewStatus
+			case 19:// LiveViewStatus
 				bRet = SetUnsignedCapability( pRefSrc, kNkMAIDCapability_LiveViewStatus );
 				break;
-			case 25:// LiveViewImageZoomRate 
+			case 20:// LiveViewImageZoomRate 
 				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_LiveViewImageZoomRate );
 				break;
-			case 26:// GetLiveViewImage
+			case 21:// GetLiveViewImage
 				bRet = GetLiveViewImageCapability( pRefSrc );
 				break;
+			case 22:// LiveViewImageSize
+				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_LiveViewImageSize );
+				break;
+			case 23:// MovRecInCardProhibit
+				bRet = SetUnsignedCapability( pRefSrc, kNkMAIDCapability_MovRecInCardProhibit );
+				break;
+			case 24:// MovRecInCardStatus
+				bRet = SetUnsignedCapability( pRefSrc, kNkMAIDCapability_MovRecInCardStatus );
+				break;
+
 			default:
 				wSel = 0;
 				break;
@@ -578,80 +541,18 @@ BOOL SetCustomSettings( LPRefObj pRefSrc )
 	do {
 		// Wait for selection by user
 		printf( "\nSelect a Custom Setting\n" );
-		printf( " 1. ResetCustomSetting      2. ResetFileNumber    3. ShootNoCard \n" );
-		printf( " 4. NumberingMode           5. LimitImageDisplay  6. AutoOffDelay \n" );
-		printf( " 7. SelfTimerDuration       8. EVInterval         9. BracketingVary\n" );
-		printf( "10. BracketingOrder        11. ExchangeDials     12. AEAFLockButton\n" );
-		printf( "13. AELockonRelease        14. LCDBackLight      15. AFAreaSelector\n" );
-		printf( "16. AFsPriority            17. AFcPriority\n" );
+		printf( " 1. EVInterval              2. BracketingVary \n" );
 		printf( " 0. Exit\n>" );
 		scanf( "%s", buf );
 		wSel = atoi( buf );
 
 		switch( wSel )
 		{
-			case 1:// ResetCustomSetting
-				bRet = IssueProcess( pRefSrc, kNkMAIDCapability_ResetCustomSetting );
-				break;
-			case 2:// ResetFileNumber
-				bRet = IssueProcess( pRefSrc, kNkMAIDCapability_ResetFileNumber );
-				break;
-			case 3:// ShootNoCard 
-				bRet = SetBoolCapability( pRefSrc, kNkMAIDCapability_ShootNoCard );
-				break;
-			case 4:// NumberingMode
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_NumberingMode );
-				break;
-			case 5:// LimitImageDisplay
-				if ( !( g_ulCameraType == kNkMAIDCameraType_D3      || 
-					    g_ulCameraType == kNkMAIDCameraType_D3_FU1  ||
-					    g_ulCameraType == kNkMAIDCameraType_D3_FU2  ||
-					    g_ulCameraType == kNkMAIDCameraType_D3_FU3  ||
-					    g_ulCameraType == kNkMAIDCameraType_D300    ||
-					    g_ulCameraType == kNkMAIDCameraType_D300_FU   )
-				)
-				{
-					printf( "This capability is not supported.\n" );
-					bRet = true;
-					break;
-				}
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_LimitImageDisplay );
-				break;
-			case 6:// AutoOffDelay
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_AutoOffDelay );
-				break;
-			case 7:// SelfTimerDuration
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_SelfTimerDuration );
-				break;
-			case 8:// EVInterval
+			case 1:// EVInterval
 				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_EVInterval );
 				break;
-			case 9:// BracketingVary
+			case 2:// BracketingVary
 				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_BracketingVary );
-				break;
-			case 10:// BracketingOrder
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_BracketingOrder );
-				break;
-			case 11:// ExchangeDials
-				bRet = SetUnsignedCapability( pRefSrc, kNkMAIDCapability_ExchangeDialsEx );
-				break;
-			case 12:// AEAFLockButton
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_AEAFLockButton );
-				break;
-			case 13:// AELockonRelease 
-				bRet = SetBoolCapability( pRefSrc, kNkMAIDCapability_AELockonRelease );
-				break;
-			case 14:// LCDBackLight 
-				bRet = SetBoolCapability( pRefSrc, kNkMAIDCapability_LCDBackLight );
-				break;
-			case 15:// AFAreaSelector
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_AFAreaSelector );
-				break;
-			case 16:// AFsPriority 
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_AFsPriority );
-				break;
-			case 17:// AFcPriority 
-				bRet = SetEnumCapability( pRefSrc, kNkMAIDCapability_AFcPriority );
 				break;
 			default:
 				wSel = 0;
@@ -716,7 +617,17 @@ BOOL ItemCommandLoop( LPRefObj pRefSrc, ULONG ulItmID )
 						RemoveChild( pRefSrc, ulItmID );
 						pRefItm = NULL;
 					}
-				} 
+				}
+				else if ( ulDataType == kNkMAIDDataObjType_Video )
+				{
+					// reset file removed flag
+					g_bFileRemoved = false;
+					bRet = MovieCommandLoop( pRefItm, ulDataType );
+					if ( g_bFileRemoved ) {
+						RemoveChild( pRefSrc, ulItmID );
+						pRefItm = NULL;
+					}
+				}
 				else if ( ulDataType == kNkMAIDDataObjType_Thumbnail )
 				{
 					bRet = ThumbnailCommandLoop( pRefItm, ulDataType );
@@ -724,6 +635,13 @@ BOOL ItemCommandLoop( LPRefObj pRefSrc, ULONG ulItmID )
 				if ( bRet == false )	return false;
 				break;
 			case 2:// Delete
+				ulDataType = 0;
+				bRet = CheckDataType( pRefItm, &ulDataType );
+				if ( bRet == false )
+				{
+					puts( "Movie object is not supported.\n" );
+					break;
+				}
 				bRet = DeleteDramCapability( pRefItm, ulItmID );
 				if ( g_bFileRemoved )
 				{
@@ -827,6 +745,70 @@ BOOL ImageCommandLoop( LPRefObj pRefItm, ULONG ulDatID )
 	} while( wSel > 0 && g_bFileRemoved == false );
 
 // Close Image_Object
+	bRet = RemoveChild( pRefItm, ulDatID );
+
+	return bRet;
+}
+//------------------------------------------------------------------------------------------------------------------------------------
+//
+BOOL MovieCommandLoop( LPRefObj pRefItm, ULONG ulDatID )
+{
+	LPRefObj	pRefDat = NULL;
+	char	buf[256];
+	UWORD	wSel;
+	BOOL	bRet = true;
+
+	pRefDat = GetRefChildPtr_ID( pRefItm, ulDatID );
+	if ( pRefDat == NULL ) {
+		// Create Movie object and RefSrc structure.
+		if ( AddChild( pRefItm, ulDatID ) == TRUE ) {
+			printf("Movie object is opened.\n");
+		} else {
+			printf("Movie object can't be opened.\n");
+			return false;
+		}
+		pRefDat = GetRefChildPtr_ID( pRefItm, ulDatID );
+	}
+
+	// command loop
+	do {
+		printf( "\nSelect (1-5, 0)\n" );
+		printf( " 1. IsAlive                  2. Name                     3. StoredBytes\n" );
+		printf( " 4. Pixels                   5. GetVideoImage\n" );
+		printf( " 0. Exit\n>" );
+		scanf( "%s", buf );
+		wSel = atoi( buf );
+
+		switch( wSel )
+		{
+			case 1:// IsAlive
+				bRet = SetBoolCapability( pRefDat, kNkMAIDCapability_IsAlive );
+				break;
+			case 2:// Name
+				bRet = SetStringCapability( pRefDat, kNkMAIDCapability_Name );
+				break;
+			case 3:// StoredBytes
+				bRet = SetUnsignedCapability( pRefDat, kNkMAIDCapability_StoredBytes );
+				break;
+			case 4:// Show Pixels
+				// Get to know how many pixels there are in this image.
+				bRet = SetSizeCapability( pRefDat, kNkMAIDCapability_Pixels );
+				break;
+			case 5:// GetVideoImage
+				bRet = GetVideoImageCapability( pRefDat, kNkMAIDCapability_GetVideoImage );
+				// The item has been possibly removed.
+				break;
+			default:
+				wSel = 0;
+		}
+		if ( bRet == false ) {
+			printf( "An Error occured. Enter '0' to exit.\n>" );
+			scanf( "%s", buf );
+			bRet = true;
+		}
+	} while( wSel > 0 && g_bFileRemoved == false );
+
+// Close Movie_Object
 	bRet = RemoveChild( pRefItm, ulDatID );
 
 	return bRet;
