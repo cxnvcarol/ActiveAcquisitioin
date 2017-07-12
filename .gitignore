@@ -247,3 +247,8 @@ ModelManifest.xml
 #QT Generated files
 
 ActiveAcquisitionSystem/GeneratedFiles/
+
+
+!*.dll
+!*.md3
+!*.MD3
