@@ -54,8 +54,8 @@ BOOL Search_Module( void* Path )
 	intptr_t	hFile;
 
 	// Search a module file in the current directory.
-	//GetCurrentDirectory( MAX_PATH - 11, TempPath );//todo Current path is != path from the executable!
-	//LPSTR buffer;
+	//GetCurrentDirectory( MAX_PATH - 11, TempPath );//but.. Current path is != path from the executable!
+	
 	GetModuleFileName(NULL, TempPath, MAX_PATH);
 	std::string filename(TempPath);
 	const size_t last_slash_idx = filename.rfind('\\');
@@ -63,11 +63,11 @@ BOOL Search_Module( void* Path )
 	{
 		strcpy_s(TempPath, MAX_PATH, filename.substr(0, last_slash_idx).c_str());
 	}
-
-	
 	printf(TempPath);
 	
-	strcat( TempPath, "\\Type0009.md3" );//TODO the output executable file  is not the typical path!
+	//strcat( TempPath, "\\Type0009.md3" );
+	strcat(TempPath, "\\Type0009.md3");//Warning!! When it is not loaded correctly the device is not recognize: So recognize procedure... load every library and check which one identifies the camera!
+
 	
 	if ( (hFile = _findfirst( TempPath, &c_file )) == -1L ) {
 		return false;
