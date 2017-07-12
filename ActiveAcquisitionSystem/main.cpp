@@ -51,11 +51,11 @@ int main(int argc, char *argv[])
 
 	/* 
 	//The following is working fine so far.
-
+	*/
 	AcquisitionDeviceManager *mng=new AcquisitionDeviceManager();
 	mng->detectCameras();
 	testCanonTakingPicture();
-	*/
+	
 	return a.exec();
 }
 
@@ -71,7 +71,6 @@ int testIdentifyCameras()
 
 void testCanonTakingPicture()
 {
-
 	WorkingSession ws;
 	EDSWrapper eds;
 

@@ -74,7 +74,7 @@ void AcquisitionDeviceManager::detectAVTCameras(AVTCamera* avtList)
 		CameraPtrVector cameras;
 
 		sistema->GetCameras(cameras);
-		qDebug("Num cameras: %d\n", cameras.size());
+		qDebug("Num AVT cameras: %d\n", cameras.size());
 	}
 
 }
