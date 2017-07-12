@@ -85,9 +85,6 @@
     <ClCompile Include="AcquisitionDeviceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\External\Nikon\Header Files\CtrlSample.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">
@@ -135,9 +132,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\External\Nikon\Header Files\NkTypes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\External\Nikon\Header Files\CtrlSample.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
