@@ -99,6 +99,9 @@
     <CustomBuild Include="StandardProjector.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="MainGUI.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_ActiveAcquisitionSystem.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="..\External\Nikon\Header Files\NkTypes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_MainGUI.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
