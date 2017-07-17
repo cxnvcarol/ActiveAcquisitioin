@@ -26,6 +26,8 @@ public:
 	Projector* getProjector(std::string dev_id);
 	Projector* getProjectors();
 
+	void loadXmlSettingsToFirstAVTCamera();
+
 private:
 	AVT::VmbAPI::VimbaSystem* sistema;
 	VmbErrorType    err;

@@ -75,6 +75,17 @@ void AcquisitionDeviceManager::detectAVTCameras(AVTCamera* avtList)
 
 		sistema->GetCameras(cameras);
 		qDebug("Num AVT cameras: %d\n", cameras.size());
+
+		AVTCamera firstCam(cameras[0]);
 	}
+
+}
+
+void AcquisitionDeviceManager::loadXmlSettingsToFirstAVTCamera()
+{
+	//TODO Obviously re-write properly!. This is just an ultra-short-term solution.
+
+
+
 
 }

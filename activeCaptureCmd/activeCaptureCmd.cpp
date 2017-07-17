@@ -2,8 +2,9 @@
 //
 
 #include "stdafx.h"
+#include <QtWidgets/QApplication>
 //#include ""
-//#include "StandardProjector.h"
+#include "StandardProjector.h"
 //#include "AVTCamera.h"
 #include "AcquisitionDeviceManager.h"
 
@@ -25,11 +26,10 @@ static void printHelp()
 
 void testExternalProjection()
 {
-	/*
-	StandardProjector iv;//important to call in main function (or keep the reference to iv)
-	iv.showInFullProjection();
+	
 
-	*/
+
+	
 
 	
 }
@@ -144,9 +144,21 @@ int main(int argc, char *argv[])
 	initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);
 
 	testExternalProjection();
-	printf("\n\nEnter to finish");
+	printf("\n\nClose to finish");
 	
-	cin.get();
-    return 0;
+
+
+	QApplication a(argc, argv);
+
+	StandardProjector iv;//important to call in main function (or keep the reference to iv)
+	iv.showInFullProjection();
+
+
+	//qDebug("main print");
+	
+
+	//cin.get();
+	
+	return a.exec();
 }
 
