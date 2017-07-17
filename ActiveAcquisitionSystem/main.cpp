@@ -45,7 +45,7 @@ int main2(int argc, char *argv[])
 	return a.exec();
 
 }
-int main(int argc, char *argv[])
+int main3(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
 

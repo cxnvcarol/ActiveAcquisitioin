@@ -85,6 +85,9 @@
     <ClCompile Include="AcquisitionDeviceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\activeCaptureCmd\activeCaptureCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">
