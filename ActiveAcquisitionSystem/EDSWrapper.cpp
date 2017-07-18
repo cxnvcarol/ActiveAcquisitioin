@@ -173,8 +173,8 @@ EDSWrapper::~EDSWrapper()
 {
 }
 void EDSWrapper::sampleRun()
-{	
-	// Get first camera
+{
+	// ! first camera
 	EdsError err = EDS_ERR_OK;
 	if (err == EDS_ERR_OK)
 	{

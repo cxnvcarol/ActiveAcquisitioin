@@ -17,6 +17,7 @@ public:
 
 	virtual int takePicture();
 	virtual void loadSettings(CameraSettings cs);
+	virtual void loadSettings(std::string pathToSettings);
 
 private:
 	std::string dev_id;

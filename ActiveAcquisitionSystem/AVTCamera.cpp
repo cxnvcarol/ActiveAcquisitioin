@@ -8,12 +8,19 @@ AVTCamera::AVTCamera(CameraPtr avtCam)
 {
 	pCam = avtCam;
 }
-
+/* //removed to avoid unitialized objects
+AVTCamera::AVTCamera()
+{
+}
+*/
 AVTCamera::~AVTCamera()
 {
 	
 }
-
+void AVTCamera::setCameraPtr(CameraPtr avtCam)
+{
+	pCam = avtCam;
+}
 bool AVTCamera::loadSettings()
 {
 	VmbErrorType err = pCam->Open(VmbAccessModeFull);
@@ -318,7 +325,6 @@ bool AVTCamera::loadSettings()
 	ss.str("");
 	ss << "--> Feature values have been loaded from given XML file '" << xmlFile << "'";
 	std::cout << ss.str() << std::endl;
-
 	
 
 

@@ -22,18 +22,24 @@ public:
 	void detectProjectors();
 	
 	ActiveCamera* getCameras();
-	ActiveCamera* getCamera(std::string dev_id);
+	ActiveCamera getCamera(std::string dev_id);
+	ActiveCamera getCamera(int index);
 	Projector* getProjector(std::string dev_id);
 	Projector* getProjectors();
 
 	void loadXmlSettingsToFirstAVTCamera();
+
+	int getCountCameras() { return numCams; }
 
 private:
 	AVT::VmbAPI::VimbaSystem* sistema;
 	VmbErrorType    err;
 	ActiveCamera* cameraList;
 
+	int numCams;
 
-	void detectAVTCameras(AVTCamera* avtList);
+
+	//AVTCamera* detectAVTCameras();
+	int detectAVTCameras(AVTCamera* avtList);
 };
 

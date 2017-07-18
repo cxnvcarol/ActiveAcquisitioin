@@ -24,22 +24,13 @@ static void printHelp()
 	printf("Help text goes here!");
 }
 
-void testExternalProjection()
-{
-	
-
-
-	
-
-	
-}
-void initActiveCapture(int nCams, string cameraXmls[], int nProjectors, string projectionsFolder[], string projectionsConfig[],
+void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjectors, string projectionsFolder[], string projectionsConfig[],
 	int projectionScreen[], string outputFolder)
 {
 	//Procedure:
 	/*
 	1. Initialize selected APIS (vimba, no need x canon/nikon/dlp)
-	2. identify upto nCams vimba
+	2. select upto nCams vimba from identified list
 	3. load xmls to vimba
 	
 	In parallel (?)
@@ -56,6 +47,23 @@ void initActiveCapture(int nCams, string cameraXmls[], int nProjectors, string p
 
 	
 	*/
+	//1.
+
+	
+
+	/*
+	//The following is working fine so far.
+	*/
+	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();//API Inintialization is into the constructor
+	mng->detectCameras();
+
+	int nCams = nCamsToConfigure > mng->getCountCameras() ?mng->getCountCameras() : nCamsToConfigure;
+
+	for (int i = 0;i < nCams;i++)
+	{
+		mng->getCamera(i).loadSettings(cameraXmls[i]);
+
+	}
 
 
 
@@ -143,7 +151,6 @@ int main(int argc, char *argv[])
 
 	initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);
 
-	testExternalProjection();
 	printf("\n\nClose to finish");
 	
 

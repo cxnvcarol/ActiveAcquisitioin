@@ -24,3 +24,9 @@ void ActiveCamera::loadSettings(CameraSettings cs)
 {
 	throw "Not implemented";
 }
+
+
+void ActiveCamera::loadSettings(std::string pathToSettings)
+{
+	throw "Not implemented";
+}

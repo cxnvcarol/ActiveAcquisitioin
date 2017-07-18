@@ -7,8 +7,11 @@ class AVTCamera :
 	public ActiveCamera
 {
 public:
+	//AVTCamera();
 	AVTCamera(AVT::VmbAPI::CameraPtr avtCam);
 	~AVTCamera();
+
+	void setCameraPtr(AVT::VmbAPI::CameraPtr avtCam);
 
 
 	bool loadSettings();
