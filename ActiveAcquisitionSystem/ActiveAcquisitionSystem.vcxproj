@@ -208,6 +208,7 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\activeCaptureCmd\activeCaptureCmd.h" />
     <ClInclude Include="..\External\Nikon\Header Files\Maid3.h" />
     <ClInclude Include="..\External\Nikon\Header Files\Maid3d1.h" />
     <ClInclude Include="..\External\Nikon\Header Files\NkTypes.h" />

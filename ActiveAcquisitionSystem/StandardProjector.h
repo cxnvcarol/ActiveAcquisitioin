@@ -52,7 +52,6 @@
 #define IMAGEVIEWER_H
 
 #include <QMainWindow>
-#include <QImage>
 #include "Projector.h"
 
 class QAction;
@@ -70,7 +69,8 @@ public:
 
 public:
 	StandardProjector();
-	bool loadFile(const QString &);
+	bool loadAndDisplayImageFile(const QString &);
+	
 
 	private slots:
 	void fitToWindow();
@@ -80,10 +80,11 @@ public:
 private:
 	void setImage(const QImage &newImage);
 
+	void playSequence();
+
 	QImage image;
 	QLabel *imageLabel;
 	QScrollArea *scrollArea;
-	double scaleFactor;
 
 };
 

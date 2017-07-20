@@ -48,14 +48,13 @@
 **
 ****************************************************************************/
 
-#include <QtWidgets>
 
 #include "StandardProjector.h"
+#include <thread>
 
 StandardProjector::StandardProjector()
 	: imageLabel(new QLabel)
 	, scrollArea(new QScrollArea)
-	, scaleFactor(1)
 {
 	imageLabel->setBackgroundRole(QPalette::Base);
 	imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -69,7 +68,7 @@ StandardProjector::StandardProjector()
 	resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 }
 
-bool StandardProjector::loadFile(const QString &fileName)
+bool StandardProjector::loadAndDisplayImageFile(const QString &fileName)
 {
 	QImageReader reader(fileName);
 	reader.setAutoTransform(true);
@@ -83,9 +82,6 @@ bool StandardProjector::loadFile(const QString &fileName)
 
 	setImage(newImage);
 
-	setWindowFilePath(fileName);
-	//const QString message = tr("Opened \"%1\", %2x%3, Depth: %4").arg(QDir::toNativeSeparators(fileName)).arg(image.width()).arg(image.height()).arg(image.depth());
-	//statusBar()->showMessage(message);
 	return true;
 }
 
@@ -93,12 +89,21 @@ void StandardProjector::setImage(const QImage &newImage)
 {
 	image = newImage;
 	imageLabel->setPixmap(QPixmap::fromImage(image));
-	scaleFactor = 1.0;
 
 	scrollArea->setVisible(true);
 	imageLabel->adjustSize();
 }
+void StandardProjector::playSequence()
+{
 
+}
+void Projector::playProjectionSequence()
+{
+	//TODO!!! Find out how to play the thread using (private?) member functions
+
+	//https://stackoverflow.com/questions/266168/simple-example-of-threading-in-c
+	//https://stackoverflow.com/questions/10998780/stdthread-calling-method-of-class
+}
 
 
 void StandardProjector::fitToWindow()
@@ -114,9 +119,9 @@ void StandardProjector::showInFullProjection()
 	QRect rec2 = QApplication::desktop()->screenGeometry(1);
 	int x = rec.center().rx();
 	int x2 = rec2.center().rx();
-	//TODO Select rec according to the right-est x coordinate
+	//TODO Select rec according to the right-est x coordinate, or according to the parameter in the constructor (pass it!)
 	setGeometry(rec);
 
-	this->loadFile("C:\\Users\\naranjo\\Pictures\\IMG_0001.JPG");//TODO Parametrize
+	//TODO Show black at first!
 	this->fitToWindow();
 }

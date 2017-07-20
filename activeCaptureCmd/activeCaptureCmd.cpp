@@ -7,6 +7,7 @@
 #include "StandardProjector.h"
 //#include "AVTCamera.h"
 #include "AcquisitionDeviceManager.h"
+#include "activeCaptureCmd.h"
 
 
 enum class ParamCase {
@@ -152,16 +153,27 @@ int main(int argc, char *argv[])
 
 	}
 
-	initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);
+	//initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);//TODO Never worked nicely
 
 	printf("\n\nClose to finish\n");
 	
+
+
+
 
 
 	QApplication a(argc, argv);
 
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)
 	iv.showInFullProjection();
+
+	iv.loadAndDisplayImageFile("C:\\Users\\naranjo\\Pictures\\allied1.bmp");
+	int c=iv.loadProjectionsFolder("C:\\Users\\naranjo\\Pictures");
+
+
+	iv.loadProjectionSettings(projectionsConfig);
+
+	printf("\nPictures count: %d\n", c);
 
 
 	//qDebug("main print");
