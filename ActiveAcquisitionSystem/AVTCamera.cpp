@@ -1,12 +1,43 @@
 #include "AVTCamera.h"
 #include <iostream>
 #include <sstream>
+#include <algorithm>
+#include <string>
 
 using namespace AVT::VmbAPI;
+using namespace std;
 
+void PrintFtrInfo(const FeaturePtr &fs)
+{
+	std::string s;
+	try {
+		fs->GetValue(s);
+		printf("Ftr: %s\n", s);
+	}
+	catch (exception e)
+	{
+		printf("Ftr failed!");
+	}
+	
+}
 AVTCamera::AVTCamera(CameraPtr avtCam)
 {
 	pCam = avtCam;
+	VmbErrorType err = pCam->Open(VmbAccessModeFull);
+	if (err == VmbErrorSuccess)
+	{
+		FeaturePtr feature;
+		pCam->GetID(dev_id);
+		FeaturePtrVector fs;
+		pCam->GetFeatures(fs);
+		for_each(fs.begin(), fs.end(), PrintFtrInfo);
+
+
+		pCam->Close();
+	}
+}
+AVTCamera::AVTCamera()
+{
 }
 /* //removed to avoid unitialized objects
 AVTCamera::AVTCamera()
@@ -21,6 +52,86 @@ void AVTCamera::setCameraPtr(CameraPtr avtCam)
 {
 	pCam = avtCam;
 }
+
+bool AVTCamera::loadSettings(std::string configXml)
+{
+	VmbErrorType err = pCam->Open(VmbAccessModeFull);
+	std::stringstream ss;
+	bool apiFlag = false;
+	bool cameraFlag = false;
+	if (VmbErrorSuccess != err)
+	{
+		ss.str("");
+		ss << "Could not open camera [error code: " << err << "]";
+		std::cout << ss.str() << std::endl;
+
+		err = pCam->Close();
+		if (VmbErrorSuccess != err)
+		{
+			ss.str("");
+			ss << "Could not close camera [error code: " << err << "]";
+			std::cout << ss.str() << std::endl;
+		}
+		/*//TODO Review!
+		err = sys.Shutdown();
+		if (VmbErrorSuccess != err)
+		{
+		ss.str("");
+		ss << "Could not shutdown Vimba [error code: " << err << "]";
+		std::cout << ss.str() << std::endl;
+		}
+		*/
+
+		throw std::exception();
+	}
+
+
+	//  create settings struct to determine behaviour during loading
+	VmbFeaturePersistSettings_t settingsStruct;
+	settingsStruct.loggingLevel = 4;
+	settingsStruct.maxIterations = 5;
+	settingsStruct.persistType = VmbFeaturePersistNoLUT;
+
+	//  re-load saved settings from file
+	err = pCam->LoadCameraSettings(configXml, &settingsStruct);
+	if (VmbErrorSuccess != err)
+	{
+		ss.str("");
+		ss << "Could not load camera settings to file '" << configXml << "' [error code: " << err << "]";
+		std::cout << ss.str() << std::endl;
+
+		err = pCam->Close();
+		if (VmbErrorSuccess != err)
+		{
+			ss.str("");
+			ss << "Could not close camera [error code: " << err << "]";
+			std::cout << ss.str() << std::endl;
+		}
+		cameraFlag = false;
+
+		/*//TODO Review!
+		err = sys.Shutdown();
+		if (VmbErrorSuccess != err)
+		{
+		ss.str("");
+		ss << "Could not shutdown Vimba [error code: " << err << "]";
+		std::cout << ss.str() << std::endl;
+		}
+		*/
+		apiFlag = false;
+
+		throw std::exception();
+	}
+
+	ss.str("");
+	ss << "--> Feature values have been loaded from given XML file '" << configXml << "'";
+	std::cout << ss.str() << std::endl;
+
+
+
+	return true;
+}
+
 bool AVTCamera::loadSettings()
 {
 	VmbErrorType err = pCam->Open(VmbAccessModeFull);

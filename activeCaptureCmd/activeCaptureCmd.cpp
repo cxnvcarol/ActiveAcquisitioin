@@ -44,12 +44,10 @@ void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjector
 	6. avts -> start capturing & start projecting
 	7. transfer captured pictures to output folder
 	8. write xml output with capturing data (compliant with 3digify format!)
-
 	
 	*/
 	//1.
 
-	
 
 	/*
 	//The following is working fine so far.
@@ -59,15 +57,20 @@ void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjector
 
 	int nCams = nCamsToConfigure > mng->getCountCameras() ?mng->getCountCameras() : nCamsToConfigure;
 
+
+	printf("There are %d detected cams and I'm trying to load %d xml files", mng->getCountCameras(), nCamsToConfigure);
+
 	for (int i = 0;i < nCams;i++)
 	{
-		mng->getCamera(i).loadSettings(cameraXmls[i]);
-
+		AVTCamera ac = mng->getCamera(0);
+		string as = ac.getAnyStr();
+		bool result = ac.loadSettings(cameraXmls[i]);
+		printf("loading for cam # %d: %s\n", i, result ? "true" : "false");
 	}
-
-
-
 }
+
+
+
 int main(int argc, char *argv[])
 {	
 	printf("# args: %d\n", argc);
@@ -151,7 +154,7 @@ int main(int argc, char *argv[])
 
 	initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);
 
-	printf("\n\nClose to finish");
+	printf("\n\nClose to finish\n");
 	
 
 

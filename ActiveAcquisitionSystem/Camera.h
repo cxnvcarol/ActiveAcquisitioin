@@ -16,10 +16,9 @@ public:
 //	template <typename CameraSettings>;
 
 	virtual int takePicture();
-	virtual void loadSettings(CameraSettings cs);
-	virtual void loadSettings(std::string pathToSettings);
-
-private:
+	virtual bool loadSettings(CameraSettings cs);
+	virtual bool loadSettings(std::string pathToSettings);
+protected:
 	std::string dev_id;
 };
 

@@ -20,13 +20,13 @@ int ActiveCamera::takePicture()
 	throw "Not implemented";
 }
 
-void ActiveCamera::loadSettings(CameraSettings cs)
+bool ActiveCamera::loadSettings(CameraSettings cs)//GRAL CASE (makes more sense for canon & nikon)
 {
 	throw "Not implemented";
 }
 
 
-void ActiveCamera::loadSettings(std::string pathToSettings)
+bool ActiveCamera::loadSettings(std::string pathToSettings)
 {
 	throw "Not implemented";
 }
