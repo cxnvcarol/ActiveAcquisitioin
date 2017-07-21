@@ -93,16 +93,41 @@ void StandardProjector::setImage(const QImage &newImage)
 	scrollArea->setVisible(true);
 	imageLabel->adjustSize();
 }
-void StandardProjector::playSequence()
+static void doPlay( int n)
 {
+	for (int i = 0;i < n;i++)
+	{
+		printf("i got the number %d\n", n);
+		fflush(stdout);
+		Sleep(500);
+	}
+	
 
 }
-void Projector::playProjectionSequence()
+void StandardProjector::playProjectionSequence(int n)
 {
-	//TODO!!! Find out how to play the thread using (private?) member functions
+	
+	printf("playProjectionSequence called, repeat for %d times\n",n);
 
-	//https://stackoverflow.com/questions/266168/simple-example-of-threading-in-c
-	//https://stackoverflow.com/questions/10998780/stdthread-calling-method-of-class
+	if (!playingSequence)
+	{
+		playingSequence = true;
+		//TODO!!! Find out how to play the thread using (private?) member functions
+		//https://stackoverflow.com/questions/266168/simple-example-of-threading-in-c
+		//https://stackoverflow.com/questions/10998780/stdthread-calling-method-of-class
+		StandardProjector theone;
+		std::thread t(doPlay, n);
+
+		t.join();
+		return;
+		//return t;
+	}
+
+	//TODO Edit real response!
+	printf("this is supose to happen into the thread, no obstructing GUI??");
+	fflush(stdout);
+	Sleep(500);
+
 }
 
 

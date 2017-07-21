@@ -27,14 +27,14 @@ public:
 	void loadProjectionSettings(const QString projectionsConfig);
 	int loadProjectionsFolder(const QString &folderPath);
 
-	virtual void playProjectionSequence();//play already loaded sequence
+	virtual void playProjectionSequence(int n);//play already loaded sequence
 
 protected:
 	std::vector<ProjectedImg> projections;
 	std::vector<Projection> sequenceProjections;
 
 
-
+	bool playingSequence;
 
 
 };

@@ -6,7 +6,7 @@ using namespace std;
 
 Projector::Projector()
 {
-	string what = "ha!";
+	playingSequence = false;
 }
 
 
@@ -66,6 +66,8 @@ void Projector::loadProjectionSettings(const QString projectionsConfig)
 				throw ("incorrect projection setting in line: " + line);
 			}
 			sequenceProjections.push_back({index,us,camTrigger});
+
+			line = in.readLine();
 		}
 	}
 
@@ -85,7 +87,7 @@ int Projector::loadProjectionsFolder(const QString & folderPath)
 		QFileInfoList filelistinfo = dir.entryInfoList();
 		foreach(const QFileInfo &fileinfo, filelistinfo) {
 			QString imageFile = fileinfo.absoluteFilePath();
-			QStringList list = imageFile.split(QRegExp("[\r\n\t ]+"));
+			QStringList list = imageFile.split(QRegExp("[\\/]+"));
 
 			//imageFile is the image path, just put your load image code here
 			QImageReader reader(imageFile);
@@ -96,7 +98,7 @@ int Projector::loadProjectionsFolder(const QString & folderPath)
 	return projections.size();
 }
 
-void Projector::playProjectionSequence()
+void Projector::playProjectionSequence(int n)
 {
 	throw "not implemented";
 }

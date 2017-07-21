@@ -8,7 +8,7 @@
 //#include "AVTCamera.h"
 #include "AcquisitionDeviceManager.h"
 #include "activeCaptureCmd.h"
-
+#include <thread>
 
 enum class ParamCase {
 	DEFAULT,
@@ -70,10 +70,15 @@ void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjector
 	}
 }
 
-
+void playSeq(Projector* p, int n)
+{
+	//iv.playProjectionSequence(n);
+	printf("hi you");
+}
 
 int main(int argc, char *argv[])
 {	
+	QApplication a(argc, argv);
 	printf("# args: %d\n", argc);
 	for (int i = 1;i < argc;i++)
 	{
@@ -162,7 +167,7 @@ int main(int argc, char *argv[])
 
 
 
-	QApplication a(argc, argv);
+	
 
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)
 	iv.showInFullProjection();
@@ -171,7 +176,11 @@ int main(int argc, char *argv[])
 	int c=iv.loadProjectionsFolder("C:\\Users\\naranjo\\Pictures");
 
 
-	iv.loadProjectionSettings(projectionsConfig);
+	iv.loadProjectionSettings(projectionsConfig[0].c_str());
+
+	std::thread t(playSeq, iv);
+
+	//iv.playProjectionSequence(2);//play sequence twice
 
 	printf("\nPictures count: %d\n", c);
 
@@ -180,6 +189,8 @@ int main(int argc, char *argv[])
 	
 
 	//cin.get();
+
+	t.join();
 	
 	return a.exec();
 }

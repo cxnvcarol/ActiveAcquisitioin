@@ -71,21 +71,22 @@ public:
 	StandardProjector();
 	bool loadAndDisplayImageFile(const QString &);
 	
+	void playProjectionSequence(int n);
 
-	private slots:
-	void fitToWindow();
-
+	
 	
 
 private:
 	void setImage(const QImage &newImage);
 
-	void playSequence();
+	
 
 	QImage image;
 	QLabel *imageLabel;
 	QScrollArea *scrollArea;
 
+private slots:
+	void fitToWindow();
 };
 
 #endif
