@@ -3,12 +3,10 @@
 
 #include "stdafx.h"
 #include <QtWidgets/QApplication>
-//#include ""
 #include "StandardProjector.h"
 //#include "AVTCamera.h"
 #include "AcquisitionDeviceManager.h"
 #include "activeCaptureCmd.h"
-#include <thread>
 
 enum class ParamCase {
 	DEFAULT,
@@ -68,12 +66,6 @@ void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjector
 		bool result = ac.loadSettings(cameraXmls[i]);
 		printf("loading for cam # %d: %s\n", i, result ? "true" : "false");
 	}
-}
-
-void playSeq(Projector* p, int n)
-{
-	//iv.playProjectionSequence(n);
-	printf("hi you");
 }
 
 int main(int argc, char *argv[])
@@ -178,20 +170,9 @@ int main(int argc, char *argv[])
 
 	iv.loadProjectionSettings(projectionsConfig[0].c_str());
 
-	std::thread t(playSeq, iv);
-
-	//iv.playProjectionSequence(2);//play sequence twice
+	iv.playProjectionSequence(15);//play sequence twice
 
 	printf("\nPictures count: %d\n", c);
-
-
-	//qDebug("main print");
-	
-
-	//cin.get();
-
-	t.join();
 	
 	return a.exec();
 }
-

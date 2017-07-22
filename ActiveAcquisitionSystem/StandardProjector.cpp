@@ -50,7 +50,7 @@
 
 
 #include "StandardProjector.h"
-#include <thread>
+
 
 StandardProjector::StandardProjector()
 	: imageLabel(new QLabel)
@@ -66,6 +66,14 @@ StandardProjector::StandardProjector()
 	setCentralWidget(scrollArea);
 
 	resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+}
+
+StandardProjector::~StandardProjector()
+{
+	if (playingSequence)
+	{
+		playingSequence = false;
+	}
 }
 
 bool StandardProjector::loadAndDisplayImageFile(const QString &fileName)
@@ -93,6 +101,7 @@ void StandardProjector::setImage(const QImage &newImage)
 	scrollArea->setVisible(true);
 	imageLabel->adjustSize();
 }
+/*
 static void doPlay( int n)
 {
 	for (int i = 0;i < n;i++)
@@ -101,7 +110,12 @@ static void doPlay( int n)
 		fflush(stdout);
 		Sleep(500);
 	}
-	
+}
+*/
+
+void twth(StandardProjector* pr,int n)
+{
+	pr->playProjectionSequence(n);
 
 }
 void StandardProjector::playProjectionSequence(int n)
@@ -116,18 +130,18 @@ void StandardProjector::playProjectionSequence(int n)
 		//https://stackoverflow.com/questions/266168/simple-example-of-threading-in-c
 		//https://stackoverflow.com/questions/10998780/stdthread-calling-method-of-class
 		StandardProjector theone;
-		std::thread t(doPlay, n);
-
-		t.join();
+		std::thread another(twth, this, n);
+		another.detach();
 		return;
-		//return t;
 	}
 
-	//TODO Edit real response!
-	printf("this is supose to happen into the thread, no obstructing GUI??");
-	fflush(stdout);
-	Sleep(500);
-
+	for (int i = 0;i < n;i++)
+	{
+		printf("\n\nthis is supose to happen into the thread, no obstructing GUI??\n");
+		fflush(stdout);
+		Sleep(500);
+	}
+	playingSequence = false;
 }
 
 

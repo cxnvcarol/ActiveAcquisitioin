@@ -53,6 +53,7 @@
 
 #include <QMainWindow>
 #include "Projector.h"
+#include <thread>
 
 class QAction;
 class QLabel;
@@ -69,21 +70,17 @@ public:
 
 public:
 	StandardProjector();
-	bool loadAndDisplayImageFile(const QString &);
-	
-	void playProjectionSequence(int n);
 
-	
-	
+	~StandardProjector();
+	bool loadAndDisplayImageFile(const QString &);	
+	void playProjectionSequence(int n);
 
 private:
 	void setImage(const QImage &newImage);
-
-	
-
 	QImage image;
 	QLabel *imageLabel;
-	QScrollArea *scrollArea;
+	QScrollArea *scrollArea;//TODO Manage to remove the element (shouldnt be necessary in fullscreen) 
+
 
 private slots:
 	void fitToWindow();
