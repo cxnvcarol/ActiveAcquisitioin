@@ -151,28 +151,21 @@ int main(int argc, char *argv[])
 	}
 
 	//initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);//TODO Never worked nicely
+		
 
-	printf("\n\nClose to finish\n");
-	
-
-
-
-
-
-	
-
-	StandardProjector iv;//important to call in main function (or keep the reference to iv)
-	iv.showInFullProjection();
-
-	iv.loadAndDisplayImageFile("C:\\Users\\naranjo\\Pictures\\allied1.bmp");
+	StandardProjector iv;//important to call in main function (or keep the reference to iv)	
+	//iv.loadAndDisplayImageFile("C:\\Users\\naranjo\\Pictures\\allied1.bmp");
 	int c=iv.loadProjectionsFolder("C:\\Users\\naranjo\\Pictures");
-
-
 	iv.loadProjectionSettings(projectionsConfig[0].c_str());
-
-	iv.playProjectionSequence(15);//play sequence twice
-
-	printf("\nPictures count: %d\n", c);
 	
+
+
+	//camera related: 1. get first avt detected, load 
+
+
+
+	iv.showInFullProjection();
+	iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
+		
 	return a.exec();
 }
