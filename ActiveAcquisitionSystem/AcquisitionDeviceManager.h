@@ -29,6 +29,9 @@ public:
 	Projector* getProjectors();
 
 	void loadXmlSettingsToFirstAVTCamera();
+	//int detectAVTCameras(AVTCamera* avtList);
+	AVTCamera * detectAVTCameras();
+	static bool testValidCameraPtr(AVT::VmbAPI::CameraPtr sh);
 
 	int getCountCameras() {
 		
@@ -37,9 +40,6 @@ public:
 private:
 	AVT::VmbAPI::VimbaSystem* sistema;
 	VmbErrorType    err;
-	//ActiveCamera* cameraList;
-	//std::vector<ActiveCamera*> cameraList;
-	//AVTCamera cameraList[100];
 	AVTCamera* cameraList;
 	AVT::VmbAPI::CameraPtrVector cameras;
 
@@ -47,6 +47,5 @@ private:
 
 
 	//AVTCamera* detectAVTCameras();
-	int detectAVTCameras(AVTCamera* avtList);
 };
 

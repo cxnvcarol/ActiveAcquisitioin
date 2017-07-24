@@ -154,18 +154,38 @@ int main(int argc, char *argv[])
 		
 
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)	
-	//iv.loadAndDisplayImageFile("C:\\Users\\naranjo\\Pictures\\allied1.bmp");
 	int c=iv.loadProjectionsFolder("C:\\Users\\naranjo\\Pictures");
 	iv.loadProjectionSettings(projectionsConfig[0].c_str());
 	
+	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
+	AVTCamera* cameraList=mng->detectAVTCameras();
+	printf("the cam name: %s\n",cameraList[0].getName().c_str());
+	
+	/////////////
+
+	cameraList[0].loadSettings(cameraConfigXml[0]);
+	AVT::VmbAPI::CameraPtr cam= cameraList[0].getAVTPointer();	
+	VmbErrorType err = cam->Open(VmbAccessModeFull);
+	
+
+	if (vimbaError)
+	{
+		printf("Alles kaput, close and try again ;)");
+		cin.get();
+		return -1;
+	}
+	//TODO 2. wait for camready & capture picture!!
+	printf("so far it seems to have xml loaded");
 
 
 	//camera related: 1. get first avt detected, load 
 
-
+	
 
 	iv.showInFullProjection();
 	iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
 		
+
+	err = cam->Close();
 	return a.exec();
 }

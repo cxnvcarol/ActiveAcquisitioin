@@ -21,7 +21,7 @@ public:
 		if (pCam == NULL)
 		{
 			std::string ns = "no se cuando paso, ni como sucedio, lo unico que yo se es que me muero por tii.";
-			printf("ns: %s\n", ns);
+			printf("ns: %s\n", ns.c_str());
 			return ns;
 		}
 		pCam->Open(VmbAccessModeFull);
@@ -29,6 +29,15 @@ public:
 		pCam->Close();
 		return "any string";
 	}
+	AVT::VmbAPI::CameraPtr getAVTPointer() { 
+		return pCam; }
+
+	void setName(std::string n) {name = n; }
+	std::string getName() { 
+		const char* n = name.c_str();
+		printf("%s:\n", n);
+
+		return name; }
 
 private:
 //	VimbaSystem& sys;

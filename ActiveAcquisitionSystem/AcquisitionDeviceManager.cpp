@@ -46,7 +46,8 @@ void AcquisitionDeviceManager::endAPIs()
 void AcquisitionDeviceManager::detectCameras()
 {
 	//AVTCamera *list;
-	int count= detectAVTCameras(cameraList);
+	//int count= detectAVTCameras(cameraList);
+	cameraList = detectAVTCameras();
 	//TODO Complete!
 	//1. detect canons, detect nikons, then allocate the cameraList matching the count of objects.
 	// So far just fillsN the list with the avt!
@@ -75,7 +76,7 @@ void AcquisitionDeviceManager::detectCameras()
 	//TODO Remove this test:
 	string as = cameraList[0].getAnyStr();
 	
-	numCams = count;
+	numCams = sizeof(cameraList);//review here (likely not the right size)
 }
 
 void AcquisitionDeviceManager::detectProjectors()
@@ -110,47 +111,51 @@ Projector* AcquisitionDeviceManager::getProjector(string dev_id)
 }
 
 
-int AcquisitionDeviceManager::detectAVTCameras(AVTCamera* avtList)
+AVTCamera* AcquisitionDeviceManager::detectAVTCameras()
 {
-	//AVTCamera* avtList;
-	//TODO 
+	AVTCamera* avtList;
 	int count = 0;
 	if (!vimbaError)
 	{
-		
-
 		sistema->GetCameras(cameras);
 		count = cameras.size();
 		qDebug("Num AVT cameras: %d\n", count);
 
 		avtList = new AVTCamera[cameras.size()];
-		//avtList = (AVTCamera*)calloc(count, sizeof(AVTCamera));
+		
 		CameraPtr sh;
 		if (count > 0)
 		{
-			sh = cameras[0];
-			VmbErrorType err=sh->Open(VmbAccessModeFull);
-			err=sh->Close();
-		}
-		for (int i = 0;i < count;i++)
-		{
-			avtList[i]= AVTCamera(cameras[i]);
-			VmbErrorType err = cameras[i]->Open(VmbAccessModeFull);
-			err = cameras[i]->Close();
-			
+			testValidCameraPtr(cameras[0]);
+			for (int i = 0;i < count ; i++)
+			{
+				avtList[i].setCameraPtr(cameras[i]);
+				avtList[i].setName("myname");
+			}
+			avtList[0].getName();
+			testValidCameraPtr(avtList[0].getAVTPointer());
 		}		
-		if (count > 0)
-		{
-			VmbErrorType err = sh->Open(VmbAccessModeFull);
-			err = sh->Close();
-		}
-		//todo remove this test:
-		string as=avtList[0].getAnyStr();
-		printf("as: %s",as);
 	}
-	return count;
+
+	//return count;
+	return avtList;
 }
 
+bool AcquisitionDeviceManager::testValidCameraPtr(CameraPtr sh)
+{
+	try {
+		VmbErrorType err = sh->Open(VmbAccessModeFull);
+		string nm;
+		sh->GetName(nm);
+		printf("Valid cameraptr: %s\n",nm.c_str());
+		sh->Close();
+		return true;
+	}
+	catch(exception ex){
+		printf("invalid cameraptr");
+		return false;
+	}
+}
 void AcquisitionDeviceManager::loadXmlSettingsToFirstAVTCamera()
 {
 	//TODO Obviously re-write properly!. This is just an ultra-short-term solution.

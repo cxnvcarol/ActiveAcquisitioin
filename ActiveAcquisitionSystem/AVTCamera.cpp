@@ -12,7 +12,7 @@ void PrintFtrInfo(const FeaturePtr &fs)
 	std::string s;
 	try {
 		fs->GetValue(s);
-		printf("Ftr: %s\n", s);
+		printf("Ftr: %s\n", s.c_str());
 	}
 	catch (exception e)
 	{
@@ -127,7 +127,7 @@ bool AVTCamera::loadSettings(std::string configXml)
 	ss << "--> Feature values have been loaded from given XML file '" << configXml << "'";
 	std::cout << ss.str() << std::endl;
 
-
+	pCam->Close();
 
 	return true;
 }
