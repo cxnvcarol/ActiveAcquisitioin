@@ -38,8 +38,9 @@ void Projector::loadProjectionSettings(const QString projectionsConfig)
 	if (f.open(QIODevice::ReadOnly))
 	{
 		QTextStream in(&f);
-		QString line = in.readLine();
+		QString line;
 		while (!in.atEnd()) {
+			line = in.readLine();
 			QStringList  fields = line.split(",");
 			if (fields.size() != 3)
 			{
@@ -66,7 +67,7 @@ void Projector::loadProjectionSettings(const QString projectionsConfig)
 			}
 			projectionsSequence.push_back({index,us,camTrigger});
 
-			line = in.readLine();
+			
 		}
 		f.close();
 	}

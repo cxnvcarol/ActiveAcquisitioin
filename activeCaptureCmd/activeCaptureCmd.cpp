@@ -160,32 +160,39 @@ int main(int argc, char *argv[])
 	std::vector<AVTCamera*> cameraList=mng->detectAVTCameras();
 	if (cameraList.size() == 0)
 	{
-		printf("\nno AVT Cameras detected. Enter to finish");
+		printf("\nno AVT Cameras detected. Enter to continue");
+		
+		/*
 		delete mng;
 		cin.get();		
 		return 0;
+		*/
 	}
-	printf("the cam name: %s\n",cameraList[0]->getName().c_str());
-	
-	//////
+	else {
+		printf("the cam name: %s\n", cameraList[0]->getName().c_str());
 
-	cameraList[0]->loadSettings(cameraConfigXml[0]);
-	AVT::VmbAPI::CameraPtr cam= cameraList[0]->getAVTPointer();	
-	VmbErrorType err = cam->Open(VmbAccessModeFull);
-	if (vimbaError)
-	{
-		printf("Alles kaput, close and try again ;)");
-		cin.get();
-		return -1;
+		//////
+
+		cameraList[0]->loadSettings(cameraConfigXml[0]);
+		AVT::VmbAPI::CameraPtr cam = cameraList[0]->getAVTPointer();
+		VmbErrorType err = cam->Open(VmbAccessModeFull);
+		if (vimbaError)
+		{
+			printf("Alles kaput, close and try again X/");
+			cin.get();
+			return -1;
+		}
+		//TODO 2. wait for camready & capture picture!!
+		//camera related: 1. get first avt detected, load
+		printf("xml load succeeded\n");
+		err = cam->Close();
 	}
-	//TODO 2. wait for camready & capture picture!!
-	//camera related: 1. get first avt detected, load
-	printf("xml load succeeded\n");
+	
 
 	
 	iv.showInFullProjection();
 	iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
-
-	err = cam->Close();
-	return a.exec();
+	int result = a.exec();
+	delete mng;
+	return result;
 }

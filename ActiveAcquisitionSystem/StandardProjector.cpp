@@ -65,7 +65,13 @@ StandardProjector::StandardProjector()
 	scrollArea->setVisible(false);
 	setCentralWidget(scrollArea);
 
-	resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+	//resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
+
+	projectionTimer = new QTimer(this);
+	//projectionTimer->setSingleShot(true);
+	
+	connect(projectionTimer, SIGNAL(timeout()), this, SLOT(advanceProjectionSequence()));
+	
 }
 
 StandardProjector::~StandardProjector()
@@ -107,48 +113,39 @@ void StandardProjector::setImage(const QImage &newImage)
 	scrollArea->setVisible(true);
 	imageLabel->adjustSize();
 }
-/*
-static void doPlay( int n)
-{
-	for (int i = 0;i < n;i++)
-	{
-		printf("i got the number %d\n", n);
-		fflush(stdout);
-		Sleep(500);
-	}
-}
-*/
 
-void playInThread(StandardProjector* pr,int n)
-{
-	//pr->playProjectionSequence(n);
-	for (int i = 0;i < n;i++)
-	{
-		//Here play the right sequence!
-		//no uS supported
-		std::vector<Projection> seq = pr->getPprojectionsSequence();
-		for (int j = 0;j < seq.size();j++)
-		{
-			Projection proj = seq[j];
-			
-			//bool trigger = pr.triggerCam;
-			//TODO Read and use trigger condition!
-			pr->setCurrentProjection(proj.ProjectedImgIndex);
-			Sleep(proj.usTime / 1000);
-		}
-
-	}
-	pr->playingSequence = false;
-}
 void StandardProjector::playProjectionSequence(int n)
 {
 	if (!playingSequence)
 	{
 		printf("playProjectionSequence called, repeat for %d times\n", n);
+		
 		playingSequence = true;
-		std::thread theThread(playInThread, this, n);
-		theThread.detach();
-		return;
+		
+		currentProjectionIndex = 0;
+		//bool trigger = projection.triggerCam;
+		//TODO Read and use trigger condition to emit signal to cameras!
+		setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
+		projectionTimer->start(projectionsSequence[currentProjectionIndex].usTime/1000);		
+		currentProjectionIndex++;
+
+		//TODO SET SINGLESHOT TIMER, RESTART TIMER EVERYTIME WITH CORRECT TIME FOR EACH PROJECTION
+	}
+}
+
+void StandardProjector::advanceProjectionSequence()
+{
+	//bool trigger = projection.triggerCam;
+	//TODO Read and use trigger condition to emit signal to cameras!
+	//setImage(projections[currentProjectionIndex].image);
+	printf("setting the next projection..%d\n",currentProjectionIndex);
+	setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
+	currentProjectionIndex++;
+	if (currentProjectionIndex == projectionsSequence.size())
+	{
+		projectionTimer->stop();
+		currentProjectionIndex = 0;
+		printf("end of projections\n");
 	}
 }
 
@@ -167,7 +164,7 @@ void StandardProjector::showInFullProjection()
 	int x = rec.center().rx();
 	int x2 = rec2.center().rx();
 	//TODO Select rec according to the right-est x coordinate, or according to the parameter in the constructor (pass it!)
-	setGeometry(rec);
+	setGeometry(rec2);
 
 	//TODO Show black at first!
 	this->fitToWindow();
