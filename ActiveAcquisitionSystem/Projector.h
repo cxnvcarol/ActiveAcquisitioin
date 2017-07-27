@@ -29,12 +29,19 @@ public:
 
 	virtual void playProjectionSequence(int n);//play already loaded sequence
 
+
+	std::vector<Projection> getPprojectionsSequence() {
+		return projectionsSequence;
+	}
+
+	bool playingSequence;//TODO Should be protected!?
+
 protected:
 	std::vector<ProjectedImg> projections;
-	std::vector<Projection> sequenceProjections;
+	std::vector<Projection> projectionsSequence;
 
 
-	bool playingSequence;
+	
 
 
 };

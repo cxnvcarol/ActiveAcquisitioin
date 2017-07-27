@@ -92,7 +92,13 @@ bool StandardProjector::loadAndDisplayImageFile(const QString &fileName)
 
 	return true;
 }
-
+void StandardProjector::setCurrentProjection(int projectionIndex)
+{
+	if (projections.size() > projectionIndex)
+	{
+		setImage(projections[projectionIndex].image);
+	}
+}
 void StandardProjector::setImage(const QImage &newImage)
 {
 	image = newImage;
@@ -113,35 +119,37 @@ static void doPlay( int n)
 }
 */
 
-void twth(StandardProjector* pr,int n)
+void playInThread(StandardProjector* pr,int n)
 {
-	pr->playProjectionSequence(n);
+	//pr->playProjectionSequence(n);
+	for (int i = 0;i < n;i++)
+	{
+		//Here play the right sequence!
+		//no uS supported
+		std::vector<Projection> seq = pr->getPprojectionsSequence();
+		for (int j = 0;j < seq.size();j++)
+		{
+			Projection proj = seq[j];
+			
+			//bool trigger = pr.triggerCam;
+			//TODO Read and use trigger condition!
+			pr->setCurrentProjection(proj.ProjectedImgIndex);
+			Sleep(proj.usTime / 1000);
+		}
 
+	}
+	pr->playingSequence = false;
 }
 void StandardProjector::playProjectionSequence(int n)
 {
-	
-	printf("playProjectionSequence called, repeat for %d times\n",n);
-
 	if (!playingSequence)
 	{
+		printf("playProjectionSequence called, repeat for %d times\n", n);
 		playingSequence = true;
-		//TODO!!! Find out how to play the thread using (private?) member functions
-		//https://stackoverflow.com/questions/266168/simple-example-of-threading-in-c
-		//https://stackoverflow.com/questions/10998780/stdthread-calling-method-of-class
-		StandardProjector theone;
-		std::thread another(twth, this, n);
-		another.detach();
+		std::thread theThread(playInThread, this, n);
+		theThread.detach();
 		return;
 	}
-
-	for (int i = 0;i < n;i++)
-	{
-		printf("\n\nthis is supose to happen into the thread, no obstructing GUI??\n");
-		fflush(stdout);
-		Sleep(500);
-	}
-	playingSequence = false;
 }
 
 

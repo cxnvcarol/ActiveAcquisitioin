@@ -2,54 +2,35 @@
 #include "Camera.h"
 #include "VimbaCPP/Include/VimbaCPP.h"
 //#include <string>
-
+using namespace AVT::VmbAPI;
+using namespace std;
 class AVTCamera :
-	public ActiveCamera
+	public ActiveCamera, virtual public IFrameObserver
 {
 public:
+	//void triggerCamera();
+	AVTCamera(CameraPtr avtCam);
 	AVTCamera();
-	AVTCamera(AVT::VmbAPI::CameraPtr avtCam);
 	~AVTCamera();
 
-	void setCameraPtr(AVT::VmbAPI::CameraPtr avtCam);
-	bool loadSettings();
 	bool loadSettings(std::string configPath);
+	virtual void FrameReceived(const FramePtr pFrame);
 
-
-	std::string getAnyStr()
-	{
-		if (pCam == NULL)
-		{
-			std::string ns = "no se cuando paso, ni como sucedio, lo unico que yo se es que me muero por tii.";
-			printf("ns: %s\n", ns.c_str());
-			return ns;
-		}
-		pCam->Open(VmbAccessModeFull);
-		
-		pCam->Close();
-		return "any string";
-	}
-	AVT::VmbAPI::CameraPtr getAVTPointer() { 
-		return pCam; }
-
-	void setName(std::string n) {name = n; }
-	std::string getName() { 
-		const char* n = name.c_str();
-		printf("%s:\n", n);
-
-		return name; }
+	bool setFrame(const AVT::VmbAPI::FramePtr & frame);
+	
+	CameraPtr getAVTPointer() { return pCam; }
+	void setName(string n) {name = n; }
+	string getName() { 	return name; }
 
 private:
-//	VimbaSystem& sys;
-
-	std::string name;
-	std::string model;
-	std::string serial;
-	std::string interfaceID;//i.e. ETHERNET for GigE cameras
+	string name;
+	string model;
+	string serial;
+	string interfaceID;//i.e. ETHERNET for GigE cameras
 
 	std::string ipAddress;
 
-	AVT::VmbAPI::CameraPtr pCam;
+	CameraPtr pCam;
 	
 };
 

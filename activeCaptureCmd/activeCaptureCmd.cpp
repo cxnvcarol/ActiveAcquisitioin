@@ -7,7 +7,7 @@
 //#include "AVTCamera.h"
 #include "AcquisitionDeviceManager.h"
 #include "activeCaptureCmd.h"
-
+//todo check and use vector<> instead of pointer arrays.
 enum class ParamCase {
 	DEFAULT,
 	CAMERA_CONFIGS,
@@ -61,9 +61,8 @@ void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjector
 
 	for (int i = 0;i < nCams;i++)
 	{
-		AVTCamera ac = mng->getCamera(0);
-		string as = ac.getAnyStr();
-		bool result = ac.loadSettings(cameraXmls[i]);
+		AVTCamera *ac = mng->getCamera(0);
+		bool result = ac->loadSettings(cameraXmls[i]);
 		printf("loading for cam # %d: %s\n", i, result ? "true" : "false");
 	}
 }
@@ -158,16 +157,21 @@ int main(int argc, char *argv[])
 	iv.loadProjectionSettings(projectionsConfig[0].c_str());
 	
 	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
-	AVTCamera* cameraList=mng->detectAVTCameras();
-	printf("the cam name: %s\n",cameraList[0].getName().c_str());
+	std::vector<AVTCamera*> cameraList=mng->detectAVTCameras();
+	if (cameraList.size() == 0)
+	{
+		printf("\nno AVT Cameras detected. Enter to finish");
+		delete mng;
+		cin.get();		
+		return 0;
+	}
+	printf("the cam name: %s\n",cameraList[0]->getName().c_str());
 	
-	/////////////
+	//////
 
-	cameraList[0].loadSettings(cameraConfigXml[0]);
-	AVT::VmbAPI::CameraPtr cam= cameraList[0].getAVTPointer();	
+	cameraList[0]->loadSettings(cameraConfigXml[0]);
+	AVT::VmbAPI::CameraPtr cam= cameraList[0]->getAVTPointer();	
 	VmbErrorType err = cam->Open(VmbAccessModeFull);
-	
-
 	if (vimbaError)
 	{
 		printf("Alles kaput, close and try again ;)");
@@ -175,16 +179,12 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 	//TODO 2. wait for camready & capture picture!!
-	printf("so far it seems to have xml loaded");
-
-
-	//camera related: 1. get first avt detected, load 
+	//camera related: 1. get first avt detected, load
+	printf("xml load succeeded\n");
 
 	
-
 	iv.showInFullProjection();
 	iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
-		
 
 	err = cam->Close();
 	return a.exec();

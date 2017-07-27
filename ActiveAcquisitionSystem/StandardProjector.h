@@ -66,13 +66,15 @@ class StandardProjector : public QMainWindow, public Projector
 
 public:
 	void showInFullProjection();
+	
 	Q_OBJECT
 
 public:
 	StandardProjector();
 
 	~StandardProjector();
-	bool loadAndDisplayImageFile(const QString &);	
+	bool loadAndDisplayImageFile(const QString &);
+	void setCurrentProjection(int projectionIndex);
 	void playProjectionSequence(int n);
 
 private:

@@ -14,6 +14,8 @@ AcquisitionDeviceManager::AcquisitionDeviceManager()
 
 AcquisitionDeviceManager::~AcquisitionDeviceManager()
 {
+	//release memory, close api's objects
+	sistema->Shutdown();
 }
 
 bool AcquisitionDeviceManager::initializeAPIs()
@@ -45,54 +47,26 @@ void AcquisitionDeviceManager::endAPIs()
 
 void AcquisitionDeviceManager::detectCameras()
 {
-	//AVTCamera *list;
-	//int count= detectAVTCameras(cameraList);
 	cameraList = detectAVTCameras();
 	//TODO Complete!
 	//1. detect canons, detect nikons, then allocate the cameraList matching the count of objects.
-	// So far just fillsN the list with the avt!
-
-	//cameraList = (AVTCamera*)calloc(count, sizeof(AVTCamera));//
-	//cameraList = (ActiveCamera*)calloc(count, sizeof(AVTCamera));//
-	
-
-	//
-	//cameraList.reserve(count);
-	/*
-	for (int i = 0;i < count;i++)//GOOD PRACTICE CHECK... there must be a better way to copy this, or not?
-	//int i = 0;
-	//for (vector<ActiveCamera*>::iterator it = cameraList.begin() ; it != cameraList.end(); ++it)
-	
-	{
-		//*cameraList[i] = list[i];//TODO Dying here :'(
-		cameraList.push_back(&list[i]);
-		//*camli[i] = list[i];
-		//*it = &list[i];
-		//i++;
-
-	}
-	*/	 
-	
-	//TODO Remove this test:
-	string as = cameraList[0].getAnyStr();
-	
+	// So far just fillsN the list with the avt!	
 	numCams = sizeof(cameraList);//review here (likely not the right size)
 }
 
 void AcquisitionDeviceManager::detectProjectors()
 {
-
+	//TODO Implement
 }
-ActiveCamera* AcquisitionDeviceManager::getCameras()
+std::vector<AVTCamera*> AcquisitionDeviceManager::getCameras()
 {
-	throw "nop";
+	return cameraList;
 }
 ActiveCamera AcquisitionDeviceManager::getCamera(string dev_id)
 {
 	return NULL;
 }
-//ActiveCamera* AcquisitionDeviceManager::getCamera(int index)
-AVTCamera AcquisitionDeviceManager::getCamera(int index)
+AVTCamera* AcquisitionDeviceManager::getCamera(int index)
 {
 	if (numCams > index)
 	{
@@ -101,9 +75,9 @@ AVTCamera AcquisitionDeviceManager::getCamera(int index)
 	throw "NO CAMERA";
 }
 
-Projector* AcquisitionDeviceManager::getProjectors()
+std::vector<Projector*> AcquisitionDeviceManager::getProjectors()
 {
-	throw "nop";
+	return projectors;
 }
 Projector* AcquisitionDeviceManager::getProjector(string dev_id)
 {
@@ -111,17 +85,18 @@ Projector* AcquisitionDeviceManager::getProjector(string dev_id)
 }
 
 
-AVTCamera* AcquisitionDeviceManager::detectAVTCameras()
+vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 {
-	AVTCamera* avtList;
+	AVT::VmbAPI::CameraPtrVector cameras;
+	vector<AVTCamera*> avtList;
 	int count = 0;
 	if (!vimbaError)
 	{
 		sistema->GetCameras(cameras);
 		count = cameras.size();
 		qDebug("Num AVT cameras: %d\n", count);
-
-		avtList = new AVTCamera[cameras.size()];
+		//avtList = new AVTCamera[cameras.size()];
+		avtList.resize(cameras.size());
 		
 		CameraPtr sh;
 		if (count > 0)
@@ -129,11 +104,9 @@ AVTCamera* AcquisitionDeviceManager::detectAVTCameras()
 			testValidCameraPtr(cameras[0]);
 			for (int i = 0;i < count ; i++)
 			{
-				avtList[i].setCameraPtr(cameras[i]);
-				avtList[i].setName("myname");
+				avtList[i] = new AVTCamera(cameras[i]);
+				avtList[i]->setName("myname");//TODO Correct this!
 			}
-			avtList[0].getName();
-			testValidCameraPtr(avtList[0].getAVTPointer());
 		}		
 	}
 
@@ -155,9 +128,4 @@ bool AcquisitionDeviceManager::testValidCameraPtr(CameraPtr sh)
 		printf("invalid cameraptr");
 		return false;
 	}
-}
-void AcquisitionDeviceManager::loadXmlSettingsToFirstAVTCamera()
-{
-	//TODO Obviously re-write properly!. This is just an ultra-short-term solution.
-
 }

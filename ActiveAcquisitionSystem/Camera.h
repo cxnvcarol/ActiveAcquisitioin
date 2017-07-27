@@ -13,7 +13,6 @@ public:
 	ActiveCamera();
 	virtual ~ActiveCamera();
 
-//	template <typename CameraSettings>;
 
 	virtual int takePicture();
 	virtual bool loadSettings(CameraSettings cs);

@@ -33,7 +33,6 @@ int Projector::indexOfProjection(const QString imgName)
 
 void Projector::loadProjectionSettings(const QString projectionsConfig)
 {
-	//TODO
 	//1. Read text file, split each line, save projection in array.
 	QFile f(projectionsConfig);
 	if (f.open(QIODevice::ReadOnly))
@@ -65,10 +64,11 @@ void Projector::loadProjectionSettings(const QString projectionsConfig)
 			{
 				throw ("incorrect projection setting in line: " + line);
 			}
-			sequenceProjections.push_back({index,us,camTrigger});
+			projectionsSequence.push_back({index,us,camTrigger});
 
 			line = in.readLine();
 		}
+		f.close();
 	}
 
 }
