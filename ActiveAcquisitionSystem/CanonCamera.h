@@ -7,6 +7,6 @@ public:
 	CanonCamera();
 	~CanonCamera();
 
-	int takePicture();
+	int takeSinglePicture();
 };
 

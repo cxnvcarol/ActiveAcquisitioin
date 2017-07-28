@@ -1,4 +1,4 @@
-#define AVT_DEBUG
+//#define AVT_DEBUG
 
 #include "AVTCamera.h"
 #include <iostream>
@@ -36,27 +36,34 @@ AVTCamera::AVTCamera() : IFrameObserver(CameraPtr())
 {
 
 }
+
 AVTCamera::AVTCamera(CameraPtr avtCam) : IFrameObserver(avtCam)
 {
 	pCam = avtCam;
+#ifdef AVT_DEBUG
 	VmbErrorType err = pCam->Open(VmbAccessModeFull);
 	if (err == VmbErrorSuccess)
 	{
-#ifdef AVT_DEBUG
+
 		FeaturePtr feature;
 		pCam->GetID(dev_id);
 		FeaturePtrVector fs;
 		pCam->GetFeatures(fs);
 		for_each(fs.begin(), fs.end(), PrintFtrInfo);
-#endif // AVT_DEBUG
+
 
 		
 		pCam->Close();
 	}
+
+#endif // AVT_DEBUG
 }
 AVTCamera::~AVTCamera()
 {
-	
+
+	VmbError_t error = releaseBuffer();
+
+	pCam->Close();
 }
 bool AVTCamera::loadSettings(std::string configXml)
 {
@@ -128,7 +135,8 @@ bool AVTCamera::loadSettings(std::string configXml)
 
 void AVTCamera::FrameReceived(const FramePtr frame)
 {
-
+	//TODO BIG TODO... Function not being called!
+	printf("receiving frame!\n");
 	VmbFrameStatusType statusType = VmbFrameStatusInvalid;
 
 	if (VmbErrorSuccess == frame->GetReceiveStatus(statusType))
@@ -143,6 +151,53 @@ void AVTCamera::FrameReceived(const FramePtr frame)
 	}
 	pCam->QueueFrame(frame);
 }
+int AVTCamera::takeSinglePicture()
+{
+	VmbErrorType err = pCam->Open(VmbAccessModeFull);
+	std::stringstream ss;
+	bool apiFlag = false;
+	bool cameraFlag = false;
+	if (VmbErrorSuccess != err)
+	{
+		return err;		
+	}
+
+	prepareCapture();
+	if (VmbErrorSuccess != err)
+	{
+		printf("something wrong preparing the capture");
+		return err;
+	}
+
+	FeaturePtr pFeat;
+	err = pCam->GetFeatureByName("AcquisitionStart", pFeat);
+	err = pFeat->RunCommand();
+
+	
+	if (VmbErrorSuccess != err)
+	{
+		return err;
+	}
+	else {
+		bool bIsCommandDone = false;
+		do
+		{
+			if (VmbErrorSuccess != pFeat->IsCommandDone(bIsCommandDone))
+			{
+				printf("ohoh!");
+				break;
+			}
+		} while (false == bIsCommandDone);
+	}
+	printf("picture taken without issues.\n");
+	//err = pCam->Close();
+	if (VmbErrorSuccess != err)
+	{
+		return err;
+	}
+	return 0;
+	
+}
 bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 {
 	VmbUchar_t          *imgData = NULL;
@@ -154,29 +209,20 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 		VmbErrorSuccess == frame->GetBuffer(imgData) &&
 		VmbErrorSuccess == frame->GetPixelFormat(pixelFormat))
 	{
-
 		VmbUint32_t nSize;
 		if (VmbErrorSuccess != frame->GetImageSize(nSize))
 			return false;
-
-
 		try
 		{
 			QString s = "./";
 			s.append("\\");
-			s.append("imname").append(QString::number(55)).append(".bin");//TODO Verify name
+			s.append("imname").append(QString::number(55)).append(".bin");//TODO Verify name.... cool, we are good here!. BUT IT IS a useless format!!
 			printf("it is about to save the rawfile %s\n", s.toStdString().c_str());
 			
 			QSharedPointer<unsigned char> m_pFrame = QSharedPointer<unsigned char>(new unsigned char[nSize], DeleteArray<unsigned char>);
 			memcpy(m_pFrame.data(), imgData, nSize);
 			
 			/* saving Raw Data */
-			
-			
-			
-			
-
-
 			QFile rawFile(s);
 			rawFile.open(QIODevice::WriteOnly);
 			QDataStream out(&rawFile);
@@ -195,4 +241,94 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 	}
 
 	return false;
+}
+
+
+VmbError_t AVTCamera::releaseBuffer(void)
+{
+	//m_pFrameObs->Stopping();
+	VmbError_t error = pCam->EndCapture();
+	if (VmbErrorSuccess == error)
+		error = pCam->FlushQueue();
+	if (VmbErrorSuccess == error)
+		error = pCam->RevokeAllFrames();
+
+	return error;
+}
+
+VmbError_t AVTCamera::prepareCapture(void)
+{
+	FeaturePtr pFeature;
+	VmbInt64_t nPayload = 0;
+	vector <FramePtr> frames;
+	VmbError_t error = pCam->GetFeatureByName("PayloadSize", pFeature);
+	VmbUint32_t nCounter = 0;
+	if (VmbErrorSuccess == error)
+	{
+		error = pFeature->GetValue(nPayload);
+		if (VmbErrorSuccess == error)
+		{
+			
+			frames.resize(FRAME_BUFFER_COUNT);
+
+			for (int i = 0; i<frames.size(); i++)
+			{
+				try
+				{
+					frames[i] = FramePtr(new Frame(nPayload));
+					nCounter++;
+				}
+				catch (std::bad_alloc&)
+				{
+					frames.resize((VmbInt64_t)(nCounter * 0.7));
+					break;
+				}
+				IFrameObserverPtr pObserver(this);
+				error = frames[i]->RegisterObserver(pObserver);
+				if (VmbErrorSuccess != error)
+				{
+					return error;
+				}
+			}
+
+			for (int i = 0; i<frames.size(); i++)
+			{
+				error = pCam->AnnounceFrame(frames[i]);
+				if (VmbErrorSuccess != error)
+				{
+					return error;
+				}
+			}
+			
+
+			if (VmbErrorSuccess == error)
+			{
+				error = pCam->StartCapture();
+				if (VmbErrorSuccess != error)
+				{
+					return error;
+				}
+			}
+			
+			for (int i = 0; i<frames.size(); i++)
+			{
+				error = pCam->QueueFrame(frames[i]);
+				if (VmbErrorSuccess != error)
+				{
+					return error;
+				}
+			}
+			
+		}
+		else
+		{
+			return error;
+		}
+	}
+	else
+	{
+		return error;
+	}
+
+	return error;
 }

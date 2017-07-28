@@ -15,7 +15,7 @@ ActiveCamera::ActiveCamera()
 ActiveCamera::~ActiveCamera()
 {
 }
-int ActiveCamera::takePicture()
+int ActiveCamera::takeSinglePicture()
 {
 	throw "Not implemented";
 }

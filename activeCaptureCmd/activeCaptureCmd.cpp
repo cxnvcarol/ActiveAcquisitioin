@@ -51,6 +51,7 @@ void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjector
 	/*
 	//The following is working fine so far.
 	*/
+
 	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();//API Inintialization is into the constructor
 	mng->detectCameras();
 
@@ -172,8 +173,10 @@ int main(int argc, char *argv[])
 		printf("the cam name: %s\n", cameraList[0]->getName().c_str());
 
 		//////
-
-		cameraList[0]->loadSettings(cameraConfigXml[0]);
+		//camera related: 1. get first avt detected, load
+		bool res=cameraList[0]->loadSettings(cameraConfigXml[0]);
+		res?printf("xml load succeeded\n"):printf("something failed loading camera settings");
+		/*
 		AVT::VmbAPI::CameraPtr cam = cameraList[0]->getAVTPointer();
 		VmbErrorType err = cam->Open(VmbAccessModeFull);
 		if (vimbaError)
@@ -182,16 +185,17 @@ int main(int argc, char *argv[])
 			cin.get();
 			return -1;
 		}
+		*/
 		//TODO 2. wait for camready & capture picture!!
-		//camera related: 1. get first avt detected, load
-		printf("xml load succeeded\n");
-		err = cam->Close();
+		
+		cameraList[0]->takeSinglePicture();
+		
 	}
 	
 
 	
-	iv.showInFullProjection();
-	iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
+	//iv.showInFullProjection();
+	//iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
 	int result = a.exec();
 	delete mng;
 	return result;

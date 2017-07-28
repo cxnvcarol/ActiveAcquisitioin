@@ -14,7 +14,7 @@ public:
 	virtual ~ActiveCamera();
 
 
-	virtual int takePicture();
+	virtual int takeSinglePicture();
 	virtual bool loadSettings(CameraSettings cs);
 	virtual bool loadSettings(std::string pathToSettings);
 protected:

@@ -81,5 +81,5 @@ void testCanonTakingPicture()
 	eds.sampleRun();
 
 	CanonCamera cac;
-	cac.takePicture();
+	cac.takeSinglePicture();
 }

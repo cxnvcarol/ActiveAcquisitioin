@@ -11,7 +11,7 @@ CanonCamera::~CanonCamera()
 {
 }
 
-int CanonCamera::takePicture()
+int CanonCamera::takeSinglePicture()
 {
 	//TODO
 	return 0;

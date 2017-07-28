@@ -24,7 +24,7 @@ public:
 	EdsError downloadImage(EdsDirectoryItemRef directoryItem);
 	EdsError getVolume(EdsCameraRef camera, EdsVolumeRef * volume);
 	EdsError getDCIMFolder(EdsVolumeRef volume, EdsDirectoryItemRef * directoryItem);
-	EdsError takePicture(EdsCameraRef camera);
+	EdsError takeSinglePicture(EdsCameraRef camera);
 	EdsError startLiveview(EdsCameraRef camera);
 	EdsError downloadEvfData(EdsCameraRef camera);
 	EdsError endLiveview(EdsCameraRef camera);

@@ -215,7 +215,7 @@ void EDSWrapper::sampleRun()
 	fflush(stderr);
 	if (err == EDS_ERR_OK)
 	{
-		EdsError er= this->takePicture(currentCamera);
+		EdsError er= this->takeSinglePicture(currentCamera);
 		if (er != EDS_ERR_OK)
 		{
 			//printf("error here!!\n");
@@ -458,7 +458,7 @@ EdsError EDSWrapper::getDCIMFolder(EdsVolumeRef volume, EdsDirectoryItemRef * di
 	return err;
 }
 
-EdsError EDSWrapper::takePicture(EdsCameraRef camera)
+EdsError EDSWrapper::takeSinglePicture(EdsCameraRef camera)
 {
 	EdsError err;
 

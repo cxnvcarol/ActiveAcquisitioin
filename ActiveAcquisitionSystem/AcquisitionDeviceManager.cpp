@@ -95,7 +95,6 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 		sistema->GetCameras(cameras);
 		count = cameras.size();
 		qDebug("Num AVT cameras: %d\n", count);
-		//avtList = new AVTCamera[cameras.size()];
 		avtList.resize(cameras.size());
 		
 		CameraPtr sh;
