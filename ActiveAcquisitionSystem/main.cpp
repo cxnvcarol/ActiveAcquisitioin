@@ -59,15 +59,6 @@ int main3(int argc, char *argv[])
 	return a.exec();
 }
 
-int testIdentifyCameras()
-{
-	//TODO
-	//Goal:: identify all connected cameras and fill array of cameras
-	ActiveCamera *cameraList;
-	cameraList = new ActiveCamera[5];//TODO Get the number first, then fill the array.
-
-	return sizeof(cameraList);//todo check actual returned number!
-}
 
 void testCanonTakingPicture()
 {

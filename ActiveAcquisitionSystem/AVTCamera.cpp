@@ -135,8 +135,6 @@ bool AVTCamera::loadSettings(std::string configXml)
 
 void AVTCamera::FrameReceived(const FramePtr frame)
 {
-	//TODO BIG TODO... Function not being called!
-	printf("receiving frame!\n");
 	VmbFrameStatusType statusType = VmbFrameStatusInvalid;
 
 	if (VmbErrorSuccess == frame->GetReceiveStatus(statusType))
@@ -144,6 +142,7 @@ void AVTCamera::FrameReceived(const FramePtr frame)
 		/* ignore any incompletely frame */
 		if (VmbFrameStatusComplete != statusType)
 		{
+			printf("oh oh! incomplete frame\n");
 			pCam->QueueFrame(frame);
 			return;
 		}

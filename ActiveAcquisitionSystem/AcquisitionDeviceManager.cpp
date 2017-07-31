@@ -56,7 +56,7 @@ void AcquisitionDeviceManager::detectCameras()
 
 void AcquisitionDeviceManager::detectProjectors()
 {
-	//TODO Implement
+	//TODO Implement: detect # of screens (each is a projector) + DLPs connected
 }
 std::vector<AVTCamera*> AcquisitionDeviceManager::getCameras()
 {
@@ -100,11 +100,13 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 		CameraPtr sh;
 		if (count > 0)
 		{
+#ifdef AVT_DEBUG
 			testValidCameraPtr(cameras[0]);
-			for (int i = 0;i < count ; i++)
+#endif // AVT_DEBUG
+		for (int i = 0;i < count ; i++)
 			{
 				avtList[i] = new AVTCamera(cameras[i]);
-				avtList[i]->setName("myname");//TODO Correct this!
+				avtList[i]->setName("myname");//TODO Correct this filling the correct properties!
 			}
 		}		
 	}

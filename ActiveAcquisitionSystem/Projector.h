@@ -34,11 +34,12 @@ public:
 		return projectionsSequence;
 	}
 
-	bool playingSequence;//TODO Should be protected!?
+	
 
 protected:
 	std::vector<ProjectedImg> projections;
 	std::vector<Projection> projectionsSequence;
+	bool playingSequence;//TODO Should be protected!?
 
 
 	

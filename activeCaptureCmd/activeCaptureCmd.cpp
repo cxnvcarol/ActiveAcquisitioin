@@ -4,10 +4,8 @@
 #include "stdafx.h"
 #include <QtWidgets/QApplication>
 #include "StandardProjector.h"
-//#include "AVTCamera.h"
 #include "AcquisitionDeviceManager.h"
 #include "activeCaptureCmd.h"
-//todo check and use vector<> instead of pointer arrays.
 enum class ParamCase {
 	DEFAULT,
 	CAMERA_CONFIGS,
@@ -150,7 +148,7 @@ int main(int argc, char *argv[])
 
 	}
 
-	//initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);//TODO Never worked nicely
+	//initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);//TODO Never worked nicely. Reformat for better decoupling
 		
 
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)	
@@ -162,12 +160,6 @@ int main(int argc, char *argv[])
 	if (cameraList.size() == 0)
 	{
 		printf("\nno AVT Cameras detected. Enter to continue");
-		
-		/*
-		delete mng;
-		cin.get();		
-		return 0;
-		*/
 	}
 	else {
 		printf("the cam name: %s\n", cameraList[0]->getName().c_str());
@@ -176,18 +168,8 @@ int main(int argc, char *argv[])
 		//camera related: 1. get first avt detected, load
 		bool res=cameraList[0]->loadSettings(cameraConfigXml[0]);
 		res?printf("xml load succeeded\n"):printf("something failed loading camera settings");
-		/*
-		AVT::VmbAPI::CameraPtr cam = cameraList[0]->getAVTPointer();
-		VmbErrorType err = cam->Open(VmbAccessModeFull);
-		if (vimbaError)
-		{
-			printf("Alles kaput, close and try again X/");
-			cin.get();
-			return -1;
-		}
-		*/
-		//TODO 2. wait for camready & capture picture!!
-		
+
+		//TODO 2. wait for camready & capture picture!!		
 		cameraList[0]->takeSinglePicture();
 		
 	}
