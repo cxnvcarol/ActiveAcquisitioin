@@ -25,6 +25,7 @@ public:
 	std::string getDev_id();
 	int indexOfProjection(const QString imgName);
 	void loadProjectionSettings(const QString projectionsConfig);
+	
 	int loadProjectionsFolder(const QString &folderPath);
 
 	virtual void playProjectionSequence(int n);//play already loaded sequence
@@ -39,7 +40,7 @@ public:
 protected:
 	std::vector<ProjectedImg> projections;
 	std::vector<Projection> projectionsSequence;
-	bool playingSequence;//TODO Should be protected!?
+	bool playingSequence;
 
 
 	

@@ -220,10 +220,7 @@ VmbError_t AVTCamera::processFrame()
 
 	if (VmbErrorSuccess != error)
 	{
-		
-		//convertedImage = QImage();
-		printf("error converting image %d\n", error);
-		
+		printf("error converting image %d\n", error);		
 		return error;
 	}
 

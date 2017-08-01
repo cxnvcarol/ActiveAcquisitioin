@@ -154,6 +154,7 @@ int main(int argc, char *argv[])
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)	
 	int c=iv.loadProjectionsFolder("C:\\Users\\naranjo\\Pictures");
 	iv.loadProjectionSettings(projectionsConfig[0].c_str());
+	iv.setScreen(projectionScreen[0]);
 	
 	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
 	std::vector<AVTCamera*> cameraList=mng->detectAVTCameras();
@@ -176,8 +177,8 @@ int main(int argc, char *argv[])
 	
 
 	
-	//iv.showInFullProjection();
-	//iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
+	iv.showInFullProjection();
+	iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
 	int result = a.exec();
 	delete mng;
 	return result;

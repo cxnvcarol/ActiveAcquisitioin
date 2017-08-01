@@ -54,16 +54,20 @@
 
 StandardProjector::StandardProjector()
 	: imageLabel(new QLabel)
-	, scrollArea(new QScrollArea)
+	//, scrollArea(new QScrollArea)
 {
 	imageLabel->setBackgroundRole(QPalette::Base);
 	imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 	imageLabel->setScaledContents(true);
 
+	imageLabel->setBackgroundRole(QPalette::Dark);
+	setCentralWidget(imageLabel);
+	/*
 	scrollArea->setBackgroundRole(QPalette::Dark);
 	scrollArea->setWidget(imageLabel);
 	scrollArea->setVisible(false);
 	setCentralWidget(scrollArea);
+	*/
 
 	//resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
 
@@ -110,7 +114,7 @@ void StandardProjector::setImage(const QImage &newImage)
 	image = newImage;
 	imageLabel->setPixmap(QPixmap::fromImage(image));
 
-	scrollArea->setVisible(true);
+	//scrollArea->setVisible(true);
 	imageLabel->adjustSize();
 }
 
@@ -152,7 +156,16 @@ void StandardProjector::advanceProjectionSequence()
 
 void StandardProjector::fitToWindow()
 {
-	scrollArea->setWidgetResizable(true);
+	//TODO Review this!
+	//imageLabel->setWidgetResizable(true);
+	//scrollArea->setWidgetResizable(true);
+}
+
+
+void StandardProjector::setScreen(int screenId)
+{
+	projectedScreen = screenId;
+
 }
 
 void StandardProjector::showInFullProjection()
