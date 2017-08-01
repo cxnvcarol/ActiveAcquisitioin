@@ -7,8 +7,9 @@
 #include <string>
 #include <QString>
 #include <QFile>
-#include <QtCore/QSharedPointer>
+
 #include <qdatastream.h>
+#include "../External/Vimba/VmbImageTransformHelper.hpp"
 
 using namespace AVT::VmbAPI;
 using namespace std;
@@ -197,11 +198,45 @@ int AVTCamera::takeSinglePicture()
 	return 0;
 	
 }
+
+VmbError_t AVTCamera::processFrame()
+{
+	//TODO fix and test!!!	
+	QImage convertedImage(nWidth, nHeight, QImage::Format_RGB32);
+
+	VmbError_t error;
+
+	try
+	{
+		error = AVT::VmbImageTransform(convertedImage, m_pFrame.data(), nWidth, nHeight, pixelFormat);
+		//error = AVT::VmbImageTransform(convertedImage, m_pFrame.data(), nWidth, nHeight, AVT::GetCompatibleMonoPixelFormatForRaw(pixelFormat));
+	}
+	catch (...)
+	{
+		
+		error = AVT::VmbImageTransform(convertedImage, m_pFrame.data(), nWidth, nHeight, AVT::GetCompatibleMonoPixelFormatForRaw(pixelFormat));
+	}
+	
+
+	if (VmbErrorSuccess != error)
+	{
+		
+		//convertedImage = QImage();
+		printf("error converting image %d\n", error);
+		
+		return error;
+	}
+
+	//m_sFormat = m_Helper->convertFormatToString(m_Format);
+	//TODO... save qimage to path
+	convertedImage.save("./result111.png","PNG");
+	printf("png saved");
+	return error;
+}
+
 bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 {
 	VmbUchar_t          *imgData = NULL;
-	VmbPixelFormatType   pixelFormat;
-	VmbUint32_t             nWidth = 0, nHeight = 0;
 
 	if (VmbErrorSuccess == frame->GetWidth(nWidth) &&
 		VmbErrorSuccess == frame->GetHeight(nHeight) &&
@@ -216,9 +251,12 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 			QString s = "./";
 			s.append("\\");
 			s.append("imname").append(QString::number(55)).append(".bin");//TODO Verify name.... cool, we are good here!. BUT IT IS a useless format!!
+
+
+			//// image processing takes shorter than the FPS with no converting
 			printf("it is about to save the rawfile %s\n", s.toStdString().c_str());
 			
-			QSharedPointer<unsigned char> m_pFrame = QSharedPointer<unsigned char>(new unsigned char[nSize], DeleteArray<unsigned char>);
+			m_pFrame = QSharedPointer<unsigned char>(new unsigned char[nSize], DeleteArray<unsigned char>);
 			memcpy(m_pFrame.data(), imgData, nSize);
 			
 			/* saving Raw Data */
@@ -228,6 +266,7 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 			out.writeRawData((const char*)m_pFrame.data(), nSize);
 			rawFile.close();
 			/* Now save a usable picture:*/
+			processFrame();//TODO Check if I should do it without class properties!
 			
 		}
 		catch (...)

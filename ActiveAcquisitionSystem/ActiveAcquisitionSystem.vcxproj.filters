@@ -146,6 +146,9 @@
     <ClInclude Include="..\activeCaptureCmd\activeCaptureCmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\External\Vimba\VmbImageTransformHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ActiveAcquisitionSystem.rc" />

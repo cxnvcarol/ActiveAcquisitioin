@@ -4,6 +4,9 @@
 
 #include "Camera.h"
 #include "VimbaCPP/Include/VimbaCPP.h"
+#include <qimage.h>
+#include <QtCore/QSharedPointer>
+
 //#include <string>
 using namespace AVT::VmbAPI;
 using namespace std;
@@ -19,6 +22,10 @@ public:
 	bool loadSettings(std::string configPath);
 	virtual void FrameReceived(const FramePtr pFrame);
 	virtual int takeSinglePicture();
+
+	
+
+	
 
 	bool setFrame(const AVT::VmbAPI::FramePtr & frame);
 
@@ -39,8 +46,14 @@ private:
 	CameraPtr pCam;
 
 
+	VmbPixelFormatType   pixelFormat;
+	VmbUint32_t             nWidth = 0, nHeight = 0;
+
+
 	VmbError_t releaseBuffer(void);
 
 	VmbError_t prepareCapture(void);
+	VmbError_t processFrame();
+	QSharedPointer<unsigned char> m_pFrame;
 	
 };
