@@ -252,3 +252,4 @@ ActiveAcquisitionSystem/GeneratedFiles/
 !*.dll
 !*.md3
 !*.MD3
+/ActiveAcquisitionSystem/outputTest/00000.png

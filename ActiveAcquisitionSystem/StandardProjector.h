@@ -57,7 +57,6 @@
 class QAction;
 class QLabel;
 class QMenu;
-class QScrollArea;
 
 class StandardProjector : public QMainWindow, public Projector
 //class StandardProjector : public QWidget
@@ -84,12 +83,10 @@ private:
 	void setImage(const QImage &newImage);
 	QImage image;
 	QLabel *imageLabel;
-	//QScrollArea *scrollArea;//TODO Manage to remove the element (shouldnt be necessary in fullscreen) 
 	QTimer  *projectionTimer;
 	int currentProjectionIndex;
 
-private slots:
-	void fitToWindow();
+
 	int projectedScreen;
 
 	

@@ -17,7 +17,7 @@ using namespace std;
 
 static void printHelp()
 {
-	//TODO Complete here!!
+	//TODO Complete helptext here!!
 	printf("Help text goes here!");
 }
 
@@ -169,10 +169,8 @@ int main(int argc, char *argv[])
 		//camera related: 1. get first avt detected, load
 		bool res=cameraList[0]->loadSettings(cameraConfigXml[0]);
 		res?printf("xml load succeeded\n"):printf("something failed loading camera settings");
-
-		//TODO 2. wait for camready & capture picture!!		
-		cameraList[0]->takeSinglePicture();
-		
+		cameraList[0]->setOutputFolder(outputFolder);
+		cameraList[0]->takeSinglePicture();		
 	}
 	
 

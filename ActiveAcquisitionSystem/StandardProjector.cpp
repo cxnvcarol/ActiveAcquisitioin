@@ -54,7 +54,6 @@
 
 StandardProjector::StandardProjector()
 	: imageLabel(new QLabel)
-	//, scrollArea(new QScrollArea)
 {
 	imageLabel->setBackgroundRole(QPalette::Base);
 	imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -62,18 +61,7 @@ StandardProjector::StandardProjector()
 
 	imageLabel->setBackgroundRole(QPalette::Dark);
 	setCentralWidget(imageLabel);
-	/*
-	scrollArea->setBackgroundRole(QPalette::Dark);
-	scrollArea->setWidget(imageLabel);
-	scrollArea->setVisible(false);
-	setCentralWidget(scrollArea);
-	*/
-
-	//resize(QGuiApplication::primaryScreen()->availableSize() * 3 / 5);
-
-	projectionTimer = new QTimer(this);
-	//projectionTimer->setSingleShot(true);
-	
+	projectionTimer = new QTimer(this);	
 	connect(projectionTimer, SIGNAL(timeout()), this, SLOT(advanceProjectionSequence()));
 	
 }
@@ -113,9 +101,9 @@ void StandardProjector::setImage(const QImage &newImage)
 {
 	image = newImage;
 	imageLabel->setPixmap(QPixmap::fromImage(image));
-
-	//scrollArea->setVisible(true);
 	imageLabel->adjustSize();
+	//imageLabel->update();//check if necessary
+	printf("just painted\n");
 }
 
 void StandardProjector::playProjectionSequence(int n)
@@ -140,7 +128,7 @@ void StandardProjector::playProjectionSequence(int n)
 void StandardProjector::advanceProjectionSequence()
 {
 	//bool trigger = projection.triggerCam;
-	//TODO Read and use trigger condition to emit signal to cameras!
+	//TODO Read and use trigger condition to emit signal to cameras!. Use kind of observer model: https://sourcemaking.com/design_patterns/observer/cpp/3
 	//setImage(projections[currentProjectionIndex].image);
 	printf("setting the next projection..%d\n",currentProjectionIndex);
 	setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
@@ -152,15 +140,6 @@ void StandardProjector::advanceProjectionSequence()
 		printf("end of projections\n");
 	}
 }
-
-
-void StandardProjector::fitToWindow()
-{
-	//TODO Review this!
-	//imageLabel->setWidgetResizable(true);
-	//scrollArea->setWidgetResizable(true);
-}
-
 
 void StandardProjector::setScreen(int screenId)
 {
@@ -179,6 +158,5 @@ void StandardProjector::showInFullProjection()
 	//TODO Select rec according to the right-est x coordinate, or according to the parameter in the constructor (pass it!)
 	setGeometry(rec2);
 
-	//TODO Show black at first!
-	this->fitToWindow();
+	//TODO Show black at first!?
 }

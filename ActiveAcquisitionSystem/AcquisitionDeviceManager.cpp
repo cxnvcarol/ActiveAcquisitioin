@@ -15,7 +15,25 @@ AcquisitionDeviceManager::AcquisitionDeviceManager()
 AcquisitionDeviceManager::~AcquisitionDeviceManager()
 {
 	//release memory, close api's objects
-	sistema->Shutdown();
+	try {
+		foreach(AVTCamera* c, cameraList)
+		{
+			delete c;
+			//c->getAVTPointer()->Close();
+		}
+	}
+	catch (...)
+	{
+		printf("oh! not closing");
+	}
+	try {
+		sistema->Shutdown();//TODO It is failing badly after taking a picture, why? SharedPointer implementation!
+	}
+	catch (...)
+	{
+		printf("oh! not shutting down?");
+	}
+	
 }
 
 bool AcquisitionDeviceManager::initializeAPIs()
@@ -110,7 +128,7 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 			}
 		}		
 	}
-
+	cameraList = avtList;
 	//return count;
 	return avtList;
 }
