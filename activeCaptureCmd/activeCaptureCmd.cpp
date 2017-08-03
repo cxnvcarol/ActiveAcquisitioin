@@ -196,6 +196,7 @@ int main(int argc, char *argv[])
 	//mng->endAPIs();
 
 	cin.get();
+	printf("just before delete manager\n\n");
 	delete mng;
 	return result;
 }

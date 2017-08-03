@@ -3,18 +3,15 @@
 
 
 FrameObserverAVT::FrameObserverAVT(CameraPtr avtCam, AVTCamera*p) : IFrameObserver(avtCam),pCam(avtCam),parent(p)
-{
-}
+{}
 
 FrameObserverAVT::FrameObserverAVT() : IFrameObserver(CameraPtr())
-{
-}
+{}
 
 FrameObserverAVT::~FrameObserverAVT() 
 {
 	printf("del frameobserver\n");
 }
-
 
 void FrameObserverAVT::FrameReceived(const FramePtr frame)
 {
@@ -25,12 +22,13 @@ void FrameObserverAVT::FrameReceived(const FramePtr frame)
 		/* ignore any incompletely frame */
 		if (VmbFrameStatusComplete != statusType)
 		{
-			printf("oh oh! incomplete frame\n");
+			printf("oh oh! incomplete frame, %d\n", statusType);
 			pCam->QueueFrame(frame);
 			return;
 		}
-		parent->setFrame(frame);
-		
+		parent->setFrame(frame);		
 	}
-	pCam->QueueFrame(frame);
+	VmbErrorType err= pCam->QueueFrame(frame);
+	printf("queueng frame: %d\n", err);
+
 }

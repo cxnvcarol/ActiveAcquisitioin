@@ -21,19 +21,12 @@ public:
 	AVTCamera();
 	~AVTCamera();
 
-	bool loadSettings(std::string configPath);
-	
+	bool loadSettings(std::string configPath);	
 	virtual int takeSinglePicture();
-
-	
-
-	
 	/*
 	virtual void FrameReceived(const FramePtr pFrame);
 	bool setFrame(const AVT::VmbAPI::FramePtr & frame);
 	*/
-
-
 
 	void setOutputFolder(std::string folder);
 	
@@ -58,15 +51,9 @@ private:
 	string interfaceID;//i.e. ETHERNET for GigE cameras
 
 	std::string ipAddress;
-
 	CameraPtr pCam;
-
 	string outputFolder;
-
-
 	VmbError_t releaseBuffer(void);
-
-	
 	//VmbError_t processFrame();
 	//QSharedPointer<unsigned char> m_pFrame;
 	bool playingProjectionSequence;

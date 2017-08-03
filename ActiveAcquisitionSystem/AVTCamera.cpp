@@ -203,7 +203,7 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 				printf("error converting image %d\n", error);
 				return error;
 			}
-			QString pName = QString(outputFolder.c_str()) + "/" + QString("%1").arg(indexPicture, 5, 10, QChar('0')) + ".png";
+			QString pName = QString(outputFolder.c_str()) + "/" + QString("%1").arg(indexPicture, 2, 10, QChar('0')) + ".png";
 			
 			convertedImage.save(pName, "PNG");
 			indexPicture++;
@@ -302,12 +302,13 @@ VmbError_t AVTCamera::releaseBuffer(void)
 	printf("releasing buffer\n");
 	//m_pFrameObs->Stopping();	
 	
-	VmbError_t error = pCam->EndCapture();
+	VmbError_t error = pCam->FlushQueue();
 	if (VmbErrorSuccess == error)
-		error = pCam->FlushQueue();
+		error = pCam->EndCapture();
+	
 	if (VmbErrorSuccess == error)
 		try {
-		error = pCam->RevokeAllFrames();
+		//error = pCam->RevokeAllFrames();//TODO Fix or not? it was throwing unhandled exception! But closing camera afterwards seems enough.
 	}
 	catch (...) { printf("revoking failed"); }
 
