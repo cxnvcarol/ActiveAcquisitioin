@@ -88,6 +88,9 @@
     <ClCompile Include="..\activeCaptureCmd\activeCaptureCmd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameObserverAVT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">
@@ -147,6 +150,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\External\Vimba\VmbImageTransformHelper.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FrameObserverAVT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

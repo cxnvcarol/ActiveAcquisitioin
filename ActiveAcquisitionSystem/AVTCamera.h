@@ -7,12 +7,13 @@
 #include <qimage.h>
 //#include <QtCore/QSharedPointer>
 #include "Projector.h"
+#include "FrameObserverAVT.h"
 
 //#include <string>
 using namespace AVT::VmbAPI;
 using namespace std;
 class AVTCamera :
-	public ActiveCamera, virtual public IFrameObserver
+	public ActiveCamera//, virtual public IFrameObserver
 {
 public:
 	//void triggerCamera();
@@ -21,14 +22,19 @@ public:
 	~AVTCamera();
 
 	bool loadSettings(std::string configPath);
-	virtual void FrameReceived(const FramePtr pFrame);
+	
 	virtual int takeSinglePicture();
 
 	
 
 	
-
+	/*
+	virtual void FrameReceived(const FramePtr pFrame);
 	bool setFrame(const AVT::VmbAPI::FramePtr & frame);
+	*/
+
+
+
 	void setOutputFolder(std::string folder);
 	
 	
@@ -41,6 +47,9 @@ public:
 		playingProjectionSequence = false;
 		indexPicture = 0;
 	};
+
+	bool setFrame(const AVT::VmbAPI::FramePtr & frame);
+	VmbErrorType prepareCapture(void);
 
 private:
 	string name;
@@ -57,9 +66,11 @@ private:
 
 	VmbError_t releaseBuffer(void);
 
-	VmbError_t prepareCapture(void);
+	
 	//VmbError_t processFrame();
 	//QSharedPointer<unsigned char> m_pFrame;
 	bool playingProjectionSequence;
 	int indexPicture;
+
+	FrameObserverAVT* frameObserver;
 };

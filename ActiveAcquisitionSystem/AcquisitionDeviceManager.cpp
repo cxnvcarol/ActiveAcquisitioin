@@ -26,14 +26,7 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 	{
 		printf("oh! not closing");
 	}
-	try {
-		sistema->Shutdown();//TODO It is failing badly after taking a picture, why? SharedPointer implementation!
-	}
-	catch (...)
-	{
-		printf("oh! not shutting down?");
-	}
-	
+	endAPIs();
 }
 
 bool AcquisitionDeviceManager::initializeAPIs()
@@ -41,7 +34,6 @@ bool AcquisitionDeviceManager::initializeAPIs()
 	//vimba
 	sistema = &AVT::VmbAPI::VimbaSystem::GetInstance();
 	err = sistema->Startup();
-
 	
 	//texas dlp
 
@@ -60,7 +52,10 @@ void AcquisitionDeviceManager::endAPIs()
 		sistema->Shutdown();
 	}
 	catch(exception e)
-	{ }
+	{ 
+		printf("oh! not shutting down?");
+	}
+
 }
 
 void AcquisitionDeviceManager::detectCameras()

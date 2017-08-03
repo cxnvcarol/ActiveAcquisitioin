@@ -136,6 +136,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CanonCamera.cpp" />
     <ClCompile Include="EDSWrapper.cpp" />
+    <ClCompile Include="FrameObserverAVT.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_ActiveAcquisitionSystem.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
@@ -218,6 +219,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CanonCamera.h" />
     <ClInclude Include="EDSWrapper.h" />
+    <ClInclude Include="FrameObserverAVT.h" />
     <ClInclude Include="GeneratedFiles\ui_ActiveAcquisitionSystem.h" />
     <ClInclude Include="GeneratedFiles\ui_MainGUI.h" />
     <ClInclude Include="Projector.h" />

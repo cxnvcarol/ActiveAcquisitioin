@@ -170,14 +170,32 @@ int main(int argc, char *argv[])
 		bool res=cameraList[0]->loadSettings(cameraConfigXml[0]);
 		res?printf("xml load succeeded\n"):printf("something failed loading camera settings");
 		cameraList[0]->setOutputFolder(outputFolder);
-		cameraList[0]->takeSinglePicture();		
+		VmbErrorType err = cameraList[0]->prepareCapture();
+
+
+		if (VmbErrorSuccess != err)
+		{
+			printf("something wrong preparing the capture");
+			return err;
+		}
+
+		printf("shotPictureResult: %d\n",cameraList[0]->takeSinglePicture());
+		Sleep(1000);
+		printf("stop sleep\n\n");
+		printf("shotPictureResult: %d\n", cameraList[0]->takeSinglePicture());
 	}
 	
 
-	
+	/*
 	iv.showInFullProjection();
 	iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
-	int result = a.exec();
+	*/
+	int result = 0;
+	//int result = a.exec();
+	
+	//mng->endAPIs();
+
+	cin.get();
 	delete mng;
 	return result;
 }
