@@ -119,7 +119,7 @@ bool AVTCamera::loadSettings(std::string configXml)
 		}
 		cameraFlag = false;
 
-		/*//TODO Review catcherror&logging!
+		/*//TODO Review catcherror&logging! (inf-10)
 		err = sys.Shutdown();
 		if (VmbErrorSuccess != err)
 		{
@@ -146,7 +146,6 @@ bool AVTCamera::loadSettings(std::string configXml)
 bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 {
 	printf("settingFrame\n");
-	//return false;//TODO Super fast test!
 	VmbUchar_t          *imgData = NULL;
 
 	VmbPixelFormatType   pixelFormat;
@@ -162,29 +161,8 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 			return false;
 		try
 		{
-			/*
-			QString s = "./";
-			s.append("\\");
-			s.append("imname").append(QString::number(55)).append(".bin");//TODO Verify name.... cool, we are good here!. BUT IT IS a useless format!!
-
-
-			//// image processing takes shorter than the FPS with no converting
-			printf("it is about to save the rawfile %s\n", s.toStdString().c_str());
-
-			m_pFrame = QSharedPointer<unsigned char>(new unsigned char[nSize], DeleteArray<unsigned char>);
-			memcpy(m_pFrame.data(), imgData, nSize);
-
-			// saving Raw Data
-			QFile rawFile(s);
-			rawFile.open(QIODevice::WriteOnly);
-			QDataStream out(&rawFile);
-			out.writeRawData((const char*)m_pFrame.data(), nSize);
-			rawFile.close();
-			// Now save a usable picture:
-			processFrame();//TODO Check if I should/can do it without class properties!
-			*/
 			QSharedPointer<unsigned char> m_pFrame = QSharedPointer<unsigned char>(new unsigned char[nSize], DeleteArray<unsigned char>);
-			memcpy(m_pFrame.data(), imgData, nSize);//TODO Review: do i need the copy? in a shared pointer??
+			memcpy(m_pFrame.data(), imgData, nSize);//Shared pointer is to be able to reuse the original in the queue
 			QImage convertedImage(nWidth, nHeight, QImage::Format_RGB32);
 			VmbError_t error;
 			try
@@ -232,7 +210,7 @@ int AVTCamera::takeSinglePicture()
 	
 	FeaturePtr pFeat;
 	VmbErrorType err = pCam->GetFeatureByName("AcquisitionStart", pFeat);
-	err = pFeat->RunCommand();//TODO In principle I should make sure of setting the correct feature to SingleShot before running the command. TODO Test what if multiple pictures!?
+	err = pFeat->RunCommand();//TODO In principle I should make sure of setting the correct feature to SingleShot before running the command. (3)
 		
 	if (VmbErrorSuccess != err)
 	{
@@ -252,7 +230,6 @@ int AVTCamera::takeSinglePicture()
 	}
 	printf("picture taken without issues.\n");
 
-	//TODO: TRY to stop here, if not, try closing the camera and opening again.
 	err = pCam->GetFeatureByName("AcquisitionStop", pFeat);
 	err = pFeat->RunCommand();
 	//err = pCam->Close();
@@ -279,12 +256,12 @@ int AVTCamera::takeSinglePicture()
 void AVTCamera::setOutputFolder(std::string folder)
 {
 	outputFolder = folder;
-	//TODO (1) Evaluate if folder exists, if not create it!
+	if(!QDir(folder.c_str()).exists())
+		QDir().mkdir(folder.c_str());
 }
 
 bool AVTCamera::syncProjectionSequence(Projector * p)
-{
-	
+{	
 	if (playingProjectionSequence)
 	{
 		qDebug("projectionSequence already playing");
@@ -292,7 +269,7 @@ bool AVTCamera::syncProjectionSequence(Projector * p)
 	}
 	playingProjectionSequence = true;
 	indexPicture = 0;
-	//TODO Verify workflow and complete. For now is just to keep track of the number of pictures!
+	//TODO!!! Verify workflow and complete. For now is just to keep track of the number of pictures! (2)
 	return false;
 }
 

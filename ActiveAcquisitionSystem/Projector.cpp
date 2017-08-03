@@ -15,7 +15,7 @@ Projector::~Projector()
 }
 string Projector::getDev_id()
 {
-	return "";//TODO Identify projector somehow (? serial number? device name? MAC-Address?)
+	return "";//TODO Identify projector somehow (? serial number? device name? MAC-Address?) (inf-1)
 }
 
 int Projector::indexOfProjection(const QString imgName)

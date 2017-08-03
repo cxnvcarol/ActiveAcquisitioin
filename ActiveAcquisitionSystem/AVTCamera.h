@@ -36,7 +36,7 @@ public:
 	string getName() { 	return name; }
 	bool syncProjectionSequence(Projector *p);
 	void stopProjectionSequence() {
-		//TODO Evaluate need of this fn!
+		//TODO Evaluate need of this fn! (inf)
 		playingProjectionSequence = false;
 		indexPicture = 0;
 	};

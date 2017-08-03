@@ -17,7 +17,7 @@ using namespace std;
 
 static void printHelp()
 {
-	//TODO Complete helptext here!!
+	//TODO Complete helptext here!!(inf+1)
 	printf("Help text goes here!");
 }
 
@@ -148,7 +148,8 @@ int main(int argc, char *argv[])
 
 	}
 
-	//initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);//TODO Never worked nicely. Reformat for better decoupling
+	//TODO Never worked nicely. Reformat for better decoupling(inf-10)
+	//initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);
 		
 
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)	
@@ -172,27 +173,24 @@ int main(int argc, char *argv[])
 		cameraList[0]->setOutputFolder(outputFolder);
 		VmbErrorType err = cameraList[0]->prepareCapture();
 
-
 		if (VmbErrorSuccess != err)
 		{
 			printf("something wrong preparing the capture");
 			return err;
 		}
-
+		/*//this is just a test
 		printf("shotPictureResult: %d\n",cameraList[0]->takeSinglePicture());
 		Sleep(1000);
 		printf("stop sleep\n\n");
 		printf("shotPictureResult: %d\n", cameraList[0]->takeSinglePicture());
-	}
-	
-
-	/*
+		*/
+	}	
 	iv.showInFullProjection();
-	iv.playProjectionSequence(1);//play sequence n times //TODO Send ref. to camera to trigger capture.
-	*/
-	int result = 0;
-	//int result = a.exec();
+	//iv.playProjectionSequence(1);//play sequence n times //TODO!!!---- Send ref. to camera to trigger capture.(1)
+	iv.playProjectionSequence(1, cameraList[0]);
 	
+	int result = 0;
+	//int result = a.exec();	
 	//mng->endAPIs();
 
 	cin.get();

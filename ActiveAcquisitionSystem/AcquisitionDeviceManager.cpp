@@ -61,7 +61,7 @@ void AcquisitionDeviceManager::endAPIs()
 void AcquisitionDeviceManager::detectCameras()
 {
 	cameraList = detectAVTCameras();
-	//TODO Complete!
+	//TODO Complete! (inf-1)
 	//1. detect canons, detect nikons, then allocate the cameraList matching the count of objects.
 	// So far just fillsN the list with the avt!	
 	numCams = sizeof(cameraList);//review here (likely not the right size)
@@ -69,7 +69,7 @@ void AcquisitionDeviceManager::detectCameras()
 
 void AcquisitionDeviceManager::detectProjectors()
 {
-	//TODO Implement: detect # of screens (each is a projector) + DLPs connected
+	//TODO Implement: detect # of screens (each is a projector) + DLPs connected (inf-1)
 }
 std::vector<AVTCamera*> AcquisitionDeviceManager::getCameras()
 {
@@ -119,7 +119,7 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 		for (int i = 0;i < count ; i++)
 			{
 				avtList[i] = new AVTCamera(cameras[i]);
-				avtList[i]->setName("myname");//TODO Correct this filling the correct properties!
+				avtList[i]->setName("myname");//TODO Correct this filling the correct properties! (inf)
 			}
 		}		
 	}

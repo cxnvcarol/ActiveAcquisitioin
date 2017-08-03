@@ -53,7 +53,7 @@
 
 
 StandardProjector::StandardProjector()
-	: imageLabel(new QLabel)
+	: imageLabel(new QLabel), nObservers(0)
 {
 	imageLabel->setBackgroundRole(QPalette::Base);
 	imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -110,28 +110,51 @@ void StandardProjector::playProjectionSequence(int n)
 {
 	if (!playingSequence)
 	{
-		printf("playProjectionSequence called, repeat for %d times\n", n);
-		
-		playingSequence = true;
-		
+		printf("playProjectionSequence called, repeat for %d times\n", n);		
+		playingSequence = true;		
 		currentProjectionIndex = 0;
-		//bool trigger = projection.triggerCam;
-		//TODO Read and use trigger condition to emit signal to cameras!
 		setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
 		projectionTimer->start(projectionsSequence[currentProjectionIndex].usTime/1000);		
 		currentProjectionIndex++;
-
-		//TODO SET SINGLESHOT TIMER, RESTART TIMER EVERYTIME WITH CORRECT TIME FOR EACH PROJECTION
+		
 	}
+}
+
+void StandardProjector::playProjectionSequence(int n,AVTCamera * cam)
+{
+	observerCams.push_back(cam);
+	//observerCam = cam;
+	playProjectionSequence(n);
 }
 
 void StandardProjector::advanceProjectionSequence()
 {
-	//bool trigger = projection.triggerCam;
-	//TODO Read and use trigger condition to emit signal to cameras!. Use kind of observer model: https://sourcemaking.com/design_patterns/observer/cpp/3
+
+	Projection projection = projectionsSequence[currentProjectionIndex];
+	
+
+	//TODO!!! Read and use trigger condition to emit signal to cameras!. Use kind of observer model: https://sourcemaking.com/design_patterns/observer/cpp/3 (3)
 	//setImage(projections[currentProjectionIndex].image);
 	printf("setting the next projection..%d\n",currentProjectionIndex);
 	setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
+
+	bool trigger = projection.triggerCam;
+	if (trigger)
+	{
+		foreach(AVTCamera* obs, observerCams)
+		{
+			try {
+				int result=obs->takeSinglePicture();
+				printf("something wrong capturing picture!!: %d\n", result);
+			}
+			catch (...)
+			{
+				printf("something wrong capturing picture!! \n");
+			}
+			
+		}
+	}
+
 	currentProjectionIndex++;
 	if (currentProjectionIndex == projectionsSequence.size())
 	{
@@ -139,12 +162,12 @@ void StandardProjector::advanceProjectionSequence()
 		currentProjectionIndex = 0;
 		printf("end of projections\n");
 	}
+	//TODO!!! SET SINGLESHOT TIMER, RESTART TIMER EVERYTIME WITH CORRECT TIME FOR EACH PROJECTION
 }
 
 void StandardProjector::setScreen(int screenId)
 {
 	projectedScreen = screenId;
-
 }
 
 void StandardProjector::showInFullProjection()
@@ -155,8 +178,6 @@ void StandardProjector::showInFullProjection()
 	QRect rec2 = QApplication::desktop()->screenGeometry(1);
 	int x = rec.center().rx();
 	int x2 = rec2.center().rx();
-	//TODO Select rec according to the right-est x coordinate, or according to the parameter in the constructor (pass it!)
+	//TODO Select rec according to the right-est x coordinate, or according to the parameter in the constructor (pass it!) (inf-15)
 	setGeometry(rec2);
-
-	//TODO Show black at first!?
 }
