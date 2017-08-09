@@ -103,7 +103,7 @@ void StandardProjector::setImage(const QImage &newImage)
 	imageLabel->setPixmap(QPixmap::fromImage(image));
 	imageLabel->adjustSize();
 	imageLabel->update();//check if necessary
-	printf("just painted\n");
+	printf("[%d]:: %s",QTime::currentTime().msecsSinceStartOfDay(),"just painted\n");
 }
 
 void StandardProjector::playProjectionSequence(int n)
@@ -114,7 +114,8 @@ void StandardProjector::playProjectionSequence(int n)
 		playingSequence = true;		
 		currentProjectionIndex = 0;
 		setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
-		projectionTimer->start(projectionsSequence[currentProjectionIndex].usTime/1000);		
+		long tms=projectionsSequence[currentProjectionIndex].usTime / 1000;
+		projectionTimer->start(tms);		
 		currentProjectionIndex++;		
 	}
 }

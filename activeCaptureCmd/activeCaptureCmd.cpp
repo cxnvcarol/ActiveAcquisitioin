@@ -17,8 +17,8 @@ using namespace std;
 
 static void printHelp()
 {
-	//TODO Complete helptext here!!(inf+1)
-	printf("Help text goes here!");
+	//TODO Complete helptext here!! Example of config files (inf+1)
+	printf("\nUsage:\n\nactiveAcquisition.exe -p [PathToProjectedPictures] [PathToProjectionSettings.csv] -c [pathToCameraSettings.xml] -o [ExistingOutputFolder]\n\n\n");
 }
 
 void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjectors, string projectionsFolder[], string projectionsConfig[],
@@ -67,7 +67,7 @@ void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjector
 }
 
 int main(int argc, char *argv[])
-{	
+{
 	QApplication a(argc, argv);
 	printf("# args: %d\n", argc);
 	for (int i = 1;i < argc;i++)
@@ -84,28 +84,28 @@ int main(int argc, char *argv[])
 	string projectionsFolder[2];//Path to the folder with pngs to be projected. max 2 projs (projector + mask)
 	string projectionsConfig[2];//text files with configuration of time x each projection.
 	int projectionScreen[2] = { 1,2 };//screen identfier, 2nd and 3rd screen by default.
-	string outputFolder="./";
+	string outputFolder = "./";
 
-	for (int i=1;i<argc;i++)
-	{		
+	for (int i = 1;i < argc;i++)
+	{
 		if (argv[i][0] == '-')
 		{
 			//param=param.substr(1, param.size());
-			if (!_strnicmp("-h", argv[i],2))
+			if (!_strnicmp("-h", argv[i], 2))
 			{
 				printHelp();
 				break;
 			}
-			else if (!_strnicmp("-c", argv[i],2))
+			else if (!_strnicmp("-c", argv[i], 2))
 			{
 				paramCase = ParamCase::CAMERA_CONFIGS;
 			}
-			else if (!_strnicmp("-p", argv[i],2))
+			else if (!_strnicmp("-p", argv[i], 2))
 			{
 				paramCase = ParamCase::PROJECTION_CONFIGS;
 				countProjectors++;
 			}
-			else if (!_strnicmp("-o", argv[i],2))
+			else if (!_strnicmp("-o", argv[i], 2))
 			{
 				paramCase = ParamCase::OUTPUT_FOLDER;
 			}
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
 			printHelp();
 			break;
 
-			
+
 		case ParamCase::CAMERA_CONFIGS:
 			cameraConfigXml[countParamCase] = param;
 			nCams++;
@@ -130,14 +130,14 @@ int main(int argc, char *argv[])
 			switch (countParamCase)
 			{
 			case 0:
-				projectionsFolder[countProjectors-1] = param;
+				projectionsFolder[countProjectors - 1] = param;
 				break;
 			case 1:
-				projectionsConfig[countProjectors-1] = param;
+				projectionsConfig[countProjectors - 1] = param;
 				break;
 			case 2:
 				int screenId = (atoi(argv[i]));
-				projectionScreen[countProjectors-1]=screenId;
+				projectionScreen[countProjectors - 1] = screenId;
 			}
 			break;
 		case ParamCase::OUTPUT_FOLDER:
@@ -150,26 +150,26 @@ int main(int argc, char *argv[])
 
 	//TODO Never worked nicely. Reformat for better decoupling(inf-10)
 	//initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);
-		
+
 
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)	
-	int c=iv.loadProjectionsFolder("C:\\Users\\naranjo\\Pictures");
+	int c = iv.loadProjectionsFolder("C:\\Users\\naranjo\\Pictures");
 	iv.loadProjectionSettings(projectionsConfig[0].c_str());
 	iv.setScreen(projectionScreen[0]);
-	
+
 	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
-	std::vector<AVTCamera*> cameraList=mng->detectAVTCameras();
+	std::vector<AVTCamera*> cameraList = mng->detectAVTCameras();
 	if (cameraList.size() == 0)
 	{
 		printf("\nno AVT Cameras detected. Enter to continue");
 	}
 	else {
-		printf("the cam name: %s\n", cameraList[0]->getName().c_str());
+		//printf("the cam name: %s\n", cameraList[0]->getName().c_str());
 
 		//////
 		//camera related: 1. get first avt detected, load
-		bool res=cameraList[0]->loadSettings(cameraConfigXml[0]);
-		res?printf("xml load succeeded\n"):printf("something failed loading camera settings");
+		bool res = cameraList[0]->loadSettings(cameraConfigXml[0]);
+		res ? printf("xml load succeeded\n") : printf("something failed loading camera settings");
 		cameraList[0]->setOutputFolder(outputFolder);
 		VmbErrorType err = cameraList[0]->prepareCapture();
 
@@ -186,17 +186,19 @@ int main(int argc, char *argv[])
 		*/
 
 		iv.showInFullProjection();
-		iv.loadAndDisplayImageFile("C:\\Users\\naranjo\\Pictures\\tank.png");
-		Sleep(5000);
+		//iv.loadAndDisplayImageFile("C:\\Users\\naranjo\\Pictures\\tank.png");
+		//Sleep(5000);
 		//iv.playProjectionSequence(1);//play sequence n times //TODO!!!---- Send ref. to camera to trigger capture.(1)
 		iv.playProjectionSequence(1, cameraList[0]);
-	}	
-	
-	
-	int result = 0;
-	//int result = a.exec();	
-	//mng->endAPIs();
+	}
 
+
+	//int result = 0;
+	printf("\n\njust before executing!\n\n");
+	int result = a.exec();	
+	//mng->endAPIs();
+	printf("\n\n\nenter to finish!\n\n");
+	fflush(stdout);
 	cin.get();
 	printf("just before delete manager\n\n");
 	delete mng;
