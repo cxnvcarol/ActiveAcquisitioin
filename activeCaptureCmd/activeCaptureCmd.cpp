@@ -184,10 +184,14 @@ int main(int argc, char *argv[])
 		printf("stop sleep\n\n");
 		printf("shotPictureResult: %d\n", cameraList[0]->takeSinglePicture());
 		*/
+
+		iv.showInFullProjection();
+		iv.loadAndDisplayImageFile("C:\\Users\\naranjo\\Pictures\\tank.png");
+		Sleep(5000);
+		//iv.playProjectionSequence(1);//play sequence n times //TODO!!!---- Send ref. to camera to trigger capture.(1)
+		iv.playProjectionSequence(1, cameraList[0]);
 	}	
-	iv.showInFullProjection();
-	//iv.playProjectionSequence(1);//play sequence n times //TODO!!!---- Send ref. to camera to trigger capture.(1)
-	iv.playProjectionSequence(1, cameraList[0]);
+	
 	
 	int result = 0;
 	//int result = a.exec();	

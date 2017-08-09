@@ -102,7 +102,7 @@ void StandardProjector::setImage(const QImage &newImage)
 	image = newImage;
 	imageLabel->setPixmap(QPixmap::fromImage(image));
 	imageLabel->adjustSize();
-	//imageLabel->update();//check if necessary
+	imageLabel->update();//check if necessary
 	printf("just painted\n");
 }
 
@@ -115,24 +115,19 @@ void StandardProjector::playProjectionSequence(int n)
 		currentProjectionIndex = 0;
 		setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
 		projectionTimer->start(projectionsSequence[currentProjectionIndex].usTime/1000);		
-		currentProjectionIndex++;
-		
+		currentProjectionIndex++;		
 	}
 }
 
 void StandardProjector::playProjectionSequence(int n,AVTCamera * cam)
 {
 	observerCams.push_back(cam);
-	//observerCam = cam;
 	playProjectionSequence(n);
 }
 
 void StandardProjector::advanceProjectionSequence()
 {
-
 	Projection projection = projectionsSequence[currentProjectionIndex];
-	
-
 	//TODO!!! Read and use trigger condition to emit signal to cameras!. Use kind of observer model: https://sourcemaking.com/design_patterns/observer/cpp/3 (3)
 	//setImage(projections[currentProjectionIndex].image);
 	printf("setting the next projection..%d\n",currentProjectionIndex);
@@ -145,13 +140,12 @@ void StandardProjector::advanceProjectionSequence()
 		{
 			try {
 				int result=obs->takeSinglePicture();
-				printf("something wrong capturing picture!!: %d\n", result);
+				printf("result capturing picture: %d\n", result);
 			}
 			catch (...)
 			{
 				printf("something wrong capturing picture!! \n");
-			}
-			
+			}			
 		}
 	}
 
