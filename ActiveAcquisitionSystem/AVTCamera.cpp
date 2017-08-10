@@ -30,7 +30,7 @@ void PrintFtrInfo(const FeaturePtr &fs)
 	}
 	catch (exception e)
 	{
-		printf("Ftr failed!");
+		LOGERR("Ftr failed!");
 	}	
 }
 AVTCamera::AVTCamera() //: IFrameObserver(CameraPtr())
@@ -145,7 +145,7 @@ bool AVTCamera::loadSettings(std::string configXml)
 
 bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 {
-	printf("settingFrame\n");
+	LOGEXEC("settingFrame");
 	VmbUchar_t          *imgData = NULL;
 
 	VmbPixelFormatType   pixelFormat;
@@ -205,7 +205,7 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 int AVTCamera::takeSinglePicture()
 {
 
-	printf("Trying to take picture\n");
+	LOGEXEC("Trying to take picture");
 	//return 0;
 	
 	FeaturePtr pFeat;
@@ -214,7 +214,7 @@ int AVTCamera::takeSinglePicture()
 		
 	if (VmbErrorSuccess != err)
 	{
-		printf("error in acquisition: %d\n", err);
+		LOGERR("error in acquisition");//: %d\n", err);
 		return err;
 	}
 	else {
@@ -223,19 +223,19 @@ int AVTCamera::takeSinglePicture()
 		{
 			if (VmbErrorSuccess != pFeat->IsCommandDone(bIsCommandDone))
 			{
-				printf("ohoh!");
+				LOGERR("ohoh!");
 				break;
 			}
 		} while (false == bIsCommandDone);
 	}
-	printf("picture taken without issues.\n");
+	LOGEXEC("picture taken without issues");
 
 	err = pCam->GetFeatureByName("AcquisitionStop", pFeat);
 	err = pFeat->RunCommand();
 	//err = pCam->Close();
 	if (VmbErrorSuccess != err)
 	{
-		printf("error in stopingaq: %d\n", err);
+		LOGERR("error in stoping: ");
 		return err;
 	}
 	else {
@@ -244,12 +244,12 @@ int AVTCamera::takeSinglePicture()
 		{
 			if (VmbErrorSuccess != pFeat->IsCommandDone(bIsCommandDone))
 			{
-				printf("ohoh!");
+				LOGERR("ohoh!");
 				break;
 			}
 		} while (false == bIsCommandDone);
 	}
-	printf("stoping good.\n");
+	LOGEXEC("stoping good.");
 	return 0;
 	
 }
@@ -276,7 +276,7 @@ bool AVTCamera::syncProjectionSequence(Projector * p)
 
 VmbError_t AVTCamera::releaseBuffer(void)
 {
-	printf("releasing buffer\n");
+	LOGEXEC("releasing buffer");
 	//m_pFrameObs->Stopping();	
 	
 	VmbError_t error = pCam->FlushQueue();
@@ -287,9 +287,11 @@ VmbError_t AVTCamera::releaseBuffer(void)
 		try {
 		//error = pCam->RevokeAllFrames();//TODO Fix or not? it was throwing unhandled exception! But closing camera afterwards seems enough.
 	}
-	catch (...) { printf("revoking failed"); }
+	catch (...) { LOGERR("revoking failed"); }
 
-	printf("result releasing buffer: %d\n",error);
+	char msg[120];
+	sprintf(msg, "result releasing buffer: %d", error);
+	LOGEXEC(msg);
 	return error;
 }
 
@@ -303,7 +305,7 @@ VmbErrorType AVTCamera::prepareCapture(void)
 	bool cameraFlag = false;
 	if (VmbErrorSuccess != error)
 	{
-		printf("not opening");
+		LOGEXEC("not opening");
 		return error;
 	}
 
@@ -376,6 +378,8 @@ VmbErrorType AVTCamera::prepareCapture(void)
 	{
 		return error;
 	}
-	printf("result prepare capture: %d\n", error);
+	char msg[120];
+	sprintf(msg, "result prepare capture: %d", error);
+	LOGEXEC(msg);
 	return error;
 }

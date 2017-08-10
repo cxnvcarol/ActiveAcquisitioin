@@ -1,3 +1,6 @@
+//TODO define log-macros in external file... use glog instead?
+#define LOGEXEC(msg) printf("\n[%d]::%s : %d\n", QTime::currentTime().msecsSinceStartOfDay(),(msg), __LINE__)
+#define LOGERR(msg) printf("\n[%d]:ERROR!!!:: %s : %d\n", QTime::currentTime().msecsSinceStartOfDay(),(msg), __LINE__)
 // activeCaptureCmd.cpp : Defines the entry point for the console application.
 //
 
@@ -178,17 +181,8 @@ int main(int argc, char *argv[])
 			printf("something wrong preparing the capture");
 			return err;
 		}
-		/*//this is just a test
-		printf("shotPictureResult: %d\n",cameraList[0]->takeSinglePicture());
-		Sleep(1000);
-		printf("stop sleep\n\n");
-		printf("shotPictureResult: %d\n", cameraList[0]->takeSinglePicture());
-		*/
 
 		iv.showInFullProjection();
-		//iv.loadAndDisplayImageFile("C:\\Users\\naranjo\\Pictures\\tank.png");
-		//Sleep(5000);
-		//iv.playProjectionSequence(1);//play sequence n times //TODO!!!---- Send ref. to camera to trigger capture.(1)
 		iv.playProjectionSequence(1, cameraList[0]);
 	}
 
@@ -196,7 +190,6 @@ int main(int argc, char *argv[])
 	//int result = 0;
 	printf("\n\njust before executing!\n\n");
 	int result = a.exec();	
-	//mng->endAPIs();
 	printf("\n\n\nenter to finish!\n\n");
 	fflush(stdout);
 	cin.get();

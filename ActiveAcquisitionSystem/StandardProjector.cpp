@@ -48,6 +48,9 @@
 **
 ****************************************************************************/
 
+#define LOGEXEC(msg) printf("\n[%d]::%s : %d\n", QTime::currentTime().msecsSinceStartOfDay(),(msg), __LINE__)
+#define LOGERR(msg) printf("\n[%d]:ERROR!!!:: %s : %d\n", QTime::currentTime().msecsSinceStartOfDay(),(msg), __LINE__)
+
 
 #include "StandardProjector.h"
 
@@ -62,6 +65,7 @@ StandardProjector::StandardProjector()
 	imageLabel->setBackgroundRole(QPalette::Dark);
 	setCentralWidget(imageLabel);
 	projectionTimer = new QTimer(this);	
+	projectionTimer->setSingleShot(true);
 	connect(projectionTimer, SIGNAL(timeout()), this, SLOT(advanceProjectionSequence()));
 	
 }
@@ -103,20 +107,26 @@ void StandardProjector::setImage(const QImage &newImage)
 	imageLabel->setPixmap(QPixmap::fromImage(image));
 	imageLabel->adjustSize();
 	imageLabel->update();//check if necessary
-	printf("[%d]:: %s",QTime::currentTime().msecsSinceStartOfDay(),"just painted\n");
+
+	LOGEXEC("just painted");
 }
 
 void StandardProjector::playProjectionSequence(int n)
 {
 	if (!playingSequence)
 	{
-		printf("playProjectionSequence called, repeat for %d times\n", n);		
+		char msg[120];
+		sprintf(msg,"playProjectionSequence called, repeat for %d times", n);//TODO LOOK HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		LOGEXEC(msg);
+
 		playingSequence = true;		
 		currentProjectionIndex = 0;
-		setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
-		long tms=projectionsSequence[currentProjectionIndex].usTime / 1000;
-		projectionTimer->start(tms);		
-		currentProjectionIndex++;		
+		//TODO, Fix here!
+		//setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
+		//long tms=projectionsSequence[currentProjectionIndex].usTime / 1000;
+		//projectionTimer->start(tms);		
+		//currentProjectionIndex++;		
+		advanceProjectionSequence();
 	}
 }
 
@@ -128,10 +138,20 @@ void StandardProjector::playProjectionSequence(int n,AVTCamera * cam)
 
 void StandardProjector::advanceProjectionSequence()
 {
+	if (currentProjectionIndex == projectionsSequence.size())
+	{
+		projectionTimer->stop();
+		currentProjectionIndex = 0;
+		LOGEXEC("end of projections");
+		return;
+	}
 	Projection projection = projectionsSequence[currentProjectionIndex];
 	//TODO!!! Read and use trigger condition to emit signal to cameras!. Use kind of observer model: https://sourcemaking.com/design_patterns/observer/cpp/3 (3)
 	//setImage(projections[currentProjectionIndex].image);
-	printf("setting the next projection..%d\n",currentProjectionIndex);
+	char msg[120];
+	sprintf(msg, "setting the next projection..%d", currentProjectionIndex);
+	LOGEXEC(msg);
+	//printf("setting the next projection..%d\n",currentProjectionIndex);
 	setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
 
 	bool trigger = projection.triggerCam;
@@ -141,22 +161,21 @@ void StandardProjector::advanceProjectionSequence()
 		{
 			try {
 				int result=obs->takeSinglePicture();
-				printf("result capturing picture: %d\n", result);
+				//printf("result capturing picture: %d\n", result);
+				msg[120];
+				sprintf(msg, "result capturing picture: %d", result);
+				LOGEXEC(msg);
 			}
 			catch (...)
 			{
-				printf("something wrong capturing picture!! \n");
+				LOGERR("something wrong capturing picture!!");
 			}			
 		}
 	}
 
+	long tms = projectionsSequence[currentProjectionIndex].usTime / 1000;
+	projectionTimer->start(tms);
 	currentProjectionIndex++;
-	if (currentProjectionIndex == projectionsSequence.size())
-	{
-		projectionTimer->stop();
-		currentProjectionIndex = 0;
-		printf("end of projections\n");
-	}
 	//TODO!!! SET SINGLESHOT TIMER, RESTART TIMER EVERYTIME WITH CORRECT TIME FOR EACH PROJECTION
 }
 

@@ -1,3 +1,6 @@
+#define LOGEXEC(msg) printf("\n[%d]::%s : %d\n", QTime::currentTime().msecsSinceStartOfDay(),(msg), __LINE__)
+#define LOGERR(msg) printf("\n[%d]:ERROR!!!:: %s : %d\n", QTime::currentTime().msecsSinceStartOfDay(),(msg), __LINE__)
+
 #include "AcquisitionDeviceManager.h"
 #include <qdebug.h>
 #include <vector>
@@ -24,7 +27,8 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 	}
 	catch (...)
 	{
-		printf("oh! not closing");
+		//printf("oh! not closing");
+		LOGERR("oh! not closing");
 	}
 	endAPIs();
 }
