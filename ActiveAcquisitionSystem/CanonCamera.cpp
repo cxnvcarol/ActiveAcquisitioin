@@ -13,6 +13,6 @@ CanonCamera::~CanonCamera()
 
 int CanonCamera::takeSinglePicture()
 {
-	//TODO
+	//TODO redirect or clean fn
 	return 0;
 }

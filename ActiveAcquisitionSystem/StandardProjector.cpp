@@ -116,16 +116,11 @@ void StandardProjector::playProjectionSequence(int n)
 	if (!playingSequence)
 	{
 		char msg[120];
-		sprintf(msg,"playProjectionSequence called, repeat for %d times", n);//TODO LOOK HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		sprintf(msg,"playProjectionSequence called, repeat for %d times", n);
 		LOGEXEC(msg);
 
 		playingSequence = true;		
 		currentProjectionIndex = 0;
-		//TODO, Fix here!
-		//setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
-		//long tms=projectionsSequence[currentProjectionIndex].usTime / 1000;
-		//projectionTimer->start(tms);		
-		//currentProjectionIndex++;		
 		advanceProjectionSequence();
 	}
 }
@@ -146,12 +141,10 @@ void StandardProjector::advanceProjectionSequence()
 		return;
 	}
 	Projection projection = projectionsSequence[currentProjectionIndex];
-	//TODO!!! Read and use trigger condition to emit signal to cameras!. Use kind of observer model: https://sourcemaking.com/design_patterns/observer/cpp/3 (3)
-	//setImage(projections[currentProjectionIndex].image);
+	
 	char msg[120];
 	sprintf(msg, "setting the next projection..%d", currentProjectionIndex);
 	LOGEXEC(msg);
-	//printf("setting the next projection..%d\n",currentProjectionIndex);
 	setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
 
 	bool trigger = projection.triggerCam;
@@ -176,7 +169,6 @@ void StandardProjector::advanceProjectionSequence()
 	long tms = projectionsSequence[currentProjectionIndex].usTime / 1000;
 	projectionTimer->start(tms);
 	currentProjectionIndex++;
-	//TODO!!! SET SINGLESHOT TIMER, RESTART TIMER EVERYTIME WITH CORRECT TIME FOR EACH PROJECTION
 }
 
 void StandardProjector::setScreen(int screenId)

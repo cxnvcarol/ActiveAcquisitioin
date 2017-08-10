@@ -260,7 +260,7 @@ void AVTCamera::setOutputFolder(std::string folder)
 		QDir().mkdir(folder.c_str());
 }
 
-bool AVTCamera::syncProjectionSequence(Projector * p)
+bool AVTCamera::syncProjectionSequence(Projector * p)//FIX REMOVE?? (clean)
 {	
 	if (playingProjectionSequence)
 	{
@@ -285,7 +285,7 @@ VmbError_t AVTCamera::releaseBuffer(void)
 	
 	if (VmbErrorSuccess == error)
 		try {
-		//error = pCam->RevokeAllFrames();//TODO Fix or not? it was throwing unhandled exception! But closing camera afterwards seems enough.
+		//error = pCam->RevokeAllFrames();//FIX Remove or not? it was throwing unhandled exception! But closing camera afterwards seems enough.
 	}
 	catch (...) { LOGERR("revoking failed"); }
 
