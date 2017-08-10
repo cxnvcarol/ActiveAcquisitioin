@@ -185,15 +185,17 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 			
 			convertedImage.save(pName, "PNG");
 			indexPicture++;
-			qDebug("png saved in ");
-			qDebug(pName.toStdString().c_str());
+			char msg[120];
+			sprintf("%s%s", "png saved in ", pName.toStdString().c_str());
+			LOGEXEC(msg);
+			qDebug();
 
 			return error;
 
 		}
 		catch (...)
 		{
-			printf("Oh oh! failed saving picture\n");
+			LOGERR("Oh oh! failed saving picture");
 			return false;
 		}
 
