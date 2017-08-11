@@ -64,7 +64,7 @@ class StandardProjector : public QMainWindow, public Projector
 {
 
 public:
-	void showInFullProjection();
+	void showInFullProjection(int selectedScreen);
 	
 	Q_OBJECT
 
@@ -76,7 +76,6 @@ public:
 	void setCurrentProjection(int projectionIndex);
 	void playProjectionSequence(int n);
 	void playProjectionSequence(int n, AVTCamera * cam);
-	void setScreen(int screenId);
 
 public slots:
 	void advanceProjectionSequence();

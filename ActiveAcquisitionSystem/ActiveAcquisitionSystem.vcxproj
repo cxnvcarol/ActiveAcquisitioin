@@ -132,7 +132,6 @@
     <ClCompile Include="..\activeCaptureCmd\activeCaptureCmd.cpp" />
     <ClCompile Include="AcquisitionDeviceManager.cpp" />
     <ClCompile Include="ActiveAcquisitionSystem.cpp" />
-    <ClCompile Include="activeCaptureMulticameraCmd.cpp" />
     <ClCompile Include="AVTCamera.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CanonCamera.cpp" />

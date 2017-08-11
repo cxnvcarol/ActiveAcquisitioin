@@ -171,19 +171,16 @@ void StandardProjector::advanceProjectionSequence()
 	currentProjectionIndex++;
 }
 
-void StandardProjector::setScreen(int screenId)
-{
-	projectedScreen = screenId;
-}
 
-void StandardProjector::showInFullProjection()
+void StandardProjector::showInFullProjection(int selectedScreen)
 {
 	showFullScreen();
 	int screenCount = QApplication::desktop()->screenCount();
-	QRect rec = QApplication::desktop()->screenGeometry(0);
-	QRect rec2 = QApplication::desktop()->screenGeometry(1);
-	int x = rec.center().rx();
-	int x2 = rec2.center().rx();
-	//TODO Select rec according to the right-est x coordinate, or according to the parameter in the constructor (pass it!) (inf-15)
-	setGeometry(rec2);
+	if (selectedScreen >= screenCount)
+	{
+		printf("\n[WARNING!] Selected screen not available, displaying in screen #%d\n",screenCount-1);
+		selectedScreen = screenCount - 1;
+	}
+	QRect rec = QApplication::desktop()->screenGeometry(selectedScreen);
+	setGeometry(rec);
 }

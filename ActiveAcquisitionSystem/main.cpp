@@ -30,21 +30,6 @@ using namespace std;
 int testIdentifyCameras();
 void testCanonTakingPicture();
 
-int main2(int argc, char *argv[])
-{
-	QApplication a(argc, argv);
-	ActiveAcquisitionSystem w;
-	w.show();
-
-	//testShowFullScreen():
-	StandardProjector iv;//important to call in main function (or keep the reference to iv)
-	iv.showInFullProjection();
-
-
-	qDebug("main print");
-	return a.exec();
-
-}
 int main3(int argc, char *argv[])
 {
 	QApplication a(argc, argv);
