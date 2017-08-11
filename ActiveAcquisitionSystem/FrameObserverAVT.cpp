@@ -26,6 +26,7 @@ void FrameObserverAVT::FrameReceived(const FramePtr frame)
 			pCam->QueueFrame(frame);
 			return;
 		}
+		//TODO Send the camera identifier so it can be used as part of the path to save the picture!!!! (1)!!  LOOK HERE!!!!!!!!
 		parent->setFrame(frame);		
 	}
 	VmbErrorType err= pCam->QueueFrame(frame);
