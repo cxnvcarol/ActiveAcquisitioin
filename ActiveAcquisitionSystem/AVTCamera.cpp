@@ -186,7 +186,7 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 			convertedImage.save(pName, "PNG");
 			indexPicture++;
 			char msg[120];
-			sprintf("%s%s", "png saved in ", pName.toStdString().c_str());
+			sprintf(msg,"%s%s", "png saved in ", pName.toStdString().c_str());
 			LOGEXEC(msg);
 			qDebug();
 

@@ -91,6 +91,9 @@
     <ClCompile Include="FrameObserverAVT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="activeCaptureMulticameraCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">
