@@ -124,11 +124,9 @@ void StandardProjector::playProjectionSequence(int n)
 		advanceProjectionSequence();
 	}
 }
-
-void StandardProjector::playProjectionSequence(int n,AVTCamera * cam)
+void StandardProjector::registerCameraObserver(AVTCamera * cam)
 {
 	observerCams.push_back(cam);
-	playProjectionSequence(n);
 }
 
 void StandardProjector::advanceProjectionSequence()

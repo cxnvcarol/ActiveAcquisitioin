@@ -96,6 +96,8 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 	int projectionScreen[2] = { 1,2 };//screen identfier, 2nd and 3rd screen by default.
 	string outputFolder = "./";
 
+
+	//WF: 1. Parse parameters
 	for (int i = 1;i < argc;i++)
 	{
 		if (argv[i][0] == '-')
@@ -158,29 +160,25 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 		countParamCase++;
 
 	}
+	
+	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
 
-
-
-
-	//TODO Never worked nicely. Reformat for better decoupling(inf-10)
-	//initActiveCapture(nCams, cameraConfigXml, countProjectors, projectionsFolder, projectionsConfig,projectionScreen,outputFolder);
-
-
+	////WF: 2. Initialize & configure desired projectors (extra screens)
+	//TODO Create as many standardProjectors as configured by parameter. countProjectors
 	StandardProjector iv;//important to call in main function (or keep the reference to iv)	
 	int c = iv.loadProjectionsFolder(projectionsFolder[0].c_str());
 	iv.loadProjectionSettings(projectionsConfig[0].c_str());
+	iv.showInFullProjection(projectionScreen[0]);
+	
+	////WF: 3. Detect all avt cameras, configure with passed configuration file & prepare for capturing
 
-	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
 	std::vector<AVTCamera*> cameraList = mng->detectAVTCameras();
 	if (cameraList.size() == 0)
 	{
 		printf("\nno AVT Cameras detected. Enter to continue");
 	}
 	else {
-		//printf("the cam name: %s\n", cameraList[0]->getName().c_str());
-
-		//////
-		//camera related: 1. get first avt detected, load
+		//TODO Do the loop for all identified cameras.
 		bool res = cameraList[0]->loadSettings(cameraConfigXml[0]);
 		res ? printf("xml load succeeded\n") : printf("something failed loading camera settings");
 		cameraList[0]->setOutputFolder(outputFolder);
@@ -192,11 +190,25 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 			return err;
 		}
 
-		iv.showInFullProjection(projectionScreen[0]);//TODO Assuming only 1 projector configured, I should display as much as "countProjectors" (inf-10)
-		iv.playProjectionSequence(1, cameraList[0]);
+		////WF: 4. register cameras as observers of the master(first) projector (if multiple projectors, one is master, others should be slaves as well!!)
+		for (int i = 0;i<cameraList.size();i++)
+		{
+			iv.registerCameraObserver(cameraList[i]);
+		}
+		//TODO: Register slave projectors as observers of main projector.
+
+		////WF: 5. Play synchronized projections:
+		//TODO: read and use # of repetitions as parameter of program.		
+		iv.playProjectionSequence(1);
+
+		//TODO: SOFTWARE REFACTORS:: Support canons and use register them as camera observers. Check if this can work with CAMERA class as registered observers instead of AVTCAMERA
 	}
 
 
+
+	//TODO safe termination of program:
+	//CMD CLOSE:http://www.cplusplus.com/reference/cstdlib/atexit/
+	//QT Window close:https://stackoverflow.com/questions/8165487/how-to-do-cleaning-up-on-exit-in-qt
 	//int result = 0;
 	printf("\n\njust before executing!\n\n");
 	int result = a.exec();	
@@ -207,8 +219,5 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 	printf("just before delete manager\n\n");
 	delete mng;
 	return result;
-	//TODO safe termination of program:
-	//CMD CLOSE:http://www.cplusplus.com/reference/cstdlib/atexit/
-	//QT Window close:https://stackoverflow.com/questions/8165487/how-to-do-cleaning-up-on-exit-in-qt
-
+	
 }

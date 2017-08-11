@@ -74,8 +74,10 @@ public:
 	~StandardProjector();
 	bool loadAndDisplayImageFile(const QString &);
 	void setCurrentProjection(int projectionIndex);
+	//void playProjectionSequence(int n);
 	void playProjectionSequence(int n);
-	void playProjectionSequence(int n, AVTCamera * cam);
+
+	void registerCameraObserver(AVTCamera * cam);
 
 public slots:
 	void advanceProjectionSequence();
