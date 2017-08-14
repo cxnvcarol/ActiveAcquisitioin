@@ -60,4 +60,6 @@ private:
 	int indexPicture;
 
 	FrameObserverAVT* frameObserver;
+
+	bool settingsLoaded;
 };

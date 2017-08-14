@@ -30,3 +30,8 @@ bool ActiveCamera::loadSettings(std::string pathToSettings)
 {
 	throw "Not implemented";
 }
+
+std::string ActiveCamera::getDevId()
+{
+	return dev_id;
+}

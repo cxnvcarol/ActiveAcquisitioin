@@ -22,6 +22,8 @@ public:
 	virtual int takeSinglePicture();
 	virtual bool loadSettings(CameraSettings cs);
 	virtual bool loadSettings(std::string pathToSettings);
+
+	std::string getDevId();
 protected:
 	std::string dev_id;
 };

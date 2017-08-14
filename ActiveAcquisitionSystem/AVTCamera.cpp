@@ -38,10 +38,21 @@ AVTCamera::AVTCamera() //: IFrameObserver(CameraPtr())
 
 }
 
-AVTCamera::AVTCamera(CameraPtr avtCam):playingProjectionSequence(false), indexPicture(0), outputFolder("./")//,IFrameObserver(avtCam)
+AVTCamera::AVTCamera(CameraPtr avtCam):playingProjectionSequence(false), indexPicture(0), outputFolder("."), settingsLoaded(false)//,IFrameObserver(avtCam)
 {
 	pCam = avtCam;
 	frameObserver = new FrameObserverAVT(avtCam, this);
+
+	VmbErrorType err = pCam->Open(VmbAccessModeFull);
+	if (err == VmbErrorSuccess)
+	{
+		FeaturePtr feature;
+		pCam->GetFeatureByName("DeviceID",feature);
+
+		feature->GetValue(dev_id);
+		//pCam->GetID(dev_id);
+	}
+	pCam->Close();
 #ifdef AVT_DEBUG
 	VmbErrorType err = pCam->Open(VmbAccessModeFull);
 	if (err == VmbErrorSuccess)
@@ -76,6 +87,8 @@ AVTCamera::~AVTCamera()
 }
 bool AVTCamera::loadSettings(std::string configXml)
 {
+	if (settingsLoaded)
+		return false;//meaning only load settings once, not overwritting allowed.
 	VmbErrorType err = pCam->Open(VmbAccessModeFull);
 	std::stringstream ss;
 	bool apiFlag = false;
@@ -139,6 +152,8 @@ bool AVTCamera::loadSettings(std::string configXml)
 
 	pCam->Close();
 
+
+	settingsLoaded = true;
 	return true;
 }
 

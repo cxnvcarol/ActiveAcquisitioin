@@ -71,12 +71,12 @@ void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjector
 		printf("loading for cam # %d: %s\n", i, result ? "true" : "false");
 	}
 }
-int main(int argc, char *argv[])//multiple avt cameras
+int maintest(int argc, char *argv[])//multiple avt cameras
 {
-
+	return 0;
 }
 
-int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
+int main(int argc, char *argv[])//SingleAVTCapture
 {
 	QApplication a(argc, argv);
 	printf("# args: %d\n", argc);
@@ -88,13 +88,15 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 	ParamCase paramCase = ParamCase::DEFAULT;
 	int countParamCase = 0;
 	int countProjectors = 0;
+	int countCameraConfigs = 0;
 
 	int nCams = 0;
 	string cameraConfigXml[5];//max 5 cams
+	string cameraConfigId[5] = {"","","","",""};//max 5 cams
 	string projectionsFolder[2];//Path to the folder with pngs to be projected. max 2 projs (projector + mask)
 	string projectionsConfig[2];//text files with configuration of time x each projection.
 	int projectionScreen[2] = { 1,2 };//screen identfier, 2nd and 3rd screen by default.
-	string outputFolder = "./";
+	string outputFolder = ".";
 
 
 	//WF: 1. Parse parameters
@@ -111,6 +113,7 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 			else if (!_strnicmp("-c", argv[i], 2))
 			{
 				paramCase = ParamCase::CAMERA_CONFIGS;
+				countCameraConfigs++;
 			}
 			else if (!_strnicmp("-p", argv[i], 2))
 			{
@@ -135,7 +138,13 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 
 
 		case ParamCase::CAMERA_CONFIGS:
-			cameraConfigXml[countParamCase] = param;
+			switch (countParamCase)
+			{
+			case 0:
+				cameraConfigXml[countCameraConfigs - 1] = param;
+			case 1:
+				cameraConfigId[countCameraConfigs - 1] = param;
+			}
 			nCams++;
 			break;
 		case ParamCase::PROJECTION_CONFIGS:
@@ -154,6 +163,12 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 			break;
 		case ParamCase::OUTPUT_FOLDER:
 			outputFolder = param;
+
+			if (!QDir(outputFolder.c_str()).exists())
+			{
+				QDir().mkdir(outputFolder.c_str());
+			}
+
 			break;
 		
 		}
@@ -163,12 +178,14 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 	
 	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
 
+	//TODO BIG! Support DLP Projector through USB!!
+
 	////WF: 2. Initialize & configure desired projectors (extra screens)
 	//TODO Create as many standardProjectors as configured by parameter. countProjectors
-	StandardProjector iv;//important to call in main function (or keep the reference to iv)	
-	int c = iv.loadProjectionsFolder(projectionsFolder[0].c_str());
-	iv.loadProjectionSettings(projectionsConfig[0].c_str());
-	iv.showInFullProjection(projectionScreen[0]);
+	StandardProjector mainProjector;//important to call in main function (or keep the reference to mainProjector)	
+	int c = mainProjector.loadProjectionsFolder(projectionsFolder[0].c_str());
+	mainProjector.loadProjectionSettings(projectionsConfig[0].c_str());
+	mainProjector.showInFullProjection(projectionScreen[0]);
 	
 	////WF: 3. Detect all avt cameras, configure with passed configuration file & prepare for capturing
 
@@ -178,30 +195,64 @@ int mainSingleAVTCapture(int argc, char *argv[])//SingleAVTCapture
 		printf("\nno AVT Cameras detected. Enter to continue");
 	}
 	else {
-		//TODO Do the loop for all identified cameras.
-		bool res = cameraList[0]->loadSettings(cameraConfigXml[0]);
-		res ? printf("xml load succeeded\n") : printf("something failed loading camera settings");
-		cameraList[0]->setOutputFolder(outputFolder);
-		VmbErrorType err = cameraList[0]->prepareCapture();
-
-		if (VmbErrorSuccess != err)
+		for (int i = 0;i < countCameraConfigs;i++)
 		{
-			printf("something wrong preparing the capture");
-			return err;
+			if (!cameraConfigId[i].empty())
+			{
+				string camID = cameraConfigId[i];
+
+					auto it = find_if(cameraList.begin(), cameraList.end(), [&camID](AVTCamera* obj) {return obj->getDevId() == camID;});
+
+				if (it != cameraList.end())
+				{
+					//it->loadSettings(cameraConfigXml[i]);
+					AVTCamera* cam = *it;
+					bool res = cam->loadSettings(cameraConfigXml[i]);
+					res ? printf("xml load succeeded with devid\n") : printf("xml settings failed to load with devid");
+				}
+			}
+		}
+		if (countCameraConfigs > 0)
+		{
+			//for each (AVTCamera* c in cameraList)
+			for(int i=0;i<cameraList.size();i++)
+			{
+				//WF: 3.1. Load settings
+				bool res = cameraList[i]->loadSettings(cameraConfigXml[i]);
+				res ? printf("xml load succeeded\n") : printf("xml settings were already set");
+			}
 		}
 
-		////WF: 4. register cameras as observers of the master(first) projector (if multiple projectors, one is master, others should be slaves as well!!)
+		
+		
+		
 		for (int i = 0;i<cameraList.size();i++)
 		{
-			iv.registerCameraObserver(cameraList[i]);
+			//WF: 3.2. Prepare cameras for capturing
+			string ouputCam = outputFolder + "/dev_" + cameraList[i]->getDevId();
+			if (!QDir(ouputCam.c_str()).exists())
+			{
+				QDir().mkdir(ouputCam.c_str());
+			}
+			cameraList[i]->setOutputFolder(ouputCam);
+			VmbErrorType err = cameraList[i]->prepareCapture();
+
+			if (VmbErrorSuccess != err)
+			{
+				printf("something wrong preparing the capture");
+				return err;
+			}
+
+			////WF: 4. register cameras as observers of the master(first) projector (if multiple projectors, one is master, others should be slaves as well!!)
+			mainProjector.registerCameraObserver(cameraList[i]);
 		}
 		//TODO: Register slave projectors as observers of main projector.
 
 		////WF: 5. Play synchronized projections:
 		//TODO: read and use # of repetitions as parameter of program.		
-		iv.playProjectionSequence(1);
+		mainProjector.playProjectionSequence(1);
 
-		//TODO: SOFTWARE REFACTORS:: Support canons and use register them as camera observers. Check if this can work with CAMERA class as registered observers instead of AVTCAMERA
+		//TODO: SOFTWARE REFACTORS:: Support canons and register them as camera observers. Check if this can work with CAMERA class as registered observers instead of AVTCAMERA
 	}
 
 
