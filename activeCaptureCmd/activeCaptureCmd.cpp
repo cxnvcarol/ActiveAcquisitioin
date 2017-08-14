@@ -189,6 +189,9 @@ int main(int argc, char *argv[])//SingleAVTCapture
 	
 	////WF: 3. Detect all avt cameras, configure with passed configuration file & prepare for capturing
 
+
+	////LOOK HERE!!!
+	//TODO: SOFTWARE REFACTORS:: Support canons and register them as camera observers. Check if this can work with CAMERA class as registered observers instead of AVTCAMERA
 	std::vector<AVTCamera*> cameraList = mng->detectAVTCameras();
 	if (cameraList.size() == 0)
 	{
@@ -200,21 +203,17 @@ int main(int argc, char *argv[])//SingleAVTCapture
 			if (!cameraConfigId[i].empty())
 			{
 				string camID = cameraConfigId[i];
-
-					auto it = find_if(cameraList.begin(), cameraList.end(), [&camID](AVTCamera* obj) {return obj->getDevId() == camID;});
+				auto it = find_if(cameraList.begin(), cameraList.end(), [&camID](AVTCamera* obj) {return obj->getDevId() == camID;});
 
 				if (it != cameraList.end())
 				{
-					//it->loadSettings(cameraConfigXml[i]);
-					AVTCamera* cam = *it;
-					bool res = cam->loadSettings(cameraConfigXml[i]);
+					bool res = ((AVTCamera*)*it)->loadSettings(cameraConfigXml[i]);
 					res ? printf("xml load succeeded with devid\n") : printf("xml settings failed to load with devid");
 				}
 			}
 		}
 		if (countCameraConfigs > 0)
 		{
-			//for each (AVTCamera* c in cameraList)
 			for(int i=0;i<cameraList.size();i++)
 			{
 				//WF: 3.1. Load settings
@@ -222,10 +221,6 @@ int main(int argc, char *argv[])//SingleAVTCapture
 				res ? printf("xml load succeeded\n") : printf("xml settings were already set");
 			}
 		}
-
-		
-		
-		
 		for (int i = 0;i<cameraList.size();i++)
 		{
 			//WF: 3.2. Prepare cameras for capturing
@@ -252,7 +247,7 @@ int main(int argc, char *argv[])//SingleAVTCapture
 		//TODO: read and use # of repetitions as parameter of program.		
 		mainProjector.playProjectionSequence(1);
 
-		//TODO: SOFTWARE REFACTORS:: Support canons and register them as camera observers. Check if this can work with CAMERA class as registered observers instead of AVTCAMERA
+		
 	}
 
 
