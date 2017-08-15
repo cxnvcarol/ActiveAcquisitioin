@@ -19,7 +19,7 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 {
 	//release memory, close api's objects
 	try {
-		foreach(AVTCamera* c, cameraList)
+		foreach(ActiveCamera* c, cameraList)
 		{
 			delete c;
 			//c->getAVTPointer()->Close();
@@ -62,28 +62,19 @@ void AcquisitionDeviceManager::endAPIs()
 
 }
 
-void AcquisitionDeviceManager::detectCameras()
-{
-	cameraList = detectAVTCameras();
-	//TODO Complete! (inf-1)
-	//1. detect canons, detect nikons, then allocate the cameraList matching the count of objects.
-	// So far just fillsN the list with the avt!	
-	numCams = sizeof(cameraList);//review here (likely not the right size)
-}
-
 void AcquisitionDeviceManager::detectProjectors()
 {
 	//TODO Implement: detect # of screens (each is a projector) + DLPs connected (inf-1)
 }
-std::vector<AVTCamera*> AcquisitionDeviceManager::getCameras()
+std::vector<ActiveCamera*> AcquisitionDeviceManager::getCameras()
 {
 	return cameraList;
 }
-ActiveCamera AcquisitionDeviceManager::getCamera(string dev_id)
+ActiveCamera* AcquisitionDeviceManager::getCamera(string dev_id)
 {
 	return NULL;
 }
-AVTCamera* AcquisitionDeviceManager::getCamera(int index)
+ActiveCamera* AcquisitionDeviceManager::getCamera(int index)
 {
 	if (numCams > index)
 	{
@@ -101,6 +92,18 @@ Projector* AcquisitionDeviceManager::getProjector(string dev_id)
 	return NULL;
 }
 
+vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras()
+{
+	//review: is this the most efficient?	
+	for each(AVTCamera* c in detectAVTCameras())
+	{
+		cameraList.push_back(c);
+	}
+	//TODO ADD canon cameras. LOOK HERE!!
+
+	numCams = cameraList.size();
+	return cameraList;
+}
 
 vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 {
@@ -123,12 +126,9 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 		for (int i = 0;i < count ; i++)
 			{
 				avtList[i] = new AVTCamera(cameras[i]);
-				avtList[i]->setName("myname");//TODO Correct this filling the correct properties! (inf)
 			}
 		}		
 	}
-	cameraList = avtList;
-	//return count;
 	return avtList;
 }
 

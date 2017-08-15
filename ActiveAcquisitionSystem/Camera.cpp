@@ -1,7 +1,7 @@
 #include "Camera.h"
 #include <string>
 using namespace std;
-
+#include <QDir>
 
 ActiveCamera::ActiveCamera(string dev_id)
 {
@@ -34,4 +34,11 @@ bool ActiveCamera::loadSettings(std::string pathToSettings)
 std::string ActiveCamera::getDevId()
 {
 	return dev_id;
+}
+
+void ActiveCamera::setOutputFolder(std::string folder)
+{
+	outputFolder = folder;
+	if (!QDir(folder.c_str()).exists())
+		QDir().mkdir(folder.c_str());
 }

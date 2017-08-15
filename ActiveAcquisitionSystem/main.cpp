@@ -30,20 +30,6 @@ using namespace std;
 int testIdentifyCameras();
 void testCanonTakingPicture();
 
-int main3(int argc, char *argv[])
-{
-	QApplication a(argc, argv);
-
-	/* 
-	//The following is working fine so far.
-	*/
-	AcquisitionDeviceManager *mng=new AcquisitionDeviceManager();
-	mng->detectCameras();
-	testCanonTakingPicture();
-	
-	return a.exec();
-}
-
 
 void testCanonTakingPicture()
 {

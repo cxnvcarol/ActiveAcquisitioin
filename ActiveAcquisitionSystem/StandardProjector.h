@@ -53,7 +53,7 @@
 
 #include <QMainWindow>
 #include "Projector.h"
-#include "AVTCamera.h"
+#include "Camera.h"
 
 class QAction;
 class QLabel;
@@ -77,7 +77,7 @@ public:
 	//void playProjectionSequence(int n);
 	void playProjectionSequence(int n);
 
-	void registerCameraObserver(AVTCamera * cam);
+	void registerCameraObserver(ActiveCamera * cam);
 
 public slots:
 	void advanceProjectionSequence();
@@ -93,7 +93,7 @@ private:
 	int projectedScreen;
 
 
-	std::vector<AVTCamera *> observerCams;
+	std::vector<ActiveCamera *> observerCams;
 	int nObservers;
 
 	

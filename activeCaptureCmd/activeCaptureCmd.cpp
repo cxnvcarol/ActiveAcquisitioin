@@ -27,54 +27,6 @@ static void printHelp()
 		//, "Example:\n\n");
 }
 
-void initActiveCapture(int nCamsToConfigure, string cameraXmls[], int nProjectors, string projectionsFolder[], string projectionsConfig[],
-	int projectionScreen[], string outputFolder)
-{
-	//Procedure:
-	/*
-	1. Initialize selected APIS (vimba, no need x canon/nikon/dlp)
-	2. select upto nCams vimba from identified list
-	3. load xmls to vimba
-	
-	In parallel (?)
-	2. identify  nProjectors < # of screens
-	3. Load pictures x each projectionsFolder
-	4. Load Projections config. to ProjectorClass - get total projection time.
-
-	then:
-
-	5. set #pictures to capture in AVT Cams to match longest projection total time + alpha.
-	6. avts -> start capturing & start projecting
-	7. transfer captured pictures to output folder
-	8. write xml output with capturing data (compliant with 3digify format!)
-	
-	*/
-	//1.
-
-
-	/*
-	//The following is working fine so far.
-	*/
-
-	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();//API Inintialization is into the constructor
-	mng->detectCameras();
-
-	int nCams = nCamsToConfigure > mng->getCountCameras() ?mng->getCountCameras() : nCamsToConfigure;
-
-
-	printf("There are %d detected cams and I'm trying to load %d xml files", mng->getCountCameras(), nCamsToConfigure);
-
-	for (int i = 0;i < nCams;i++)
-	{
-		AVTCamera *ac = mng->getCamera(0);
-		bool result = ac->loadSettings(cameraXmls[i]);
-		printf("loading for cam # %d: %s\n", i, result ? "true" : "false");
-	}
-}
-int maintest(int argc, char *argv[])//multiple avt cameras
-{
-	return 0;
-}
 
 int main(int argc, char *argv[])//SingleAVTCapture
 {
@@ -188,11 +140,7 @@ int main(int argc, char *argv[])//SingleAVTCapture
 	mainProjector.showInFullProjection(projectionScreen[0]);
 	
 	////WF: 3. Detect all avt cameras, configure with passed configuration file & prepare for capturing
-
-
-	////LOOK HERE!!!
-	//TODO: SOFTWARE REFACTORS:: Support canons and register them as camera observers. Check if this can work with CAMERA class as registered observers instead of AVTCAMERA
-	std::vector<AVTCamera*> cameraList = mng->detectAVTCameras();
+	std::vector<ActiveCamera*> cameraList = mng->detectAllCameras();
 	if (cameraList.size() == 0)
 	{
 		printf("\nno AVT Cameras detected. Enter to continue");
@@ -203,11 +151,11 @@ int main(int argc, char *argv[])//SingleAVTCapture
 			if (!cameraConfigId[i].empty())
 			{
 				string camID = cameraConfigId[i];
-				auto it = find_if(cameraList.begin(), cameraList.end(), [&camID](AVTCamera* obj) {return obj->getDevId() == camID;});
+				auto it = find_if(cameraList.begin(), cameraList.end(), [&camID](ActiveCamera* obj) {return obj->getDevId() == camID;});
 
 				if (it != cameraList.end())
 				{
-					bool res = ((AVTCamera*)*it)->loadSettings(cameraConfigXml[i]);
+					bool res = ((ActiveCamera*)*it)->loadSettings(cameraConfigXml[i]);
 					res ? printf("xml load succeeded with devid\n") : printf("xml settings failed to load with devid");
 				}
 			}
@@ -230,13 +178,7 @@ int main(int argc, char *argv[])//SingleAVTCapture
 				QDir().mkdir(ouputCam.c_str());
 			}
 			cameraList[i]->setOutputFolder(ouputCam);
-			VmbErrorType err = cameraList[i]->prepareCapture();
-
-			if (VmbErrorSuccess != err)
-			{
-				printf("something wrong preparing the capture");
-				return err;
-			}
+			//VmbErrorType err = cameraList[i]->prepareCapture();
 
 			////WF: 4. register cameras as observers of the master(first) projector (if multiple projectors, one is master, others should be slaves as well!!)
 			mainProjector.registerCameraObserver(cameraList[i]);

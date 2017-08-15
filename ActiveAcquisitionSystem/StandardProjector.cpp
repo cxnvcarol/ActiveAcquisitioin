@@ -124,7 +124,7 @@ void StandardProjector::playProjectionSequence(int n)
 		advanceProjectionSequence();
 	}
 }
-void StandardProjector::registerCameraObserver(AVTCamera * cam)
+void StandardProjector::registerCameraObserver(ActiveCamera * cam)
 {
 	observerCams.push_back(cam);
 }
@@ -148,12 +148,10 @@ void StandardProjector::advanceProjectionSequence()
 	bool trigger = projection.triggerCam;
 	if (trigger)
 	{
-		foreach(AVTCamera* obs, observerCams)
+		foreach(ActiveCamera* obs, observerCams)
 		{
 			try {
 				int result=obs->takeSinglePicture();
-				//printf("result capturing picture: %d\n", result);
-				msg[120];
 				sprintf(msg, "result capturing picture: %d", result);
 				LOGEXEC(msg);
 			}

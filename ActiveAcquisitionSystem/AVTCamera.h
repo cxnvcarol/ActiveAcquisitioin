@@ -5,7 +5,6 @@
 #include "Camera.h"
 #include "VimbaCPP/Include/VimbaCPP.h"
 #include <qimage.h>
-//#include <QtCore/QSharedPointer>
 #include "Projector.h"
 #include "FrameObserverAVT.h"
 
@@ -13,24 +12,16 @@
 using namespace AVT::VmbAPI;
 using namespace std;
 class AVTCamera :
-	public ActiveCamera//, virtual public IFrameObserver
+	public ActiveCamera
 {
 public:
-	//void triggerCamera();
 	AVTCamera(CameraPtr avtCam);
 	AVTCamera();
 	~AVTCamera();
 
 	bool loadSettings(std::string configPath);	
 	virtual int takeSinglePicture();
-	/*
-	virtual void FrameReceived(const FramePtr pFrame);
-	bool setFrame(const AVT::VmbAPI::FramePtr & frame);
-	*/
 
-	void setOutputFolder(std::string folder);
-	
-	
 	CameraPtr getAVTPointer() { return pCam; }
 	void setName(string n) {name = n; }
 	string getName() { 	return name; }
@@ -52,10 +43,8 @@ private:
 
 	std::string ipAddress;
 	CameraPtr pCam;
-	string outputFolder;
+	
 	VmbError_t releaseBuffer(void);
-	//VmbError_t processFrame();
-	//QSharedPointer<unsigned char> m_pFrame;
 	bool playingProjectionSequence;
 	int indexPicture;
 

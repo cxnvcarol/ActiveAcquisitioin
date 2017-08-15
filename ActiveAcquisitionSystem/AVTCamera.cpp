@@ -33,14 +33,14 @@ void PrintFtrInfo(const FeaturePtr &fs)
 		LOGERR("Ftr failed!");
 	}	
 }
-AVTCamera::AVTCamera() //: IFrameObserver(CameraPtr())
+AVTCamera::AVTCamera()
 {
 
 }
 
-AVTCamera::AVTCamera(CameraPtr avtCam):playingProjectionSequence(false), indexPicture(0), outputFolder("."), settingsLoaded(false)//,IFrameObserver(avtCam)
+AVTCamera::AVTCamera(CameraPtr avtCam):pCam(avtCam), playingProjectionSequence(false), indexPicture(0), settingsLoaded(false)
 {
-	pCam = avtCam;
+	outputFolder = ".";
 	frameObserver = new FrameObserverAVT(avtCam, this);
 
 	VmbErrorType err = pCam->Open(VmbAccessModeFull);
@@ -50,7 +50,7 @@ AVTCamera::AVTCamera(CameraPtr avtCam):playingProjectionSequence(false), indexPi
 		pCam->GetFeatureByName("DeviceID",feature);
 
 		feature->GetValue(dev_id);
-		//pCam->GetID(dev_id);
+		//TODO set name and other features (inf)
 	}
 	pCam->Close();
 #ifdef AVT_DEBUG
@@ -70,6 +70,7 @@ AVTCamera::AVTCamera(CameraPtr avtCam):playingProjectionSequence(false), indexPi
 	}
 
 #endif // AVT_DEBUG
+
 }
 AVTCamera::~AVTCamera()
 {
@@ -154,6 +155,16 @@ bool AVTCamera::loadSettings(std::string configXml)
 
 
 	settingsLoaded = true;
+
+	err = prepareCapture();
+	if (VmbErrorSuccess != err)
+	{
+		LOGERR("error preparing capture");//: %d\n", err);
+	}
+	else {
+		LOGEXEC("Camera prepared for capturing");
+	}
+
 	return true;
 }
 
@@ -221,7 +232,6 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 }
 int AVTCamera::takeSinglePicture()
 {
-
 	LOGEXEC("Trying to take picture");
 	//return 0;
 	
@@ -249,7 +259,6 @@ int AVTCamera::takeSinglePicture()
 
 	err = pCam->GetFeatureByName("AcquisitionStop", pFeat);
 	err = pFeat->RunCommand();
-	//err = pCam->Close();
 	if (VmbErrorSuccess != err)
 	{
 		LOGERR("error in stoping: ");
@@ -270,12 +279,7 @@ int AVTCamera::takeSinglePicture()
 	return 0;
 	
 }
-void AVTCamera::setOutputFolder(std::string folder)
-{
-	outputFolder = folder;
-	if(!QDir(folder.c_str()).exists())
-		QDir().mkdir(folder.c_str());
-}
+
 
 bool AVTCamera::syncProjectionSequence(Projector * p)//FIX REMOVE?? (clean)
 {	
