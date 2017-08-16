@@ -16,20 +16,22 @@ c. when buttons: load projections-sequence, load caera-settings for selected cam
 
 #include "ActiveAcquisitionSystem.h"
 #include <QtWidgets/QApplication>
-//#include "CanonCamera.h"
+//
 #include "WorkingSession.h"
-#include "EDSWrapper.h"
+//#include "EDSWrapper.h"
 
 #include "StandardProjector.h"
 
 #include "AcquisitionDeviceManager.h"
 #include <iostream>
 
+#include "CanonCamera.h"
+
 using namespace std;
 
 
 
-void mainCanon()//testCanonTakePicture
+void mainCanon()
 {
 	WorkingSession ws;
 	EDSWrapper eds;
@@ -41,4 +43,6 @@ void mainCanon()//testCanonTakePicture
 
 	fflush(stdout);
 	cin.get();
+
+	CanonCamera c;
 }

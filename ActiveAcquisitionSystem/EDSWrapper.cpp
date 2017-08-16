@@ -1,5 +1,5 @@
 #include "EDSWrapper.h"
-
+#include "debugMacros.h"
 
 map<int, string> EDSWrapper::errors = { { EDS_ERRORID_MASK,"EDS_ERRORID_MASK" },
 
@@ -339,7 +339,7 @@ EdsError EDSWrapper::getFirstCamera(EdsCameraRef *camera)
 
 EdsCameraRef * EDSWrapper::getCamera(int index)
 {
-	EdsCameraRef * camera;
+	EdsCameraRef * camera=(EdsCameraRef*)malloc(sizeof(EdsCameraRef));//TODO Review need
 	EdsError err = EDS_ERR_OK;
 	if (cameraList == NULL)
 		updateCameraList();

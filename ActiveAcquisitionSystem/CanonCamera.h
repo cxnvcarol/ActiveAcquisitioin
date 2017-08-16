@@ -1,5 +1,7 @@
 #pragma once
 #include "Camera.h"
+#include "EDSWrapper.h"
+
 class CanonCamera :
 	public ActiveCamera
 {

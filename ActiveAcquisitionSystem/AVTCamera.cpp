@@ -10,6 +10,7 @@
 
 #include <qdatastream.h>
 #include "../External/Vimba/VmbImageTransformHelper.hpp"
+#include "debugMacros.h"
 
 using namespace AVT::VmbAPI;
 using namespace std;

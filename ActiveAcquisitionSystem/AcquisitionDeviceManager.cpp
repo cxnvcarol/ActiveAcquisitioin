@@ -1,10 +1,7 @@
-#define LOGEXEC(msg) printf("\n[%d]::%s : %d\n", QTime::currentTime().msecsSinceStartOfDay(),(msg), __LINE__)
-#define LOGERR(msg) printf("\n[%d]:ERROR!!!:: %s : %d\n", QTime::currentTime().msecsSinceStartOfDay(),(msg), __LINE__)
-
 #include "AcquisitionDeviceManager.h"
 #include <qdebug.h>
 #include <vector>
-
+#include "debugMacros.h"
 
 using namespace AVT::VmbAPI;
 using namespace std;

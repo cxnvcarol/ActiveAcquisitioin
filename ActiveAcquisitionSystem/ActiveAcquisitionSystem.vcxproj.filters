@@ -88,6 +88,9 @@
     <ClCompile Include="FrameObserverAVT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CanonCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">
@@ -147,6 +150,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FrameObserverAVT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CanonCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="debugMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

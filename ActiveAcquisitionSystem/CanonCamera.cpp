@@ -1,6 +1,4 @@
 #include "CanonCamera.h"
-#include "EDSWrapper.h"
-
 
 CanonCamera::CanonCamera()
 {
