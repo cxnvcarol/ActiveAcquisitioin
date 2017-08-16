@@ -5,8 +5,12 @@ class CanonCamera :
 {
 public:
 	CanonCamera();
+	void setEdsCameraRef(EdsCameraRef *camera);
 	~CanonCamera();
 
 	int takeSinglePicture();
+
+private:
+	EdsCameraRef *camera;
 };
 

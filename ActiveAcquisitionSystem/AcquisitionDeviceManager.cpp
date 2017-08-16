@@ -11,27 +11,25 @@ using namespace std;
 
 AcquisitionDeviceManager::AcquisitionDeviceManager()
 {
+	
 	initializeAPIs();
 }
-
-
 AcquisitionDeviceManager::~AcquisitionDeviceManager()
 {
 	//release memory, close api's objects
 	try {
-		foreach(ActiveCamera* c, cameraList)
+		for(ActiveCamera* c: cameraList)
 		{
 			delete c;
-			//c->getAVTPointer()->Close();
 		}
 	}
 	catch (...)
 	{
-		//printf("oh! not closing");
-		LOGERR("oh! not closing");
+		LOGERR("oh! not closing camera");
 	}
 	endAPIs();
 }
+
 
 bool AcquisitionDeviceManager::initializeAPIs()
 {
@@ -100,6 +98,18 @@ vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras()
 		cameraList.push_back(c);
 	}
 	//TODO ADD canon cameras. LOOK HERE!!
+	/*
+	edsWrapper = new EDSWrapper();
+	int canonsCount = edsWrapper->getCameraCount();
+	
+	for (int i = 0;i < canonsCount;i++)
+	{
+		//CanonCamera* canon=new CanonCamera(edsWrapper->getCamera(i));
+		CanonCamera canon;
+		canon.setEdsCameraRef(edsWrapper->getCamera(i));
+		cameraList.push_back(&canon);
+	}
+	*/
 
 	numCams = cameraList.size();
 	return cameraList;

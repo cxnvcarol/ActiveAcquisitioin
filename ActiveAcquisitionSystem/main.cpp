@@ -16,32 +16,29 @@ c. when buttons: load projections-sequence, load caera-settings for selected cam
 
 #include "ActiveAcquisitionSystem.h"
 #include <QtWidgets/QApplication>
-#include "CanonCamera.h"
+//#include "CanonCamera.h"
 #include "WorkingSession.h"
 #include "EDSWrapper.h"
 
 #include "StandardProjector.h"
 
 #include "AcquisitionDeviceManager.h"
+#include <iostream>
 
 using namespace std;
 
 
-int testIdentifyCameras();
-void testCanonTakingPicture();
 
-
-void testCanonTakingPicture()
+void mainCanon()//testCanonTakePicture
 {
 	WorkingSession ws;
 	EDSWrapper eds;
-
 
 	int cc = eds.getCameraCount();
 
 	qDebug("Canons: %d", cc);
 	eds.sampleRun();
 
-	CanonCamera cac;
-	cac.takeSinglePicture();
+	fflush(stdout);
+	cin.get();
 }

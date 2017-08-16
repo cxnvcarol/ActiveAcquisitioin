@@ -337,6 +337,36 @@ EdsError EDSWrapper::getFirstCamera(EdsCameraRef *camera)
 	return err;
 }
 
+EdsCameraRef * EDSWrapper::getCamera(int index)
+{
+	EdsCameraRef * camera;
+	EdsError err = EDS_ERR_OK;
+	if (cameraList == NULL)
+		updateCameraList();
+
+
+	if (countCameras == 0)
+	{
+		err = EDS_ERR_DEVICE_NOT_FOUND;
+	}
+	// Get first camera retrieved
+	if (err == EDS_ERR_OK)
+	{
+		err = EdsGetChildAtIndex(cameraList, index, camera);
+	}
+	// Release camera list
+	if (cameraList != NULL)
+	{
+		EdsRelease(cameraList);
+		cameraList = NULL;
+	}
+	if (err != EDS_ERR_OK)
+	{
+		LOGERR("error getting canon camera");
+	}
+	return camera;
+}
+
 EdsError EDSWrapper::getTv(EdsCameraRef camera, EdsUInt32 *Tv)
 {
 	EdsError err = EDS_ERR_OK;

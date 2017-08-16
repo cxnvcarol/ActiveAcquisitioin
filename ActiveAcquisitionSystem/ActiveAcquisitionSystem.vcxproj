@@ -134,7 +134,6 @@
     <ClCompile Include="ActiveAcquisitionSystem.cpp" />
     <ClCompile Include="AVTCamera.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CanonCamera.cpp" />
     <ClCompile Include="EDSWrapper.cpp" />
     <ClCompile Include="FrameObserverAVT.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_ActiveAcquisitionSystem.cpp">
@@ -217,7 +216,6 @@
     <ClInclude Include="AcquisitionDeviceManager.h" />
     <ClInclude Include="AVTCamera.h" />
     <ClInclude Include="Camera.h" />
-    <ClInclude Include="CanonCamera.h" />
     <ClInclude Include="EDSWrapper.h" />
     <ClInclude Include="FrameObserverAVT.h" />
     <ClInclude Include="GeneratedFiles\ui_ActiveAcquisitionSystem.h" />

@@ -3,10 +3,9 @@
 #include "Camera.h"
 #include "AVTCamera.h"
 #include "Projector.h"
-
+//#include "CanonCamera.h"
 
 #define vimbaError (VmbErrorSuccess!=err)
-
 
 class AcquisitionDeviceManager
 {
@@ -43,6 +42,7 @@ private:
 
 	int numCams;
 
+	//EDSWrapper* edsWrapper;
 
 	//AVTCamera* detectAVTCameras();
 };

@@ -6,7 +6,7 @@ EDS Canon DLSR cameras
 
 #include "Camera.h"
 using namespace std;
-class EDSWrapper//:public Camera
+class EDSWrapper
 {
 public:
 	EDSWrapper();
@@ -18,6 +18,7 @@ public:
 	static EdsError EDSCALLBACK handleStateEvent(EdsPropertyEvent event, EdsPropertyID property, EdsUInt32 parameter, EdsVoid * context);
 	static EdsError EDSCALLBACK handlePropertyEvent(EdsPropertyEvent event, EdsPropertyID id, EdsUInt32 parameter, EdsVoid * context);
 	EdsError getFirstCamera(EdsCameraRef *camera);
+	EdsCameraRef* getCamera(int index);
 	EdsError getTv(EdsCameraRef camera, EdsUInt32 *Tv);
 	EdsError getTvDesc(EdsCameraRef camera, EdsPropertyDesc *TvDesc);
 	EdsError setTv(EdsCameraRef camera, EdsUInt32 TvValue);
