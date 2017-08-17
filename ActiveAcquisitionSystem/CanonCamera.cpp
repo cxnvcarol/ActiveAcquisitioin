@@ -16,12 +16,7 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 	camera = camref;
 
 	//TODO Separate the following in a prepareCapture function
-	EdsError err = EDS_ERR_OK;
-	// Set event handler
-	if (err == EDS_ERR_OK)
-	{
-		//err = EdsSetObjectEventHandler(*camera, kEdsObjectEvent_All, handleObjectEvent, this);//TODO LOOK HERE... fix, refactor to use as independent of wrapper as possible
-	}
+	
 	/* //TODO Review: when do I need property and state callbacks??
 	if (err == EDS_ERR_OK)
 	{
@@ -37,8 +32,8 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 
 	*/
 	///
-
-	err = EdsOpenSession(*camera);
+	
+	EdsError err = EdsOpenSession(*camera);
 	EdsDataType dataType;
 	EdsUInt32 dataSize;// = 200;
 	err = EdsGetPropertySize(*camera, kEdsPropID_BodyIDEx, 0, &dataType, &dataSize);
@@ -49,8 +44,7 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 		err = EdsGetPropertyData(*camera, kEdsPropID_BodyIDEx, 0, dataSize, serial);//kEdsDataType_String
 		if (err == EDS_ERR_OK)
 		{
-			printf("\nprinting canon name>>");
-			printf(serial);
+			LOGEXEC("CanonCamera serial>>%s", serial);
 			dev_id = serial;
 			printf("\n\n\n");
 		}
@@ -59,6 +53,7 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 	else {
 		LOGERR("Error reading serial from canon:%d", err);
 	}
+	err = EdsCloseSession(*camera);
 	
 }
 
@@ -68,10 +63,89 @@ CanonCamera::~CanonCamera()
 	EdsCloseSession(*camera);
 	
 }
-/*
+int CanonCamera::prepareCapture()
+{
+	EdsError err = EDS_ERR_OK;
+	// Set event handler
+	if (err == EDS_ERR_OK)
+	{
+		err = EdsSetObjectEventHandler(*camera, kEdsObjectEvent_All, handleObjectEvent, this);//TODO LOOK HERE... fix, refactor to use as independent of wrapper as possible
+	}
+	//EdsError err = EdsOpenSession(*camera);//Open and close only when taking picture!!
+	return 0;
+}
+
 int CanonCamera::takeSinglePicture()
 {
 	//TODO redirect or clean fn
+
+
 	return 0;
 }
-*/
+
+
+
+EdsError EDSCALLBACK CanonCamera::handleObjectEvent(EdsObjectEvent event, EdsBaseRef object, EdsVoid * context)
+{
+	EdsError err = EDS_ERR_OK;
+	// do something
+
+	CanonCamera* caller = (CanonCamera*)context;
+
+	switch (event)
+	{
+	case kEdsObjectEvent_DirItemRequestTransfer:
+	case kEdsObjectEvent_DirItemCreated:
+		printf("downloading image");
+		caller->downloadImage(object);
+		break;
+	default:
+		break;
+	}
+
+	// Object must be released
+	if (object)
+	{
+		EdsRelease(object);
+	}
+	return err;
+}
+
+EdsError CanonCamera::downloadImage(EdsDirectoryItemRef directoryItem)
+{
+	EdsError err = EDS_ERR_OK;
+	EdsStreamRef stream = NULL;
+	EdsDirectoryItemInfo dirItemInfo;
+	err = EdsGetDirectoryItemInfo(directoryItem, &dirItemInfo);
+	// Create file stream for transfer destination
+	if (err == EDS_ERR_OK)
+	{
+		
+		err = EdsCreateFileStream(dirItemInfo.szFileName,
+			kEdsFileCreateDisposition_CreateAlways,
+			//kEdsFile_CreateAlways,
+			kEdsAccess_ReadWrite, &stream);
+	}
+	// Download image
+	if (err == EDS_ERR_OK)
+	{
+		err = EdsDownload(directoryItem, dirItemInfo.size, stream);
+	}
+	// Issue notification that download is complete
+	if (err == EDS_ERR_OK)
+	{
+		err = EdsDownloadComplete(directoryItem);
+
+		//TODO LOOK HERE, HOW TO SAVE THE PICTURE??
+		EdsImageRef* outImage;
+		EdsCreateImageRef(stream, outImage);
+	}
+	
+	// Release stream
+	if (stream != NULL)
+	{
+		EdsRelease(stream);
+		stream = NULL;
+	}
+	return err;
+}

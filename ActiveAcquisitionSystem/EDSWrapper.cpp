@@ -184,13 +184,14 @@ void EDSWrapper::sampleRun(EdsCameraRef *currentCamera)
 	if (err == EDS_ERR_OK)
 	{
 		updateCameraList();
-		err = getFirstCamera(currentCamera);
+		//err = getFirstCamera(currentCamera);
+		//currentCamera = getCamera(0);
 	}
 
 	// Set event handler
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsSetObjectEventHandler(*currentCamera, kEdsObjectEvent_All, handleObjectEvent, this);
+		err = EdsSetObjectEventHandler(*currentCamera, kEdsObjectEvent_All, handleObjectEventHERE, this);
 	}
 	// Set event handler
 	if (err == EDS_ERR_OK)
@@ -201,35 +202,16 @@ void EDSWrapper::sampleRun(EdsCameraRef *currentCamera)
 	// Set event handler
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsSetPropertyEventHandler(*currentCamera, kEdsStateEvent_All,
+		err = EdsSetCameraStateEventHandler(*currentCamera, kEdsStateEvent_All,
 			handleStateEvent, this);
 	}
-	
-	// Open session with camera
-	if (err == EDS_ERR_OK)
-	{
-		err = EdsOpenSession(*currentCamera);
-	}
-	/////
-	// do something
-	
 	fflush(stderr);
-	if (err == EDS_ERR_OK)
+	Sleep(3000);
+	printf("\n\n----------------------------------------------------------------------\n\n");
+	err=takeSinglePicture(*currentCamera);
+	if (err != EDS_ERR_OK)
 	{
-		fprintf(stderr, "taking pictre!\n");
-		EdsError er= this->takeSinglePicture(*currentCamera);
-		if (er != EDS_ERR_OK)
-		{
-			//printf("error here!!\n");
-			fprintf(stderr,"error here!\n");
-			//printf(errors[er]);
-		}
-	}
-	////
-	// Close session with camera
-	if (err == EDS_ERR_OK)
-	{
-		err = EdsCloseSession(*currentCamera);
+		LOGERR("error taking picture!");		
 	}
 	// Release camera
 	if (*currentCamera != NULL)
@@ -238,8 +220,9 @@ void EDSWrapper::sampleRun(EdsCameraRef *currentCamera)
 	}
 }
 
-EdsError EDSCALLBACK EDSWrapper::handleObjectEvent(EdsObjectEvent event,EdsBaseRef object,EdsVoid * context)
+EdsError EDSCALLBACK EDSWrapper::handleObjectEventHERE(EdsObjectEvent event,EdsBaseRef object,EdsVoid * context)
 {
+	LOGEXEC("Objecthandle!!!::%d",event);
 	EdsError err = EDS_ERR_OK;
 	// do something
 
@@ -263,10 +246,11 @@ EdsError EDSCALLBACK EDSWrapper::handleObjectEvent(EdsObjectEvent event,EdsBaseR
 	}
 	return err;
 }
-EdsError EDSCALLBACK EDSWrapper::handleStateEvent(EdsPropertyEvent event,
-	EdsPropertyID property, EdsUInt32 parameter,
+EdsError EDSCALLBACK EDSWrapper::handleStateEvent(EdsStateEvent event,
+	EdsUInt32 parameter,
 	EdsVoid * context)
 {
+	LOGEXEC("Statehandle::%d", event);
 	EdsError err = EDS_ERR_OK;
 	// do something
 	return err;
@@ -275,6 +259,7 @@ EdsError EDSCALLBACK EDSWrapper::handlePropertyEvent(EdsPropertyEvent event, Eds
 	EdsUInt32 parameter,
 	EdsVoid * context)
 {
+	//LOGEXEC("propertyhandle::%d", event);
 	EdsError err = EDS_ERR_OK;
 	// do something
 	return err;
@@ -308,6 +293,7 @@ int EDSWrapper::getCameraCount()
 	}
 	return countCameras;
 }
+/*
 EdsError EDSWrapper::getFirstCamera(EdsCameraRef *camera)
 {
 	EdsError err = EDS_ERR_OK;
@@ -332,6 +318,7 @@ EdsError EDSWrapper::getFirstCamera(EdsCameraRef *camera)
 	}
 	return err;
 }
+*/
 
 EdsCameraRef * EDSWrapper::getCamera(int index)
 {
@@ -345,17 +332,19 @@ EdsCameraRef * EDSWrapper::getCamera(int index)
 	{
 		err = EDS_ERR_DEVICE_NOT_FOUND;
 	}
-	// Get first camera retrieved
+	
 	if (err == EDS_ERR_OK)
 	{
 		err = EdsGetChildAtIndex(cameraList, index, camera);
 	}
-	// Release camera list
+	// Release camera list//TODO Review, why to release the camera list??
+	/*
 	if (cameraList != NULL)
 	{
 		EdsRelease(cameraList);
 		cameraList = NULL;
 	}
+	*/
 	if (err != EDS_ERR_OK)
 	{
 		LOGERR("error getting canon camera");
@@ -398,6 +387,8 @@ EdsError EDSWrapper::downloadImage(EdsDirectoryItemRef directoryItem)
 	// Create file stream for transfer destination
 	if (err == EDS_ERR_OK)
 	{
+		char* filename = dirItemInfo.szFileName;//TODO LOOK HERE:: Working! picture saved in working path, now I need to use my desired path and name!!! and then test for multiple cameras! and combine with AVTS
+		printf("\noutput filname?: %s\n",filename);
 		err = EdsCreateFileStream(dirItemInfo.szFileName,
 			kEdsFileCreateDisposition_CreateAlways,
 			//kEdsFile_CreateAlways,
@@ -486,12 +477,38 @@ EdsError EDSWrapper::getDCIMFolder(EdsVolumeRef volume, EdsDirectoryItemRef * di
 
 EdsError EDSWrapper::takeSinglePicture(EdsCameraRef camera)
 {
-	EdsError err;
+	EdsError err = EdsOpenSession(camera);
+	
+	if (err == EDS_ERR_OK)
+	{
+		fprintf(stderr, "taking pictre!\n");
 
-	err = EdsSendCommand(camera, kEdsCameraCommand_PressShutterButton
-		, kEdsCameraCommand_ShutterButton_Completely);
-	EdsSendCommand(camera, kEdsCameraCommand_PressShutterButton
-		, kEdsCameraCommand_ShutterButton_OFF);
+		//err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);//TODO LOOK HERE, check camera type and use this for supported cams:
+		/*
+		EOS-1D
+		Mark III, EOS 40D, EOS - 1Ds Mark III,
+		EOS DIGITAL REBEL Xsi / 450D / Kiss
+		X2, EOS DIGITAL REBEL XS / 1000D /
+		KISS F.
+		*/
+		err = EdsSendCommand(camera, kEdsCameraCommand_PressShutterButton
+			, kEdsCameraCommand_ShutterButton_Completely);
+
+		LOGERR("resultShutterBtn:%d", err);
+		err=EdsSendCommand(camera, kEdsCameraCommand_PressShutterButton
+			, kEdsCameraCommand_ShutterButton_OFF);
+		LOGERR("resultShutterBtnOf:%d", err);
+		
+	}
+	////
+	// Close session with camera
+	if (err == EDS_ERR_OK)
+	{
+		err = EdsCloseSession(camera);
+		LOGERR("resultClosingSession:%d", err);
+	}
+
+
 	return err;
 }
 

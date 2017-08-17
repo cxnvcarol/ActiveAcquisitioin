@@ -39,7 +39,7 @@ void main()
 	int cc = eds.getCameraCount();
 
 	qDebug("Canons: %d", cc);
-	//eds.sampleRun();
+	eds.sampleRun(eds.getCamera(0));
 
 	fflush(stdout);
 	//cin.get();
@@ -48,7 +48,7 @@ void main()
 		CanonCamera* canon = new CanonCamera(eds.getCamera(0));
 		//gral wf: identify, load settings, set outputfolder, takesinglepicture, (callback: savepicture)
 		canon->setOutputFolder("C:\\Users\\naranjo\\Pictures\\canonTest");//TODO Test with fixed path, remove later.
-		canon->takeSinglePicture();
+		//canon->takeSinglePicture();
 	}
 	printf("Enter to leave\n");
 	cin.get();
