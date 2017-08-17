@@ -158,7 +158,6 @@ EDSWrapper::EDSWrapper()
 {
 	EdsError err = EDS_ERR_OK;
 	cameraList = NULL;
-	currentCamera = NULL;
 	countCameras = 0;
 	isSDKLoaded = false;
 	// Initialize SDK
@@ -171,51 +170,54 @@ EDSWrapper::EDSWrapper()
 }
 EDSWrapper::~EDSWrapper()
 {
+	// Terminate SDK
+	if (isSDKLoaded)
+	{
+		EdsTerminateSDK();
+		isSDKLoaded = false;
+	}
 }
-void EDSWrapper::sampleRun()
+void EDSWrapper::sampleRun(EdsCameraRef *currentCamera)
 {
 	// ! first camera
 	EdsError err = EDS_ERR_OK;
 	if (err == EDS_ERR_OK)
 	{
 		updateCameraList();
-		err = getFirstCamera(&currentCamera);
+		err = getFirstCamera(currentCamera);
 	}
 
 	// Set event handler
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsSetObjectEventHandler(currentCamera, kEdsObjectEvent_All, handleObjectEvent, this);
+		err = EdsSetObjectEventHandler(*currentCamera, kEdsObjectEvent_All, handleObjectEvent, this);
 	}
-
-
-	
-
 	// Set event handler
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsSetPropertyEventHandler(currentCamera, kEdsPropertyEvent_All,
+		err = EdsSetPropertyEventHandler(*currentCamera, kEdsPropertyEvent_All,
 			handlePropertyEvent, this);
 	}
 	// Set event handler
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsSetPropertyEventHandler(currentCamera, kEdsStateEvent_All,
+		err = EdsSetPropertyEventHandler(*currentCamera, kEdsStateEvent_All,
 			handleStateEvent, this);
 	}
 	
 	// Open session with camera
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsOpenSession(currentCamera);
+		err = EdsOpenSession(*currentCamera);
 	}
 	/////
 	// do something
-	fprintf(stderr, "taking pictre!\n");
+	
 	fflush(stderr);
 	if (err == EDS_ERR_OK)
 	{
-		EdsError er= this->takeSinglePicture(currentCamera);
+		fprintf(stderr, "taking pictre!\n");
+		EdsError er= this->takeSinglePicture(*currentCamera);
 		if (er != EDS_ERR_OK)
 		{
 			//printf("error here!!\n");
@@ -227,18 +229,12 @@ void EDSWrapper::sampleRun()
 	// Close session with camera
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsCloseSession(currentCamera);
+		err = EdsCloseSession(*currentCamera);
 	}
 	// Release camera
-	if (currentCamera != NULL)
+	if (*currentCamera != NULL)
 	{
-		EdsRelease(currentCamera);
-	}
-	// Terminate SDK
-	if (isSDKLoaded)
-	{
-		EdsTerminateSDK();
-		isSDKLoaded = false;
+		EdsRelease(*currentCamera);
 	}
 }
 

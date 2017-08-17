@@ -111,10 +111,7 @@ void StandardProjector::playProjectionSequence(int n)
 {
 	if (!playingSequence)
 	{
-		char msg[120];
-		sprintf(msg,"playProjectionSequence called, repeat for %d times", n);
-		LOGEXEC(msg);
-
+		LOGEXEC("playProjectionSequence called, repeat for %d times", n);
 		playingSequence = true;		
 		currentProjectionIndex = 0;
 		advanceProjectionSequence();
@@ -136,9 +133,7 @@ void StandardProjector::advanceProjectionSequence()
 	}
 	Projection projection = projectionsSequence[currentProjectionIndex];
 	
-	char msg[120];
-	sprintf(msg, "setting the next projection..%d", currentProjectionIndex);
-	LOGEXEC(msg);
+	LOGEXEC("setting the next projection..%d", currentProjectionIndex);
 	setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
 
 	bool trigger = projection.triggerCam;
@@ -148,8 +143,7 @@ void StandardProjector::advanceProjectionSequence()
 		{
 			try {
 				int result=obs->takeSinglePicture();
-				sprintf(msg, "result capturing picture: %d", result);
-				LOGEXEC(msg);
+				LOGEXEC("result capturing picture: %d", result);
 			}
 			catch (...)
 			{

@@ -212,9 +212,7 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 			
 			convertedImage.save(pName, "PNG");
 			indexPicture++;
-			char msg[120];
-			sprintf(msg,"%s%s", "png saved in ", pName.toStdString().c_str());
-			LOGEXEC(msg);
+			LOGEXEC("%s%s", "png saved in ", pName.toStdString().c_str());
 			qDebug();
 
 			return error;
@@ -311,9 +309,7 @@ VmbError_t AVTCamera::releaseBuffer(void)
 	}
 	catch (...) { LOGERR("revoking failed"); }
 
-	char msg[120];
-	sprintf(msg, "result releasing buffer: %d", error);
-	LOGEXEC(msg);
+	LOGEXEC("result releasing buffer: %d", error);
 	return error;
 }
 
@@ -400,8 +396,6 @@ VmbErrorType AVTCamera::prepareCapture(void)
 	{
 		return error;
 	}
-	char msg[120];
-	sprintf(msg, "result prepare capture: %d", error);
-	LOGEXEC(msg);
+	LOGEXEC("result prepare capture: %d", error);
 	return error;
 }

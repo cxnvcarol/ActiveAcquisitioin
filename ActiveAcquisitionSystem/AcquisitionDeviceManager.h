@@ -22,7 +22,6 @@ public:
 	std::vector<ActiveCamera*> getCameras();
 	ActiveCamera* getCamera(std::string dev_id);
 	ActiveCamera* getCamera(int index);
-	//AVTCamera* getCamera(int index);
 	Projector* getProjector(std::string dev_id);
 	std::vector<Projector*> getProjectors();
 

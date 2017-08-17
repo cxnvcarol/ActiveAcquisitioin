@@ -25,7 +25,7 @@ static void printHelp()
 }
 
 
-int main(int argc, char *argv[])//SingleAVTCapture
+int mainAVT(int argc, char *argv[])//SingleAVTCapture
 {
 	QApplication a(argc, argv);
 	printf("# args: %d\n", argc);
@@ -163,7 +163,7 @@ int main(int argc, char *argv[])//SingleAVTCapture
 			{
 				//WF: 3.1. Load settings
 				bool res = cameraList[i]->loadSettings(cameraConfigXml[i]);
-				res ? printf("xml load succeeded\n") : printf("xml settings were already set");
+				res ? printf("xml load succeeded\n") : printf("xml settings load failed or were already set");
 			}
 		}
 		for (int i = 0;i<cameraList.size();i++)

@@ -18,7 +18,7 @@ c. when buttons: load projections-sequence, load caera-settings for selected cam
 #include <QtWidgets/QApplication>
 //
 #include "WorkingSession.h"
-//#include "EDSWrapper.h"
+#include "EDSWrapper.h"
 
 #include "StandardProjector.h"
 
@@ -31,7 +31,7 @@ using namespace std;
 
 
 
-void mainCanon()
+void main()
 {
 	WorkingSession ws;
 	EDSWrapper eds;
@@ -39,10 +39,17 @@ void mainCanon()
 	int cc = eds.getCameraCount();
 
 	qDebug("Canons: %d", cc);
-	eds.sampleRun();
+	//eds.sampleRun();
 
 	fflush(stdout);
+	//cin.get();
+	if (cc > 0)
+	{
+		CanonCamera* canon = new CanonCamera(eds.getCamera(0));
+		//gral wf: identify, load settings, set outputfolder, takesinglepicture, (callback: savepicture)
+		canon->setOutputFolder("C:\\Users\\naranjo\\Pictures\\canonTest");//TODO Test with fixed path, remove later.
+		canon->takeSinglePicture();
+	}
+	printf("Enter to leave\n");
 	cin.get();
-
-	CanonCamera c;
 }

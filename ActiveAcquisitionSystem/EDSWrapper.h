@@ -22,7 +22,7 @@ public:
 	EdsError getTv(EdsCameraRef camera, EdsUInt32 *Tv);
 	EdsError getTvDesc(EdsCameraRef camera, EdsPropertyDesc *TvDesc);
 	EdsError setTv(EdsCameraRef camera, EdsUInt32 TvValue);
-	EdsError downloadImage(EdsDirectoryItemRef directoryItem);
+	
 	EdsError getVolume(EdsCameraRef camera, EdsVolumeRef * volume);
 	EdsError getDCIMFolder(EdsVolumeRef volume, EdsDirectoryItemRef * directoryItem);
 	EdsError takeSinglePicture(EdsCameraRef camera);
@@ -32,13 +32,14 @@ public:
 	EdsError updateCameraList();
 	EdsCameraListRef* getCameraList();
 	int getCameraCount();
-	void sampleRun();
+	void sampleRun(EdsCameraRef *c);
 
 private:
-	EdsCameraRef currentCamera;
 	EdsCameraListRef cameraList;
 	bool isSDKLoaded;
 	EdsUInt32 countCameras;
+
+	EdsError downloadImage(EdsDirectoryItemRef directoryItem);
 
 	
 
