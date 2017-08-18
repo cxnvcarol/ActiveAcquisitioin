@@ -15,7 +15,7 @@ public:
 	static map<int, string> errors;
 
 	static EdsError EDSCALLBACK handleObjectEventHERE(EdsObjectEvent event, EdsBaseRef object, EdsVoid * context);
-	static EdsError EDSCALLBACK handleStateEvent(EdsStateEvent event, EdsUInt32 parameter, EdsVoid * context);
+	static EdsError EDSCALLBACK handleStateEvent(EdsStateEvent event, EdsUInt32 evData, EdsVoid * context);
 	//static EdsError EDSCALLBACK handleStateEvent(EdsPropertyEvent event, EdsPropertyID property, EdsUInt32 parameter, EdsVoid * context);
 	static EdsError EDSCALLBACK handlePropertyEvent(EdsPropertyEvent event, EdsPropertyID id, EdsUInt32 parameter, EdsVoid * context);
 	EdsCameraRef* getCamera(int index);

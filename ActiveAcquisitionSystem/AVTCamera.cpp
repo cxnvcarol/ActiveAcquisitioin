@@ -39,9 +39,12 @@ AVTCamera::AVTCamera()
 
 }
 
-AVTCamera::AVTCamera(CameraPtr avtCam):pCam(avtCam), playingProjectionSequence(false), indexPicture(0), settingsLoaded(false)
+AVTCamera::AVTCamera(CameraPtr avtCam):pCam(avtCam), settingsLoaded(false)
 {
 	outputFolder = ".";
+	playingProjectionSequence = false;
+	indexPicture = 0;
+
 	frameObserver = new FrameObserverAVT(avtCam, this);
 
 	VmbErrorType err = pCam->Open(VmbAccessModeFull);
@@ -208,11 +211,11 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 				printf("error converting image %d\n", error);
 				return error;
 			}
-			QString pName = QString(outputFolder.c_str()) + "/" + QString("%1").arg(indexPicture, 2, 10, QChar('0')) + ".png";
+			string pName = outputFolder + "/" + QString("%1").arg(indexPicture, 2,10, QChar('0')).toStdString() + ".png";//this is 2 digits for the picture name in base 10
 			
-			convertedImage.save(pName, "PNG");
+			convertedImage.save(QString(pName.c_str()), "PNG");
 			indexPicture++;
-			LOGEXEC("%s%s", "png saved in ", pName.toStdString().c_str());
+			LOGEXEC("%s%s", "png saved in ", pName.c_str());
 			qDebug();
 
 			return error;
@@ -280,18 +283,6 @@ int AVTCamera::takeSinglePicture()
 }
 
 
-bool AVTCamera::syncProjectionSequence(Projector * p)//FIX REMOVE?? (clean)
-{	
-	if (playingProjectionSequence)
-	{
-		qDebug("projectionSequence already playing");
-		return false;
-	}
-	playingProjectionSequence = true;
-	indexPicture = 0;
-	//TODO!!! Verify workflow and complete. For now is just to keep track of the number of pictures! (2)
-	return false;
-}
 
 
 VmbError_t AVTCamera::releaseBuffer(void)
@@ -313,6 +304,7 @@ VmbError_t AVTCamera::releaseBuffer(void)
 	return error;
 }
 
+//TODO LOOK HERE, When to call the prepareCapture
 VmbErrorType AVTCamera::prepareCapture(void)
 {
 	VmbErrorType error = VmbErrorSuccess;
@@ -337,7 +329,7 @@ VmbErrorType AVTCamera::prepareCapture(void)
 	{
 		error = pFeature->GetValue(nPayload);
 		if (VmbErrorSuccess == error)
-		{			
+		{
 			frames.resize(FRAME_BUFFER_COUNT);
 
 			for (int i = 0; i<frames.size(); i++)
@@ -376,7 +368,7 @@ VmbErrorType AVTCamera::prepareCapture(void)
 				{
 					return error;
 				}
-			}			
+			}
 			for (int i = 0; i<frames.size(); i++)
 			{
 				error = pCam->QueueFrame(frames[i]);
@@ -385,7 +377,7 @@ VmbErrorType AVTCamera::prepareCapture(void)
 					return error;
 				}
 			}
-			
+
 		}
 		else
 		{

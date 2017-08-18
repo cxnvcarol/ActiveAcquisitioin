@@ -42,3 +42,20 @@ void ActiveCamera::setOutputFolder(std::string folder)
 	if (!QDir(folder.c_str()).exists())
 		QDir().mkdir(folder.c_str());
 }
+
+void ActiveCamera::notifyStopProjectionSequence() {
+	//TODO Evaluate need of this fn! (inf) --> needed when integrated with GUI to handle multiple capture-runs into the user-session
+	playingProjectionSequence = false;
+	indexPicture = 0;
+};
+
+
+void ActiveCamera::notifyStartProjectionSequence()//TODO Review: verify workflow. do I need the reference to the projector
+{
+	if (playingProjectionSequence)
+	{
+		LOGEXEC("projectionSequence already playing");
+	}
+	playingProjectionSequence = true;
+	indexPicture = 0;
+}

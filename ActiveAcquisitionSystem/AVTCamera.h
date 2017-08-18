@@ -20,17 +20,13 @@ public:
 	~AVTCamera();
 
 	bool loadSettings(std::string configPath);	
-	virtual int takeSinglePicture();
+	int takeSinglePicture();//TODO Review, should it be virtual?
 
 	CameraPtr getAVTPointer() { return pCam; }
 	void setName(string n) {name = n; }
 	string getName() { 	return name; }
-	bool syncProjectionSequence(Projector *p);
-	void stopProjectionSequence() {
-		//TODO Evaluate need of this fn! (inf) --> needed when integrated with GUI to handle multiple capture-runs into the user-session
-		playingProjectionSequence = false;
-		indexPicture = 0;
-	};
+	
+	
 
 	bool setFrame(const AVT::VmbAPI::FramePtr & frame);
 	VmbErrorType prepareCapture(void);//TODO make this member of ActiveCamera, so the cameras are only taken during capturing instead of the whole program execution: to use with GUI
@@ -45,8 +41,8 @@ private:
 	CameraPtr pCam;
 	
 	VmbError_t releaseBuffer(void);
-	bool playingProjectionSequence;
-	int indexPicture;
+	
+	
 
 	FrameObserverAVT* frameObserver;
 

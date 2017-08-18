@@ -53,6 +53,10 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 	else {
 		LOGERR("Error reading serial from canon:%d", err);
 	}
+	if (err == EDS_ERR_OK)
+	{
+		err = EdsSetObjectEventHandler(*camera, kEdsObjectEvent_All, handleObjectEvent, this);//TODO LOOK HERE... fix, refactor to use as independent of wrapper as possible
+	}
 	err = EdsCloseSession(*camera);
 	
 }
@@ -65,22 +69,50 @@ CanonCamera::~CanonCamera()
 }
 int CanonCamera::prepareCapture()
 {
-	EdsError err = EDS_ERR_OK;
-	// Set event handler
-	if (err == EDS_ERR_OK)
-	{
-		err = EdsSetObjectEventHandler(*camera, kEdsObjectEvent_All, handleObjectEvent, this);//TODO LOOK HERE... fix, refactor to use as independent of wrapper as possible
-	}
-	//EdsError err = EdsOpenSession(*camera);//Open and close only when taking picture!!
+	
+	//EdsError err = EdsOpenSession(*camera);//Open and close only when taking picture so multiple canons can be supported!!
 	return 0;
 }
 
 int CanonCamera::takeSinglePicture()
 {
-	//TODO redirect or clean fn
+	EdsError err = EdsOpenSession(*camera);
 
+	if (err == EDS_ERR_OK)
+	{
+		fprintf(stderr, "taking pictre!\n");
 
-	return 0;
+		//err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);//TODO FIX check camera type and use this command for its supported cams:
+		/*
+		EOS-1D
+		Mark III, EOS 40D, EOS - 1Ds Mark III,
+		EOS DIGITAL REBEL Xsi / 450D / Kiss
+		X2, EOS DIGITAL REBEL XS / 1000D /
+		KISS F.
+		*/
+		err = EdsSendCommand(*camera, kEdsCameraCommand_PressShutterButton
+			, kEdsCameraCommand_ShutterButton_Completely);
+
+		//LOGERR("resultShutterBtn:%d", err);
+		err = EdsSendCommand(*camera, kEdsCameraCommand_PressShutterButton
+			, kEdsCameraCommand_ShutterButton_OFF);
+		//LOGERR("resultShutterBtnOf:%d", err);
+
+	}
+	////
+	// Close session with camera
+	if (err == EDS_ERR_OK)
+	{
+		err = EdsCloseSession(*camera);
+		if (err == EDS_ERR_OK)
+		{
+			LOGEXEC("Canon picture taken");
+		}
+		else LOGERR("error closing canon session:%d", err);
+	}
+	else LOGERR("error taking canon picture:%d", err);
+
+	return err;
 }
 
 
@@ -120,10 +152,11 @@ EdsError CanonCamera::downloadImage(EdsDirectoryItemRef directoryItem)
 	// Create file stream for transfer destination
 	if (err == EDS_ERR_OK)
 	{
-		
+		//char* filename = dirItemInfo.szFileName;
+		std::string savepath = outputFolder + "/" + QString("%1").arg(indexPicture, 2, 10, QChar('0')).toStdString() + ".png";//this is 2 digits for the picture name in base 10
+		LOGEXEC("output file?: %s", savepath.c_str());
 		err = EdsCreateFileStream(dirItemInfo.szFileName,
 			kEdsFileCreateDisposition_CreateAlways,
-			//kEdsFile_CreateAlways,
 			kEdsAccess_ReadWrite, &stream);
 	}
 	// Download image
@@ -135,12 +168,7 @@ EdsError CanonCamera::downloadImage(EdsDirectoryItemRef directoryItem)
 	if (err == EDS_ERR_OK)
 	{
 		err = EdsDownloadComplete(directoryItem);
-
-		//TODO LOOK HERE, HOW TO SAVE THE PICTURE??
-		EdsImageRef* outImage;
-		EdsCreateImageRef(stream, outImage);
 	}
-	
 	// Release stream
 	if (stream != NULL)
 	{

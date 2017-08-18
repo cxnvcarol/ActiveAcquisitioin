@@ -19,11 +19,14 @@ public:
 	virtual void setOutputFolder(std::string folder);
 	virtual bool loadSettings(CameraSettings cs);
 	virtual bool loadSettings(std::string pathToSettings);
-
+	virtual void notifyStopProjectionSequence();
+	virtual void notifyStartProjectionSequence();
 	std::string getDevId();
 protected:
 	std::string dev_id;
 	std::string outputFolder;
+	int indexPicture;
+	bool playingProjectionSequence;
 };
 
 
