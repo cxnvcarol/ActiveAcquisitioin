@@ -14,6 +14,10 @@ public:
 
 	int takeSinglePicture();
 
+	bool notifyStopProjectionSequence();
+
+	bool notifyStartProjectionSequence();
+
 	int prepareCapture();
 
 private:

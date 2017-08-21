@@ -130,7 +130,7 @@ int mainAVT(int argc, char *argv[])//SingleAVTCapture
 	//TODO BIG! Support DLP Projector through USB!!
 
 	////WF: 2. Initialize & configure desired projectors (extra screens)
-	//TODO Create as many standardProjectors as configured by parameter. countProjectors
+	//TODO Create as many standardProjectors as configured by parameter. countProjectors (?)
 	StandardProjector mainProjector;//important to call in main function (or keep the reference to mainProjector)	
 	int c = mainProjector.loadProjectionsFolder(projectionsFolder[0].c_str());
 	mainProjector.loadProjectionSettings(projectionsConfig[0].c_str());
@@ -162,7 +162,7 @@ int mainAVT(int argc, char *argv[])//SingleAVTCapture
 			for(int i=0;i<cameraList.size();i++)
 			{
 				//WF: 3.1. Load settings
-				bool res = cameraList[i]->loadSettings(cameraConfigXml[i]);
+				bool res = cameraList[i]->loadSettings(cameraConfigXml[0]);
 				res ? printf("xml load succeeded\n") : printf("xml settings load failed or were already set");
 			}
 		}

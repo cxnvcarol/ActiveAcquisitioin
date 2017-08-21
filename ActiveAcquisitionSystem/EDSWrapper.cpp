@@ -154,7 +154,7 @@ map<int, string> EDSWrapper::errors = { { EDS_ERRORID_MASK,"EDS_ERRORID_MASK" },
 
 
 
-EDSWrapper::EDSWrapper()
+EDSWrapper::EDSWrapper()//TODO Review... how to make sure it's singleton?
 {
 	EdsError err = EDS_ERR_OK;
 	cameraList = NULL;

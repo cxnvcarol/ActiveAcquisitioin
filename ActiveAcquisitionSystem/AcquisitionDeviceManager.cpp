@@ -38,7 +38,7 @@ bool AcquisitionDeviceManager::initializeAPIs()
 
 
 	//canon
-
+	//edsWrapper = new EDSWrapper();
 
 	return true;
 
@@ -96,7 +96,7 @@ vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras()
 	}
 	//TODO ADD canon cameras. LOOK HERE!!
 	/*
-	edsWrapper = new EDSWrapper();
+	
 	int canonsCount = edsWrapper->getCameraCount();
 	
 	for (int i = 0;i < canonsCount;i++)

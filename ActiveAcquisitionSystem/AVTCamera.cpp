@@ -160,18 +160,9 @@ bool AVTCamera::loadSettings(std::string configXml)
 
 	settingsLoaded = true;
 
-	err = prepareCapture();
-	if (VmbErrorSuccess != err)
-	{
-		LOGERR("error preparing capture");//: %d\n", err);
-	}
-	else {
-		LOGEXEC("Camera prepared for capturing");
-	}
-
+	
 	return true;
 }
-
 
 bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 {
@@ -390,4 +381,43 @@ VmbErrorType AVTCamera::prepareCapture(void)
 	}
 	LOGEXEC("result prepare capture: %d", error);
 	return error;
+}
+
+bool AVTCamera::notifyStopProjectionSequence()
+{
+	if (ActiveCamera::notifyStopProjectionSequence())
+	{
+		LOGEXEC("about to release AVT buffer");
+		VmbError_t error = releaseBuffer();
+		try {
+			pCam->Close();
+		}
+		catch (...)
+		{
+			LOGERR("deleting but already closed");
+		}
+		return true;
+	}
+	else return false;
+}
+
+bool AVTCamera::notifyStartProjectionSequence()
+{
+	if (ActiveCamera::notifyStartProjectionSequence())
+	{
+		VmbErrorType err = prepareCapture();
+		if (VmbErrorSuccess != err)
+		{
+			LOGERR("error preparing capture");//: %d\n", err);
+		}
+		else {
+			LOGEXEC("Camera prepared for capturing");
+		}
+		return true;
+
+	}
+	else return false;
+	
+
+	
 }

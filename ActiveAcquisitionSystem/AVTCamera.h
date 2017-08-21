@@ -29,7 +29,10 @@ public:
 	
 
 	bool setFrame(const AVT::VmbAPI::FramePtr & frame);
-	VmbErrorType prepareCapture(void);//TODO make this member of ActiveCamera, so the cameras are only taken during capturing instead of the whole program execution: to use with GUI
+	VmbErrorType prepareCapture(void);
+
+	bool notifyStopProjectionSequence();
+	bool notifyStartProjectionSequence();
 
 private:
 	string name;

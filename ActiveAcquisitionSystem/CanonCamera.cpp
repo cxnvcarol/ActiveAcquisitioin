@@ -15,24 +15,7 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 {
 	camera = camref;
 
-	//TODO Separate the following in a prepareCapture function
-	
-	/* //TODO Review: when do I need property and state callbacks??
-	if (err == EDS_ERR_OK)
-	{
-		err = EdsSetPropertyEventHandler(*camera, kEdsPropertyEvent_All,
-			handlePropertyEvent, this);
-	}
-	// Set event handler
-	if (err == EDS_ERR_OK)
-	{
-		err = EdsSetPropertyEventHandler(*camera, kEdsStateEvent_All,
-			handleStateEvent, this);
-	}
-
-	*/
-	///
-	
+	//TODO Review: when do I need property and state callbacks??
 	EdsError err = EdsOpenSession(*camera);
 	EdsDataType dataType;
 	EdsUInt32 dataSize;// = 200;
@@ -47,6 +30,7 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 			LOGEXEC("CanonCamera serial>>%s", serial);
 			dev_id = serial;
 			printf("\n\n\n");
+			//TODO Complete other important properties!
 		}
 		
 	}
@@ -56,6 +40,7 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 	if (err == EDS_ERR_OK)
 	{
 		err = EdsSetObjectEventHandler(*camera, kEdsObjectEvent_All, handleObjectEvent, this);//TODO LOOK HERE... fix, refactor to use as independent of wrapper as possible
+		printf("object callback set\n\n");
 	}
 	err = EdsCloseSession(*camera);
 	
@@ -69,53 +54,89 @@ CanonCamera::~CanonCamera()
 }
 int CanonCamera::prepareCapture()
 {
+	EdsError err = EdsOpenSession(*camera);
+	if (err = EDS_ERR_OK)
+	{
+		int p = kEdsSaveTo_Both;
+		err = EdsSetPropertyData(*camera, kEdsPropID_SaveTo, 0, sizeof(p), &p);
+	}
+	else { LOGERR("couldn't open camera session: %d",err); }	
+
+	////TODO IMPORTANT Read important properties before capturing!! (needed for further processing!!!) (1)
 	
-	//EdsError err = EdsOpenSession(*camera);//Open and close only when taking picture so multiple canons can be supported!!
-	return 0;
+	return err;
 }
 
 int CanonCamera::takeSinglePicture()
 {
-	EdsError err = EdsOpenSession(*camera);
+	//PRE: assumed open camera already
+	LOGEXEC("taking canon picture!");
 
-	if (err == EDS_ERR_OK)
-	{
-		fprintf(stderr, "taking pictre!\n");
+	//err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);//TODO FIX check camera type and use this command for its supported cams:
+	/*
+	EOS-1D
+	Mark III, EOS 40D, EOS - 1Ds Mark III,
+	EOS DIGITAL REBEL Xsi / 450D / Kiss
+	X2, EOS DIGITAL REBEL XS / 1000D /
+	KISS F.
+	*/
+	EdsError err = EdsSendCommand(*camera, kEdsCameraCommand_PressShutterButton
+		, kEdsCameraCommand_ShutterButton_Completely);
 
-		//err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);//TODO FIX check camera type and use this command for its supported cams:
-		/*
-		EOS-1D
-		Mark III, EOS 40D, EOS - 1Ds Mark III,
-		EOS DIGITAL REBEL Xsi / 450D / Kiss
-		X2, EOS DIGITAL REBEL XS / 1000D /
-		KISS F.
-		*/
-		err = EdsSendCommand(*camera, kEdsCameraCommand_PressShutterButton
-			, kEdsCameraCommand_ShutterButton_Completely);
+	err = EdsSendCommand(*camera, kEdsCameraCommand_PressShutterButton
+		, kEdsCameraCommand_ShutterButton_OFF);
 
-		//LOGERR("resultShutterBtn:%d", err);
-		err = EdsSendCommand(*camera, kEdsCameraCommand_PressShutterButton
-			, kEdsCameraCommand_ShutterButton_OFF);
-		//LOGERR("resultShutterBtnOf:%d", err);
-
-	}
+	
 	////
-	// Close session with camera
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsCloseSession(*camera);
-		if (err == EDS_ERR_OK)
-		{
-			LOGEXEC("Canon picture taken");
-		}
-		else LOGERR("error closing canon session:%d", err);
+		LOGEXEC("Canon picture taking");
 	}
 	else LOGERR("error taking canon picture:%d", err);
 
 	return err;
 }
 
+bool CanonCamera::notifyStopProjectionSequence()
+{
+	if (ActiveCamera::notifyStopProjectionSequence())//if it was in fact opened
+	{
+		Sleep(50);//time to react for the last capture
+		EdsError err = EdsCloseSession(*camera);
+		if (err == EDS_ERR_OK)
+		{
+			LOGEXEC("Canon session closed");
+		}
+		else { LOGERR("error closing canon session:%d", err); }
 
+
+		err = EdsOpenSession(*camera);
+		if (err == EDS_ERR_OK)
+		{
+			Sleep(300);//time to receive object events
+			err = EdsCloseSession(*camera);
+			if (err == EDS_ERR_OK)
+			{
+				LOGEXEC("Canon session closed");
+			}
+			else { LOGERR("error closing canon session:%d", err); }
+		}
+		else { LOGERR("error openning canon session:%d", err); }
+		
+		return true;
+	}
+	return false;
+	
+}
+
+bool CanonCamera::notifyStartProjectionSequence()
+{
+	if(ActiveCamera::notifyStartProjectionSequence())
+	{ 
+		prepareCapture();
+	}
+	else { return false; }
+}
 
 EdsError EDSCALLBACK CanonCamera::handleObjectEvent(EdsObjectEvent event, EdsBaseRef object, EdsVoid * context)
 {
@@ -129,7 +150,7 @@ EdsError EDSCALLBACK CanonCamera::handleObjectEvent(EdsObjectEvent event, EdsBas
 	case kEdsObjectEvent_DirItemRequestTransfer:
 	case kEdsObjectEvent_DirItemCreated:
 		printf("downloading image");
-		caller->downloadImage(object);
+		err=caller->downloadImage(object);
 		break;
 	default:
 		break;
@@ -154,7 +175,7 @@ EdsError CanonCamera::downloadImage(EdsDirectoryItemRef directoryItem)
 	{
 		//char* filename = dirItemInfo.szFileName;
 		std::string savepath = outputFolder + "/" + QString("%1").arg(indexPicture, 2, 10, QChar('0')).toStdString() + ".png";//this is 2 digits for the picture name in base 10
-		LOGEXEC("output file?: %s", savepath.c_str());
+		LOGEXEC("saved at: %s", savepath.c_str());
 		err = EdsCreateFileStream(dirItemInfo.szFileName,
 			kEdsFileCreateDisposition_CreateAlways,
 			kEdsAccess_ReadWrite, &stream);

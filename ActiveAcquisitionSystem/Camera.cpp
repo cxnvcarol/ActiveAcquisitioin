@@ -22,13 +22,15 @@ int ActiveCamera::takeSinglePicture()
 
 bool ActiveCamera::loadSettings(CameraSettings cs)//GRAL CASE (makes more sense for canon & nikon)
 {
-	throw "Not implemented";
+	printf("Load settings with CameraSettings object");
+	return false;
 }
 
 
 bool ActiveCamera::loadSettings(std::string pathToSettings)
 {
-	throw "Not implemented";
+	printf("Load settings with file not implemented");
+	return false;
 }
 
 std::string ActiveCamera::getDevId()
@@ -43,19 +45,26 @@ void ActiveCamera::setOutputFolder(std::string folder)
 		QDir().mkdir(folder.c_str());
 }
 
-void ActiveCamera::notifyStopProjectionSequence() {
+bool ActiveCamera::notifyStopProjectionSequence() {
 	//TODO Evaluate need of this fn! (inf) --> needed when integrated with GUI to handle multiple capture-runs into the user-session
-	playingProjectionSequence = false;
-	indexPicture = 0;
+	if (playingProjectionSequence)
+	{
+		playingProjectionSequence = false;
+		indexPicture = 0;
+		return true;
+	}
+	else return false;//if already stopped
 };
 
 
-void ActiveCamera::notifyStartProjectionSequence()//TODO Review: verify workflow. do I need the reference to the projector
+bool ActiveCamera::notifyStartProjectionSequence()//TODO Review: verify workflow. do I need the reference to the projector
 {
 	if (playingProjectionSequence)
 	{
 		LOGEXEC("projectionSequence already playing");
+		return false;
 	}
 	playingProjectionSequence = true;
 	indexPicture = 0;
+	return true;
 }
