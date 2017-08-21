@@ -96,7 +96,8 @@ int Projector::loadProjectionsFolder(const QString & folderPath)
 			projections.push_back({ list[list.size() - 1],imageFile,newImage });
 		}
 	}
-	return projections.size();
+	int pCount= projections.size();
+	return pCount;
 }
 
 void Projector::playProjectionSequence(int n)

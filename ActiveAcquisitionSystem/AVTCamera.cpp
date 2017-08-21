@@ -295,7 +295,6 @@ VmbError_t AVTCamera::releaseBuffer(void)
 	return error;
 }
 
-//TODO LOOK HERE, When to call the prepareCapture
 VmbErrorType AVTCamera::prepareCapture(void)
 {
 	VmbErrorType error = VmbErrorSuccess;

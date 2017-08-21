@@ -4,6 +4,7 @@
 #include "AVTCamera.h"
 #include "Projector.h"
 #include "CanonCamera.h"
+#include "EDSWrapper.h"
 
 #define vimbaError (VmbErrorSuccess!=err)
 
@@ -41,7 +42,7 @@ private:
 
 	int numCams;
 
-	//EDSWrapper* edsWrapper;
+	EDSWrapper* edsWrapper;
 
 	//AVTCamera* detectAVTCameras();
 };

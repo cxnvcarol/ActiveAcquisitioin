@@ -7,15 +7,12 @@ CanonCamera::CanonCamera()
 CanonCamera::CanonCamera(EdsCameraRef  *camera)
 {
 	setEdsCameraRef(camera);
-	//TODO Prepare camera: set event handlers, open session, etc. etc.
-	//
 }
 
 void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 {
 	camera = camref;
 
-	//TODO Review: when do I need property and state callbacks??
 	EdsError err = EdsOpenSession(*camera);
 	EdsDataType dataType;
 	EdsUInt32 dataSize;// = 200;
@@ -39,7 +36,7 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 	}
 	if (err == EDS_ERR_OK)
 	{
-		err = EdsSetObjectEventHandler(*camera, kEdsObjectEvent_All, handleObjectEvent, this);//TODO LOOK HERE... fix, refactor to use as independent of wrapper as possible
+		err = EdsSetObjectEventHandler(*camera, kEdsObjectEvent_All, handleObjectEvent, this);
 		printf("object callback set\n\n");
 	}
 	err = EdsCloseSession(*camera);
@@ -60,10 +57,8 @@ int CanonCamera::prepareCapture()
 		int p = kEdsSaveTo_Both;
 		err = EdsSetPropertyData(*camera, kEdsPropID_SaveTo, 0, sizeof(p), &p);
 	}
-	else { LOGERR("couldn't open camera session: %d",err); }	
-
-	////TODO IMPORTANT Read important properties before capturing!! (needed for further processing!!!) (1)
-	
+	else { LOGERR("couldn't open camera session: %d",err); }
+	////TODO IMPORTANT Read important properties before capturing!! (needed for further processing!!!) - aperture, exposure time, etc (1)
 	return err;
 }
 
@@ -71,7 +66,6 @@ int CanonCamera::takeSinglePicture()
 {
 	//PRE: assumed open camera already
 	LOGEXEC("taking canon picture!");
-
 	//err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);//TODO FIX check camera type and use this command for its supported cams:
 	/*
 	EOS-1D
@@ -82,16 +76,9 @@ int CanonCamera::takeSinglePicture()
 	*/
 	EdsError err = EdsSendCommand(*camera, kEdsCameraCommand_PressShutterButton
 		, kEdsCameraCommand_ShutterButton_Completely);
-
 	err = EdsSendCommand(*camera, kEdsCameraCommand_PressShutterButton
 		, kEdsCameraCommand_ShutterButton_OFF);
-
-	
-	////
-	if (err == EDS_ERR_OK)
-	{
-		LOGEXEC("Canon picture taking");
-	}
+	if (err == EDS_ERR_OK){LOGEXEC("Canon picture taking");}
 	else LOGERR("error taking canon picture:%d", err);
 
 	return err;

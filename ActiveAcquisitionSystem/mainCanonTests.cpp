@@ -22,7 +22,7 @@ c. when buttons: load projections-sequence, load caera-settings for selected cam
 
 #include "StandardProjector.h"
 
-#include "AcquisitionDeviceManager.h"
+//#include "AcquisitionDeviceManager.h"
 #include <iostream>
 
 #include "CanonCamera.h"

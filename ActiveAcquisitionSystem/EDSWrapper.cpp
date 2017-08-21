@@ -154,7 +154,7 @@ map<int, string> EDSWrapper::errors = { { EDS_ERRORID_MASK,"EDS_ERRORID_MASK" },
 
 
 
-EDSWrapper::EDSWrapper()//TODO Review... how to make sure it's singleton?
+EDSWrapper::EDSWrapper()//TODO Review... should I make sure it's a singleton?
 {
 	EdsError err = EDS_ERR_OK;
 	cameraList = NULL;
@@ -209,13 +209,12 @@ void EDSWrapper::sampleRun(EdsCameraRef *currentCamera)
 	{
 		LOGERR("error taking picture!");		
 	}
-	Sleep(6600);//TODO FIX REMOVE
 	printf("\nabout to close\n");
 	EdsCloseSession(*currentCamera);
 	// Release camera
 	if (*currentCamera != NULL)
 	{
-		//EdsRelease(*currentCamera);//TODO Review: release or not release?
+		//EdsRelease(*currentCamera);
 	}
 	*/
 }
@@ -323,7 +322,7 @@ EdsError EDSWrapper::getFirstCamera(EdsCameraRef *camera)
 
 EdsCameraRef * EDSWrapper::getCamera(int index)
 {
-	EdsCameraRef * camera=(EdsCameraRef*)malloc(sizeof(EdsCameraRef));//TODO Review need
+	EdsCameraRef * camera = (EdsCameraRef*)malloc(sizeof(EdsCameraRef));
 	EdsError err = EDS_ERR_OK;
 	if (cameraList == NULL)
 		updateCameraList();
@@ -388,7 +387,7 @@ EdsError EDSWrapper::downloadImage(EdsDirectoryItemRef directoryItem)
 	// Create file stream for transfer destination
 	if (err == EDS_ERR_OK)
 	{
-		char* filename = dirItemInfo.szFileName;//TODO LOOK HERE:: Working! picture saved in working path, now I need to use my desired path and name!!! and then test for multiple cameras! and combine with AVTS
+		char* filename = dirItemInfo.szFileName;//:: Working! saving in local execution path. this function is just for test. See version in CanonCamera using correct path and naming
 		printf("\noutput filname?: %s\n",filename);
 		err = EdsCreateFileStream(dirItemInfo.szFileName,
 			kEdsFileCreateDisposition_CreateAlways,
@@ -504,17 +503,8 @@ EdsError EDSWrapper::takeSinglePicture(EdsCameraRef camera)
 	}
 	////
 	// Close session with camera
-	if (err == EDS_ERR_OK)
-	{
-		//err = EdsCloseSession(camera);//TODO close or not?
-		if (err == EDS_ERR_OK)
-		{
-			LOGEXEC("Canon picture taken");
-		}
-		else { LOGERR("resultClosingSession:%d", err); }
-	}
-	else {LOGERR("error taking picture:%d", err);}
-	fflush(stdout);
+	if (err != EDS_ERR_OK) {LOGERR("error taking picture:%d", err);}
+	
 	return err;
 }
 
