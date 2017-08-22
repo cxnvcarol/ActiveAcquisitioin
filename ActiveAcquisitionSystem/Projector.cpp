@@ -31,46 +31,14 @@ int Projector::indexOfProjection(const QString imgName)
 }
 
 
+void Projector::registerCameraObserver(ActiveCamera * cam)
+{
+	throw "not implemented";
+}
+
 void Projector::loadProjectionSettings(const QString projectionsConfig)
 {
-	//1. Read text file, split each line, save projection in array.
-	QFile f(projectionsConfig);
-	if (f.open(QIODevice::ReadOnly))
-	{
-		QTextStream in(&f);
-		QString line;
-		while (!in.atEnd()) {
-			line = in.readLine();
-			QStringList  fields = line.split(",");
-			if (fields.size() != 3)
-			{
-				throw "incorrect number of arguments for the sequence projection";
-			}
-			//projections.
-			Projection *found;
-			//std::find(projections.begin(), projections.end(), found);
-			int index = indexOfProjection(fields[0]);
-			if (index < 0)
-			{
-				throw ("incorrect projection setting in line: " + line);
-			}
-			bool ok;
-			long us = fields[1].toLong(&ok);
-			if (!ok)
-			{
-				throw ("incorrect projection setting in line: " + line);
-			}
-			bool camTrigger = fields[2].toInt(&ok);
-			if (!ok)
-			{
-				throw ("incorrect projection setting in line: " + line);
-			}
-			projectionsSequence.push_back({index,us,camTrigger});
-
-			
-		}
-		f.close();
-	}
+	throw "not implemented";
 
 }
 

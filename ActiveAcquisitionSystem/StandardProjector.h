@@ -74,10 +74,10 @@ public:
 	~StandardProjector();
 	bool loadAndDisplayImageFile(const QString &);
 	void setCurrentProjection(int projectionIndex);
-	//void playProjectionSequence(int n);
+	
 	void playProjectionSequence(int n);
-
 	void registerCameraObserver(ActiveCamera * cam);
+	void loadProjectionSettings(const QString projectionsConfig);
 
 public slots:
 	void advanceProjectionSequence();
@@ -88,15 +88,7 @@ private:
 	QLabel *imageLabel;
 	QTimer  *projectionTimer;
 	int currentProjectionIndex;
-
-
 	int projectedScreen;
-
-
-	std::vector<ActiveCamera *> observerCams;
-	int nObservers;
-
-	
 };
 
 #endif

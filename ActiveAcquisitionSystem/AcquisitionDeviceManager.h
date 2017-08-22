@@ -39,7 +39,6 @@ private:
 	VmbErrorType    err;
 	std::vector<ActiveCamera*> cameraList;
 	std::vector<Projector*> projectors;
-
 	int numCams;
 
 	EDSWrapper* edsWrapper;
