@@ -180,17 +180,12 @@ int mainAVT(int argc, char *argv[])//SingleAVTCapture
 			////WF: 4. register cameras as observers of the master(first) projector (if multiple projectors, one is master, others should be slaves as well!!)
 			mainProjector.registerCameraObserver(cameraList[i]);
 		}
-		//TODO: Register slave projectors as observers of main projector.
-
+		//TODO: Register slave projectors as observers of main projector. (Applied when using a second projector as a mask! (DMD Mask!!))
 		////WF: 5. Play synchronized projections:
-		//TODO: read and use # of repetitions as parameter of program.		
-		mainProjector.playProjectionSequence(1);
-
-		
+		//TODO: x completeness:: read and use # of repetitions as parameter of the program.
+		mainProjector.playProjectionSequence(1);		
 	}
-
-
-
+	
 	//TODO safe termination of program:
 	//CMD CLOSE:http://www.cplusplus.com/reference/cstdlib/atexit/
 	//QT Window close:https://stackoverflow.com/questions/8165487/how-to-do-cleaning-up-on-exit-in-qt

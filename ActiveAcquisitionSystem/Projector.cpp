@@ -86,7 +86,7 @@ int Projector::loadProjectionsFolder(const QString & folderPath)
 		filter << QLatin1String("*.bmp");
 		dir.setNameFilters(filter);
 		QFileInfoList filelistinfo = dir.entryInfoList();
-		foreach(const QFileInfo &fileinfo, filelistinfo) {
+		for(const QFileInfo &fileinfo : filelistinfo) {
 			QString imageFile = fileinfo.absoluteFilePath();
 			QStringList list = imageFile.split(QRegExp("[\\/]+"));
 
@@ -96,10 +96,8 @@ int Projector::loadProjectionsFolder(const QString & folderPath)
 			projections.push_back({ list[list.size() - 1],imageFile,newImage });
 		}
 	}
-	int pCount= projections.size();
-	return pCount;
+	return projections.size();
 }
-
 void Projector::playProjectionSequence(int n)
 {
 	throw "not implemented";

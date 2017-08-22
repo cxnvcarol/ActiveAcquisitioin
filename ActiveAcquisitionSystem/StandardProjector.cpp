@@ -111,10 +111,14 @@ void StandardProjector::playProjectionSequence(int n)
 {
 	if (!playingSequence)
 	{
-		LOGEXEC("playProjectionSequence called, repeat for %d times", n);
+		LOGEXEC("playProjectionSequence called, repeat for %d times", n);//TODO Fix, n repetitions is ignored.
+		for (ActiveCamera* ci : observerCams)
+		{
+			ci->notifyStartProjectionSequence();
+		}
 		playingSequence = true;		
 		currentProjectionIndex = 0;
-		advanceProjectionSequence();
+		advanceProjectionSequence();//first call triggers the following timed projections.
 	}
 }
 void StandardProjector::registerCameraObserver(ActiveCamera * cam)
@@ -128,7 +132,13 @@ void StandardProjector::advanceProjectionSequence()
 	{
 		projectionTimer->stop();
 		currentProjectionIndex = 0;
+		for (ActiveCamera* ci : observerCams)
+		{
+			ci->notifyStopProjectionSequence();
+		}
+		playingSequence = false;
 		LOGEXEC("end of projections");
+		//TODO Fix here, n repetitions is ignored.
 		return;
 	}
 	Projection projection = projectionsSequence[currentProjectionIndex];
@@ -139,7 +149,7 @@ void StandardProjector::advanceProjectionSequence()
 	bool trigger = projection.triggerCam;
 	if (trigger)
 	{
-		foreach(ActiveCamera* obs, observerCams)
+		for(ActiveCamera* obs: observerCams)
 		{
 			try {
 				int result=obs->takeSinglePicture();
