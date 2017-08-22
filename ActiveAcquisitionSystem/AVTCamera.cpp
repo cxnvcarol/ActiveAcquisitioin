@@ -9,7 +9,7 @@
 #include <QFile>
 
 #include <qdatastream.h>
-#include "../External/Vimba/VmbImageTransformHelper.hpp"
+#include "Vimba/VmbImageTransformHelper.hpp"
 #include "debugMacros.h"
 
 using namespace AVT::VmbAPI;

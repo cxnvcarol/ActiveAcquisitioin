@@ -1,7 +1,6 @@
 #pragma once
 #include "Camera.h"
-//#include "EDSWrapper.h"
-#include "../External/EDSDK/EDSDK.h"
+#include "EDSDK\EDSDK.h"
 
 class CanonCamera :
 	public ActiveCamera

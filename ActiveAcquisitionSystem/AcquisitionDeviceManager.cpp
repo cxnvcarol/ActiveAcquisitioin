@@ -3,6 +3,10 @@
 #include <vector>
 #include "debugMacros.h"
 
+#include "Texas/HiresLib/usb.h"
+#include "Texas/HiresLib/API.h"
+
+
 using namespace AVT::VmbAPI;
 using namespace std;
 
@@ -33,12 +37,13 @@ bool AcquisitionDeviceManager::initializeAPIs()
 	//vimba
 	sistema = &AVT::VmbAPI::VimbaSystem::GetInstance();
 	err = sistema->Startup();
-	
-	//texas dlp
-
 
 	//canon
 	edsWrapper = new EDSWrapper();
+
+	//texas dlp
+	USB_Init();
+	//TODO LOOK HERE, Complete to detect and complete info from DLPS!!
 
 	return true;
 
@@ -90,7 +95,7 @@ Projector* AcquisitionDeviceManager::getProjector(string dev_id)
 vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras()
 {
 	//review: is this the most efficient?	
-	for each(AVTCamera* c in detectAVTCameras())
+	for(AVTCamera* c : detectAVTCameras())
 	{
 		cameraList.push_back(c);
 	}	

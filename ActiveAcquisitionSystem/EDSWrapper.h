@@ -1,7 +1,7 @@
 /**
 EDS Canon DLSR cameras
 **/
-#include "../External/EDSDK/EDSDK.h"
+#include "EDSDK\EDSDK.h"
 #include <map>
 
 #include "Camera.h"
