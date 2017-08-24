@@ -10,6 +10,7 @@
 #define USB_H
 
 #include "common.h"
+#include "hidapi.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,14 +45,23 @@ typedef struct
         unsigned char data[HID_MESSAGE_MAX_SIZE];
     }text;
 }hidMessageStruct;
-void USB_SetFakeConnection(BOOL enable);
-int USB_Open(void);
-BOOL USB_IsConnected();
-int USB_Write(uint08 *Data);
-int USB_Read(uint08 *Data);
-int USB_Close();
+/*hid_device *DeviceHandle
+typedef struct{
+	hid_device *DeviceHandle;
+	BOOL USBConnected;
+}hidCommDevice;//communication with HID detected device.
+*/
+
+void USB_SetFakeConnection(BOOL enable);//todo remove, deprecated and useless for this application.
+int USB_Open(hid_device *DeviceHandle);
+//BOOL USB_IsConnected(hid_device *DeviceHandle);
+int USB_Write(uint08 *Data, hid_device *DeviceHandle);
+int USB_Read(uint08 *Data, hid_device *DeviceHandle);
+int USB_Close(hid_device *DeviceHandle);
 int USB_Init();
 int USB_Exit();
+
+struct hid_device_info * USB_GetHIDs();
 
 #ifdef __cplusplus
 }

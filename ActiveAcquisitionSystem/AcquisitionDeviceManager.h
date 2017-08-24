@@ -5,6 +5,7 @@
 #include "Projector.h"
 #include "CanonCamera.h"
 #include "EDSWrapper.h"
+#include "DLPProjector.h"
 
 #define vimbaError (VmbErrorSuccess!=err)
 
@@ -38,11 +39,13 @@ private:
 	AVT::VmbAPI::VimbaSystem* sistema;
 	VmbErrorType    err;
 	std::vector<ActiveCamera*> cameraList;
-	std::vector<Projector*> projectors;
+	std::vector<Projector*> projectors;//TODO... remove this and separate btn screen and dlp projectors?? 
+	std::vector<DLPProjector*> dlps;
 	int numCams;
 
 	EDSWrapper* edsWrapper;
 
-	//AVTCamera* detectAVTCameras();
+	int detectDLPs();
+	bool setDLPStatus(DLPProjector *dlp);
 };
 

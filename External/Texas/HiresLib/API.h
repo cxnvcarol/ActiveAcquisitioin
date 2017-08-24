@@ -60,6 +60,7 @@ int LCR_GetVersion(unsigned int *pApp_ver, unsigned int *pAPI_ver,
                     unsigned int *pSWConfig_ver, unsigned int *pSeqConfig_ver);
 int LCR_GetFrmwVersion(unsigned int *pFrmwType, char *pFrmwTag);
 
+//TODO Review: 1. I add 1 param to most of fns declared here. 2. I don't know which fns I actually need. 3. It might make more sense to rewrite this as a class or copy it to the DLPProjector instance!
 /* Flash Programing commands */
 int LCR_GetBLStatus(BootLoaderStaus *pBL_Status);
 int LCR_SetFlashType(unsigned char Type);

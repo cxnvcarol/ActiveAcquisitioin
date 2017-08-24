@@ -195,15 +195,15 @@ static API_DataCallback_t *LCR_DataCallback;
 static void *LCR_CallbackParam;
 
 
-int LCR_Write(BOOL ackRequired)
+int LCR_Write(BOOL ackRequired, hid_device* devHandle)
 {
     if (!ackRequired)
-        return USB_Write(OutputBuffer);
+        return USB_Write(OutputBuffer, devHandle);
 
-    int ret = USB_Write(OutputBuffer);
+    int ret = USB_Write(OutputBuffer, devHandle);
     if (ret > 0)
     {
-        if(USB_Read(InputBuffer) <= 0)
+        if(USB_Read(InputBuffer, devHandle) <= 0)
             return -2;
 
         hidMessageStruct *pMsg = (hidMessageStruct *)InputBuffer;
@@ -215,7 +215,7 @@ int LCR_Write(BOOL ackRequired)
     return -1;
 }
 
-int LCR_Read()
+int LCR_Read(hid_device* devHandle)
 /**
  * This function is private to this file. This function is called to write the read control command and then read back 64 bytes over USB
  * to InputBuffer.
@@ -228,9 +228,9 @@ int LCR_Read()
 {
     int ret_val;
     hidMessageStruct *pMsg = (hidMessageStruct *)InputBuffer;
-    if(USB_Write(OutputBuffer) > 0)
+    if(USB_Write(OutputBuffer,devHandle) > 0)
     {
-        ret_val =  USB_Read(InputBuffer);
+        ret_val =  USB_Read(InputBuffer, devHandle);
 
         if((pMsg->head.flags.nack == 1) || (pMsg->head.length == 0))
             return -2;
@@ -240,12 +240,12 @@ int LCR_Read()
     return -1;
 }
 
-int LCR_ContinueRead()
+int LCR_ContinueRead(hid_device* devHandle)
 {
-    return USB_Read(InputBuffer);
+    return USB_Read(InputBuffer, devHandle);
 }
 
-int LCR_SendMsg(hidMessageStruct *pMsg)
+int LCR_SendMsg(hidMessageStruct *pMsg, hid_device* devHandle)
 /**
  * This function is private to this file. This function is called to send a message over USB; in chunks of 64 bytes.
  *
@@ -274,7 +274,7 @@ int LCR_SendMsg(hidMessageStruct *pMsg)
     while(dataBytesSent < totalLen)
     {
         memcpy(&OutputBuffer[1], (uint08 *)pMsg + dataBytesSent, USB_MAX_PACKET_SIZE);
-        if(LCR_Write(ackRequired) < 0)
+        if(LCR_Write(ackRequired,devHandle) < 0)
             return -1;
         dataBytesSent += USB_MAX_PACKET_SIZE;
     }
@@ -410,7 +410,7 @@ int LCR_PrepWriteCmd(hidMessageStruct *pMsg, LCR_CMD cmd)
     return 0;
 }
 
-int LCR_GetVersion(unsigned int *pApp_ver, unsigned int *pAPI_ver, unsigned int *pSWConfig_ver, unsigned int *pSeqConfig_ver)
+int LCR_GetVersion(unsigned int *pApp_ver, unsigned int *pAPI_ver, unsigned int *pSWConfig_ver, unsigned int *pSeqConfig_ver, hid_device* devHandle)
 /**
  * This command reads the version information of the DLPC350 firmware.
  * (I2C: 0x11)
@@ -430,7 +430,7 @@ int LCR_GetVersion(unsigned int *pApp_ver, unsigned int *pAPI_ver, unsigned int 
 
     LCR_PrepReadCmd(GET_VERSION);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -460,7 +460,7 @@ int LCR_GetVersion(unsigned int *pApp_ver, unsigned int *pAPI_ver, unsigned int 
     return -1;
 }
 
-int LCR_GetLedEnables(BOOL *pSeqCtrl, BOOL *pRed, BOOL *pGreen, BOOL *pBlue)
+int LCR_GetLedEnables(BOOL *pSeqCtrl, BOOL *pRed, BOOL *pGreen, BOOL *pBlue, hid_device* devHandle)
 /**
  * This command reads back the state of LED control method as well as the enabled/disabled status of all LEDs.
  * (I2C: 0x10)
@@ -484,7 +484,7 @@ int LCR_GetLedEnables(BOOL *pSeqCtrl, BOOL *pRed, BOOL *pGreen, BOOL *pBlue)
 
     LCR_PrepReadCmd(LED_ENABLE);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -513,7 +513,7 @@ int LCR_GetLedEnables(BOOL *pSeqCtrl, BOOL *pRed, BOOL *pGreen, BOOL *pBlue)
 }
 
 
-int LCR_SetLedEnables(BOOL SeqCtrl, BOOL Red, BOOL Green, BOOL Blue)
+int LCR_SetLedEnables(BOOL SeqCtrl, BOOL Red, BOOL Green, BOOL Blue, hid_device* devHandle)
 /**
  * This command sets the state of LED control method as well as the enabled/disabled status of all LEDs.
  * (I2C: 0x10)
@@ -548,24 +548,24 @@ int LCR_SetLedEnables(BOOL SeqCtrl, BOOL Red, BOOL Green, BOOL Blue)
     msg.text.data[2] = Enable;
     LCR_PrepWriteCmd(&msg, LED_ENABLE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetIT6535PowerMode(unsigned int powerMode)
+int LCR_SetIT6535PowerMode(unsigned int powerMode, hid_device* devHandle)
 {
     hidMessageStruct msg;
     msg.text.data[2] = powerMode;
     LCR_PrepWriteCmd(&msg, VIDEO_CONT_SEL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetIT6535PowerMode(unsigned int *pPowerMode)
+int LCR_GetIT6535PowerMode(unsigned int *pPowerMode, hid_device* devHandle)
 {
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(VIDEO_CONT_SEL);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -576,7 +576,7 @@ int LCR_GetIT6535PowerMode(unsigned int *pPowerMode)
     return -1;
 }
 
-int LCR_GetLedCurrents(unsigned char *pRed, unsigned char *pGreen, unsigned char *pBlue)
+int LCR_GetLedCurrents(unsigned char *pRed, unsigned char *pGreen, unsigned char *pBlue, hid_device* devHandle)
 /**
  * (I2C: 0x4B)
  * (USB: CMD2: 0x0B, CMD3: 0x01)
@@ -606,7 +606,7 @@ int LCR_GetLedCurrents(unsigned char *pRed, unsigned char *pGreen, unsigned char
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(LED_CURRENT);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -620,7 +620,7 @@ int LCR_GetLedCurrents(unsigned char *pRed, unsigned char *pGreen, unsigned char
 }
 
 
-int LCR_SetLedCurrents(unsigned char RedCurrent, unsigned char GreenCurrent, unsigned char BlueCurrent)
+int LCR_SetLedCurrents(unsigned char RedCurrent, unsigned char GreenCurrent, unsigned char BlueCurrent, hid_device* devHandle)
 /**
  * (I2C: 0x4B)
  * (USB: CMD2: 0x0B, CMD3: 0x01)
@@ -655,10 +655,10 @@ int LCR_SetLedCurrents(unsigned char RedCurrent, unsigned char GreenCurrent, uns
 
     LCR_PrepWriteCmd(&msg, LED_CURRENT);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-BOOL LCR_GetLongAxisImageFlip(void)
+BOOL LCR_GetLongAxisImageFlip(hid_device* devHandle)
 /**
  * (I2C: 0x08)
  * (USB: CMD2: 0x10, CMD3: 0x08)
@@ -675,7 +675,7 @@ BOOL LCR_GetLongAxisImageFlip(void)
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(FLIP_LONG);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -687,7 +687,7 @@ BOOL LCR_GetLongAxisImageFlip(void)
     return FALSE;
 }
 
-BOOL LCR_GetShortAxisImageFlip(void)
+BOOL LCR_GetShortAxisImageFlip(hid_device* devHandle)
 /**
  * (I2C: 0x09)
  * (USB: CMD2: 0x10, CMD3: 0x09)
@@ -704,7 +704,7 @@ BOOL LCR_GetShortAxisImageFlip(void)
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(FLIP_SHORT);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -717,7 +717,7 @@ BOOL LCR_GetShortAxisImageFlip(void)
 }
 
 
-int LCR_SetLongAxisImageFlip(BOOL Flip)
+int LCR_SetLongAxisImageFlip(BOOL Flip, hid_device* devHandle)
 /**
  * (I2C: 0x08)
  * (USB: CMD2: 0x10, CMD3: 0x08)
@@ -743,10 +743,10 @@ int LCR_SetLongAxisImageFlip(BOOL Flip)
 
     LCR_PrepWriteCmd(&msg, FLIP_LONG);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetShortAxisImageFlip(BOOL Flip)
+int LCR_SetShortAxisImageFlip(BOOL Flip, hid_device* devHandle)
 /**
  * (I2C: 0x09)
  * (USB: CMD2: 0x10, CMD3: 0x09)
@@ -772,10 +772,10 @@ int LCR_SetShortAxisImageFlip(BOOL Flip)
 
     LCR_PrepWriteCmd(&msg, FLIP_SHORT);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_EnterProgrammingMode()
+int LCR_EnterProgrammingMode(hid_device* devHandle)
 /**
  * This function is to be called to put the unit in programming mode. Only programming mode APIs will work once
  * in this mode.
@@ -791,10 +791,10 @@ int LCR_EnterProgrammingMode()
 
     LCR_PrepWriteCmd(&msg, BL_PROG_MODE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_ExitProgrammingMode(void)
+int LCR_ExitProgrammingMode(hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function is to be called to exit programming mode and resume normal operation with the new downloaded firmware.
@@ -809,10 +809,10 @@ int LCR_ExitProgrammingMode(void)
     msg.text.data[2] = 2;
     LCR_PrepWriteCmd(&msg, BL_PROG_MODE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_EnableMasterSlave(BOOL MasterEnable, BOOL SlaveEnable)
+int LCR_EnableMasterSlave(BOOL MasterEnable, BOOL SlaveEnable, hid_device* devHandle)
 /**
  * Enable/Disable Master/Slave ASIC for the following bootloader commands
  *
@@ -827,10 +827,10 @@ int LCR_EnableMasterSlave(BOOL MasterEnable, BOOL SlaveEnable)
     msg.text.data[2] = ((!MasterEnable) | ((!SlaveEnable) << 1)) & 3;
     LCR_PrepWriteCmd(&msg, BL_MASTER_SLAVE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetFlashPresent(BOOL *pFlashAtCS0, BOOL *pFlashAtCS1, BOOL *pFlashAtCS2)
+int LCR_GetFlashPresent(BOOL *pFlashAtCS0, BOOL *pFlashAtCS1, BOOL *pFlashAtCS2, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function returns the number of flash present.
@@ -853,7 +853,7 @@ int LCR_GetFlashPresent(BOOL *pFlashAtCS0, BOOL *pFlashAtCS1, BOOL *pFlashAtCS2)
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(BL_GET_FLASH_PRESENT);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -867,7 +867,7 @@ int LCR_GetFlashPresent(BOOL *pFlashAtCS0, BOOL *pFlashAtCS1, BOOL *pFlashAtCS2)
 }
 
 
-int LCR_GetFlashManID(unsigned short *pManID)
+int LCR_GetFlashManID(unsigned short *pManID, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function returns the manufacturer ID of the flash part interfaced with the controller.
@@ -882,7 +882,7 @@ int LCR_GetFlashManID(unsigned short *pManID)
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(BL_GET_MANID);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -893,7 +893,7 @@ int LCR_GetFlashManID(unsigned short *pManID)
     return -1;
 }
 
-int LCR_GetFlashDevID(unsigned long long *pDevID)
+int LCR_GetFlashDevID(unsigned long long *pDevID, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function returns the device ID of the flash part interfaced with the controller.
@@ -908,7 +908,7 @@ int LCR_GetFlashDevID(unsigned long long *pDevID)
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(BL_GET_DEVID);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -925,7 +925,7 @@ int LCR_GetFlashDevID(unsigned long long *pDevID)
     return -1;
 }
 
-int LCR_SetFlashAddr(unsigned int Addr)
+int LCR_SetFlashAddr(unsigned int Addr, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function is to be called to set the address prior to calling LCR_FlashSectorErase or LCR_DownloadData APIs.
@@ -947,10 +947,10 @@ int LCR_SetFlashAddr(unsigned int Addr)
 
     LCR_PrepWriteCmd(&msg, BL_SET_SECTADDR);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetFlashAddr4Byte(unsigned int Addr)
+int LCR_SetFlashAddr4Byte(unsigned int Addr, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function is to be called to set the address prior to calling LCR_FlashSectorErase or LCR_DownloadData APIs.
@@ -971,12 +971,12 @@ int LCR_SetFlashAddr4Byte(unsigned int Addr)
 
     LCR_PrepWriteCmd(&msg, BL_SET_SECTADDR_4BYTE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
 
 
-int LCR_FlashSectorErase(void)
+int LCR_FlashSectorErase(hid_device* devHandle)
 /**
   * This function works only in prorgamming mode.
   * This function is to be called to erase a sector of flash. The address of the sector to be erased
@@ -990,10 +990,10 @@ int LCR_FlashSectorErase(void)
     hidMessageStruct msg;
 
     LCR_PrepWriteCmd(&msg, BL_SECT_ERASE);
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetDownloadSize(unsigned int dataLen)
+int LCR_SetDownloadSize(unsigned int dataLen, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function is to be called to set the payload size of data to be sent using LCR_DownloadData API.
@@ -1014,10 +1014,10 @@ int LCR_SetDownloadSize(unsigned int dataLen)
 
     LCR_PrepWriteCmd(&msg, BL_SET_DNLDSIZE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetDownloadSize4Byte(unsigned int dataLen)
+int LCR_SetDownloadSize4Byte(unsigned int dataLen, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function is to be called to set the payload size of data to be sent using LCR_DownloadData API.
@@ -1038,11 +1038,11 @@ int LCR_SetDownloadSize4Byte(unsigned int dataLen)
 
     LCR_PrepWriteCmd(&msg, BL_SET_DNLDSIZE_4BYTE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
 
-int LCR_DownloadData(unsigned char *pByteArray, unsigned int dataLen)
+int LCR_DownloadData(unsigned char *pByteArray, unsigned int dataLen, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function sends one payload of data to the controller at a time. takes the total size of payload
@@ -1068,14 +1068,14 @@ int LCR_DownloadData(unsigned char *pByteArray, unsigned int dataLen)
 
     LCR_PrepWriteCmd(&msg, BL_DNLD_DATA);
 
-    retval = LCR_SendMsg(&msg);
+    retval = LCR_SendMsg(&msg,devHandle);
     if(retval > 0)
         return dataLen;
 
     return -1;
 }
 
-int LCR_GetBLStatus(BootLoaderStaus *pBL_Status)
+int LCR_GetBLStatus(BootLoaderStaus *pBL_Status, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function returns the device ID of the flash part interfaced with the controller.
@@ -1093,7 +1093,7 @@ int LCR_GetBLStatus(BootLoaderStaus *pBL_Status)
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(BL_STATUS);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
 		int i;
         memcpy(&msg, InputBuffer, 65);
@@ -1112,7 +1112,7 @@ int LCR_GetBLStatus(BootLoaderStaus *pBL_Status)
     return -1;
 }
 
-void LCR_WaitForFlashReady()
+void LCR_WaitForFlashReady(hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function polls the status bit and returns only when the controller is ready for next command.
@@ -1124,12 +1124,12 @@ void LCR_WaitForFlashReady()
    BLstatus.blstatus = STAT_BIT_FLASH_BUSY;
    do
    {
-        LCR_GetBLStatus(&BLstatus);
+        LCR_GetBLStatus(&BLstatus,devHandle);
    }
    while((BLstatus.blstatus & STAT_BIT_FLASH_BUSY) == STAT_BIT_FLASH_BUSY);//Wait for flash busy flag to go off
 }
 
-int LCR_SetFlashType(unsigned char Type)
+int LCR_SetFlashType(unsigned char Type, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function is to be used to set the programming type of the flash device attached to the controller.
@@ -1147,10 +1147,10 @@ int LCR_SetFlashType(unsigned char Type)
 
     LCR_PrepWriteCmd(&msg, BL_FLASH_TYPE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_CalculateFlashChecksum(void)
+int LCR_CalculateFlashChecksum(hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function is to be issued to instruct the controller to calculate the flash checksum.
@@ -1166,14 +1166,14 @@ int LCR_CalculateFlashChecksum(void)
 
     LCR_PrepWriteCmd(&msg, BL_CALC_CHKSUM);
 
-    if(LCR_SendMsg(&msg) <= 0)
+    if(LCR_SendMsg(&msg,devHandle) <= 0)
         return -1;
 
     return 0;
 
 }
 
-int LCR_GetFlashChecksum(unsigned int*checksum)
+int LCR_GetFlashChecksum(unsigned int*checksum, hid_device* devHandle)
 /**
  * This function works only in prorgamming mode.
  * This function is to be used to retrieve the flash checksum from the controller.
@@ -1190,13 +1190,13 @@ int LCR_GetFlashChecksum(unsigned int*checksum)
 #if 0
     LCR_PrepWriteCmd(&msg, BL_CALC_CHKSUM);
 
-    if(LCR_SendMsg(&msg) <= 0)
+    if(LCR_SendMsg(&msg,devHandle) <= 0)
         return -1;
 
     LCR_WaitForFlashReady();
 #endif
     LCR_PrepReadCmd(BL_GET_CHKSUM);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -1209,7 +1209,7 @@ int LCR_GetFlashChecksum(unsigned int*checksum)
     return -1;
 }
 
-int LCR_GetStatus(unsigned char *pHWStatus, unsigned char *pSysStatus, unsigned char *pMainStatus)
+int LCR_GetStatus(unsigned char *pHWStatus, unsigned char *pSysStatus, unsigned char *pMainStatus, hid_device* devHandle)
 /**
  * This function is to be used to check the various status indicators from the controller.
  * Refer to DLPC350 Programmer's guide section 2.1 "DLPC350 Status Commands" for detailed description of each byte.
@@ -1226,7 +1226,7 @@ int LCR_GetStatus(unsigned char *pHWStatus, unsigned char *pSysStatus, unsigned 
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(STATUS_HW);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -1236,7 +1236,7 @@ int LCR_GetStatus(unsigned char *pHWStatus, unsigned char *pSysStatus, unsigned 
         return -1;
 
     LCR_PrepReadCmd(STATUS_SYS);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -1246,7 +1246,7 @@ int LCR_GetStatus(unsigned char *pHWStatus, unsigned char *pSysStatus, unsigned 
         return -1;
 
     LCR_PrepReadCmd(STATUS_MAIN);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -1258,7 +1258,7 @@ int LCR_GetStatus(unsigned char *pHWStatus, unsigned char *pSysStatus, unsigned 
     return 0;
 }
 
-int LCR_SoftwareReset(void)
+int LCR_SoftwareReset(hid_device* devHandle)
 /**
  * Use this API to reset the controller
  *
@@ -1269,10 +1269,10 @@ int LCR_SoftwareReset(void)
     msg.text.data[2] = 0x01;
     LCR_PrepWriteCmd(&msg, SW_RESET);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetMode(int SLmode)
+int LCR_SetMode(int SLmode, hid_device* devHandle)
 /**
  * The Display Mode Selection Command enables the DLPC350 internal image processing functions for
  * video mode or bypasses them for pattern display mode. This command selects between video or pattern
@@ -1293,10 +1293,10 @@ int LCR_SetMode(int SLmode)
     msg.text.data[2] = SLmode;
     LCR_PrepWriteCmd(&msg, DISP_MODE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetMode(int *pMode)
+int LCR_GetMode(int *pMode, hid_device* devHandle)
 /**
  * The Display Mode Selection Command enables the DLPC350 internal image processing functions for
  * video mode or bypasses them for pattern display mode. This command selects between video or pattern
@@ -1315,7 +1315,7 @@ int LCR_GetMode(int *pMode)
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(DISP_MODE);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pMode = msg.text.data[0];
@@ -1324,13 +1324,13 @@ int LCR_GetMode(int *pMode)
     return -1;
 }
 
-int LCR_GetPowerMode(BOOL *Standby)
+int LCR_GetPowerMode(BOOL *Standby, hid_device* devHandle)
 {
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(POWER_CONTROL);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *Standby = (msg.text.data[0] != 0);
@@ -1339,7 +1339,7 @@ int LCR_GetPowerMode(BOOL *Standby)
     return -1;
 }
 
-int LCR_SetPowerMode(unsigned char Mode)
+int LCR_SetPowerMode(unsigned char Mode, hid_device* devHandle)
 /**
  * (I2C: 0x07)
  * (USB: CMD2: 0x02, CMD3: 0x00)
@@ -1362,10 +1362,10 @@ int LCR_SetPowerMode(unsigned char Mode)
     msg.text.data[2] = Mode;
     LCR_PrepWriteCmd(&msg, POWER_CONTROL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetRedLEDStrobeDelay(short rising, short falling)
+int LCR_SetRedLEDStrobeDelay(short rising, short falling, hid_device* devHandle)
 /**
  * (I2C: 0x6C)
  * (USB: CMD2: 0x1A, CMD3: 0x1F)
@@ -1390,10 +1390,10 @@ int LCR_SetRedLEDStrobeDelay(short rising, short falling)
 
     LCR_PrepWriteCmd(&msg, RED_LED_ENABLE_DLY);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetGreenLEDStrobeDelay(short rising, short falling)
+int LCR_SetGreenLEDStrobeDelay(short rising, short falling, hid_device* devHandle)
 /**
  * (I2C: 0x6D)
  * (USB: CMD2: 0x1A, CMD3: 0x20)
@@ -1418,10 +1418,10 @@ int LCR_SetGreenLEDStrobeDelay(short rising, short falling)
 
     LCR_PrepWriteCmd(&msg, GREEN_LED_ENABLE_DLY);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetBlueLEDStrobeDelay(short rising, short falling)
+int LCR_SetBlueLEDStrobeDelay(short rising, short falling, hid_device* devHandle)
 /**
  * (I2C: 0x6E)
  * (USB: CMD2: 0x1A, CMD3: 0x21)
@@ -1446,9 +1446,9 @@ int LCR_SetBlueLEDStrobeDelay(short rising, short falling)
 
     LCR_PrepWriteCmd(&msg, BLUE_LED_ENABLE_DLY);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
-int LCR_SetDMDSaverMode(short mode)
+int LCR_SetDMDSaverMode(short mode, hid_device* devHandle)
 /**
  * (I2C: 0x0D)
  * (USB: CMD2: 0x02, CMD3: 0x01)
@@ -1469,10 +1469,10 @@ int LCR_SetDMDSaverMode(short mode)
 
 
     LCR_PrepWriteCmd(&msg, DMD_IDLE);
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
     return 0;
 }
-int LCR_GetDMDSaverMode()
+int LCR_GetDMDSaverMode(hid_device* devHandle)
 /**
  * (I2C: 0x0D)
  * (USB: CMD2: 0x02, CMD3: 0x01)
@@ -1491,7 +1491,7 @@ int LCR_GetDMDSaverMode()
 
      LCR_PrepReadCmd(DMD_IDLE);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         short mode = msg.text.data[0];
@@ -1500,7 +1500,7 @@ int LCR_GetDMDSaverMode()
 
     return -1;
 }
-int LCR_GetRedLEDStrobeDelay(short *pRising, short *pFalling)
+int LCR_GetRedLEDStrobeDelay(short *pRising, short *pFalling, hid_device* devHandle)
 /**
  * (I2C: 0x6C)
  * (USB: CMD2: 0x1A, CMD3: 0x1F)
@@ -1520,7 +1520,7 @@ int LCR_GetRedLEDStrobeDelay(short *pRising, short *pFalling)
 
     LCR_PrepReadCmd(RED_LED_ENABLE_DLY);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pRising = msg.text.data[0] | (msg.text.data[1] << 8);
@@ -1530,7 +1530,7 @@ int LCR_GetRedLEDStrobeDelay(short *pRising, short *pFalling)
     return -1;
 }
 
-int LCR_GetGreenLEDStrobeDelay(short *pRising, short *pFalling)
+int LCR_GetGreenLEDStrobeDelay(short *pRising, short *pFalling, hid_device* devHandle)
 /**
  * (I2C: 0x6D)
  * (USB: CMD2: 0x1A, CMD3: 0x20)
@@ -1550,7 +1550,7 @@ int LCR_GetGreenLEDStrobeDelay(short *pRising, short *pFalling)
 
     LCR_PrepReadCmd(GREEN_LED_ENABLE_DLY);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pRising = msg.text.data[0] | (msg.text.data[1] << 8);
@@ -1560,7 +1560,7 @@ int LCR_GetGreenLEDStrobeDelay(short *pRising, short *pFalling)
     return -1;
 }
 
-int LCR_GetBlueLEDStrobeDelay(short *pRising, short *pFalling)
+int LCR_GetBlueLEDStrobeDelay(short *pRising, short *pFalling, hid_device* devHandle)
 /**
  * (I2C: 0x6E)
  * (USB: CMD2: 0x1A, CMD3: 0x21)
@@ -1580,7 +1580,7 @@ int LCR_GetBlueLEDStrobeDelay(short *pRising, short *pFalling)
 
     LCR_PrepReadCmd(BLUE_LED_ENABLE_DLY);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pRising = msg.text.data[0] | (msg.text.data[1] << 8);
@@ -1590,7 +1590,7 @@ int LCR_GetBlueLEDStrobeDelay(short *pRising, short *pFalling)
     return -1;
 }
 
-int LCR_SetInputSource(unsigned int source, unsigned int portWidth)
+int LCR_SetInputSource(unsigned int source, unsigned int portWidth, hid_device* devHandle)
 /**
  * (I2C: 0x00)
  * (USB: CMD2: 0x1A, CMD3: 0x00)
@@ -1621,10 +1621,10 @@ int LCR_SetInputSource(unsigned int source, unsigned int portWidth)
     msg.text.data[2] |= portWidth << 3;
     LCR_PrepWriteCmd(&msg, SOURCE_SEL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetCurtainColor(unsigned int red,unsigned int green, unsigned int blue)
+int LCR_SetCurtainColor(unsigned int red,unsigned int green, unsigned int blue, hid_device* devHandle)
 {
     hidMessageStruct msg;
     msg.text.data[2] = red & 0xff;
@@ -1636,16 +1636,16 @@ int LCR_SetCurtainColor(unsigned int red,unsigned int green, unsigned int blue)
 
     LCR_PrepWriteCmd(&msg, CURTAIN_COLOR);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetCurtainColor(unsigned int *pRed,unsigned int *pGreen, unsigned int *pBlue)
+int LCR_GetCurtainColor(unsigned int *pRed,unsigned int *pGreen, unsigned int *pBlue, hid_device* devHandle)
 {
     hidMessageStruct msg;
 
     LCR_PrepReadCmd(CURTAIN_COLOR);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pRed   = msg.text.data[0] | msg.text.data[1]<<8;
@@ -1657,7 +1657,7 @@ int LCR_GetCurtainColor(unsigned int *pRed,unsigned int *pGreen, unsigned int *p
     return -1;
 }
 
-int LCR_GetInputSource(unsigned int *pSource, unsigned int *pPortWidth)
+int LCR_GetInputSource(unsigned int *pSource, unsigned int *pPortWidth, hid_device* devHandle)
 /**
  * (I2C: 0x00)
  * (USB: CMD2: 0x1A, CMD3: 0x00)
@@ -1685,7 +1685,7 @@ int LCR_GetInputSource(unsigned int *pSource, unsigned int *pPortWidth)
 
     LCR_PrepReadCmd(SOURCE_SEL);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pSource = msg.text.data[0] & (BIT0 | BIT1 | BIT2);
@@ -1695,7 +1695,7 @@ int LCR_GetInputSource(unsigned int *pSource, unsigned int *pPortWidth)
     return -1;
 }
 
-int LCR_SetPixelFormat(unsigned int format)
+int LCR_SetPixelFormat(unsigned int format, hid_device* devHandle)
 /**
  * (I2C: 0x02)
  * (USB: CMD2: 0x1A, CMD3: 0x02)
@@ -1717,10 +1717,10 @@ int LCR_SetPixelFormat(unsigned int format)
     msg.text.data[2] = format;
     LCR_PrepWriteCmd(&msg, PIXEL_FORMAT);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetPixelFormat(unsigned int *pFormat)
+int LCR_GetPixelFormat(unsigned int *pFormat, hid_device* devHandle)
 /**
  * (I2C: 0x02)
  * (USB: CMD2: 0x1A, CMD3: 0x02)
@@ -1741,7 +1741,7 @@ int LCR_GetPixelFormat(unsigned int *pFormat)
 
     LCR_PrepReadCmd(PIXEL_FORMAT);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pFormat = msg.text.data[0] & (BIT0 | BIT1 | BIT2);
@@ -1750,7 +1750,7 @@ int LCR_GetPixelFormat(unsigned int *pFormat)
     return -1;
 }
 
-int LCR_SetPortConfig(unsigned int dataPort,unsigned int pixelClock,unsigned int dataEnable,unsigned int syncSelect)
+int LCR_SetPortConfig(unsigned int dataPort,unsigned int pixelClock,unsigned int dataEnable,unsigned int syncSelect, hid_device* devHandle)
 /**
  * (I2C: 0x03)
  * (USB: CMD2: 0x1A, CMD3: 0x03)
@@ -1781,10 +1781,10 @@ int LCR_SetPortConfig(unsigned int dataPort,unsigned int pixelClock,unsigned int
     msg.text.data[2] = data;
     LCR_PrepWriteCmd(&msg, CLK_SEL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetPortConfig(unsigned int *pDataPort,unsigned int *pPixelClock,unsigned int *pDataEnable,unsigned int *pSyncSelect)
+int LCR_GetPortConfig(unsigned int *pDataPort,unsigned int *pPixelClock,unsigned int *pDataEnable,unsigned int *pSyncSelect, hid_device* devHandle)
 /**
  * (I2C: 0x03)
  * (USB: CMD2: 0x1A, CMD3: 0x03)
@@ -1811,7 +1811,7 @@ int LCR_GetPortConfig(unsigned int *pDataPort,unsigned int *pPixelClock,unsigned
 
     LCR_PrepReadCmd(CLK_SEL);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pDataPort = (msg.text.data[0] & (BIT0 | BIT1));
@@ -1824,7 +1824,7 @@ int LCR_GetPortConfig(unsigned int *pDataPort,unsigned int *pPixelClock,unsigned
     return -1;
 }
 
-int LCR_SetDataChannelSwap(unsigned int port, unsigned int swap)
+int LCR_SetDataChannelSwap(unsigned int port, unsigned int swap, hid_device* devHandle)
 /**
  * (I2C: 0x04)
  * (USB: CMD2: 0x1A, CMD3: 0x37)
@@ -1853,10 +1853,10 @@ int LCR_SetDataChannelSwap(unsigned int port, unsigned int swap)
     msg.text.data[2] |= (swap & (BIT0 | BIT1 | BIT2))<<1;
     LCR_PrepWriteCmd(&msg, CHANNEL_SWAP);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetDataChannelSwap(unsigned int Port, unsigned int *pSwap)
+int LCR_GetDataChannelSwap(unsigned int Port, unsigned int *pSwap, hid_device* devHandle)
 /**
  * (I2C: 0x04)
  * (USB: CMD2: 0x1A, CMD3: 0x37)
@@ -1882,7 +1882,7 @@ int LCR_GetDataChannelSwap(unsigned int Port, unsigned int *pSwap)
 
     LCR_PrepReadCmdWithParam(CHANNEL_SWAP, (unsigned char)Port);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pSwap = (msg.text.data[0] & (BIT1 | BIT2 | BIT3))>>1;
@@ -1891,7 +1891,7 @@ int LCR_GetDataChannelSwap(unsigned int Port, unsigned int *pSwap)
     return -1;
 }
 
-int LCR_SetFPD_Mode_Field(unsigned int PixelMappingMode, BOOL SwapPolarity, unsigned int FieldSignalSelect)
+int LCR_SetFPD_Mode_Field(unsigned int PixelMappingMode, BOOL SwapPolarity, unsigned int FieldSignalSelect, hid_device* devHandle)
 /**
  * (I2C: 0x05)
  * (USB: CMD2: 0x1A, CMD3: 0x04)
@@ -1924,10 +1924,10 @@ int LCR_SetFPD_Mode_Field(unsigned int PixelMappingMode, BOOL SwapPolarity, unsi
         msg.text.data[2] |= BIT3;
     LCR_PrepWriteCmd(&msg, FPD_MODE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetFPD_Mode_Field(unsigned int *pPixelMappingMode, BOOL *pSwapPolarity, unsigned int *pFieldSignalSelect)
+int LCR_GetFPD_Mode_Field(unsigned int *pPixelMappingMode, BOOL *pSwapPolarity, unsigned int *pFieldSignalSelect, hid_device* devHandle)
 /**
  * (I2C: 0x05)
  * (USB: CMD2: 0x1A, CMD3: 0x04)
@@ -1956,7 +1956,7 @@ int LCR_GetFPD_Mode_Field(unsigned int *pPixelMappingMode, BOOL *pSwapPolarity, 
 
     LCR_PrepReadCmd(FPD_MODE);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pFieldSignalSelect = msg.text.data[0] & (BIT0 | BIT1 | BIT2);
@@ -1970,7 +1970,7 @@ int LCR_GetFPD_Mode_Field(unsigned int *pPixelMappingMode, BOOL *pSwapPolarity, 
     return -1;
 }
 
-int LCR_SetTPGSelect(unsigned int pattern)
+int LCR_SetTPGSelect(unsigned int pattern, hid_device* devHandle)
 /**
  * (I2C: 0x0A)
  * (USB: CMD2: 0x12, CMD3: 0x03)
@@ -2003,10 +2003,10 @@ int LCR_SetTPGSelect(unsigned int pattern)
     msg.text.data[2] = pattern;
     LCR_PrepWriteCmd(&msg, TPG_SEL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetTPGSelect(unsigned int *pPattern)
+int LCR_GetTPGSelect(unsigned int *pPattern, hid_device* devHandle)
 /**
  * (I2C: 0x0A)
  * (USB: CMD2: 0x12, CMD3: 0x03)
@@ -2034,7 +2034,7 @@ int LCR_GetTPGSelect(unsigned int *pPattern)
 
     LCR_PrepReadCmd(TPG_SEL);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pPattern = msg.text.data[0] & (BIT0 | BIT1 | BIT2 | BIT3);
@@ -2043,7 +2043,7 @@ int LCR_GetTPGSelect(unsigned int *pPattern)
     return -1;
 }
 
-int LCR_LoadSplash(unsigned int index)
+int LCR_LoadSplash(unsigned int index, hid_device* devHandle)
 /**
  * (I2C: 0x7F)
  * (USB: CMD2: 0x1A, CMD3: 0x39)
@@ -2062,10 +2062,10 @@ int LCR_LoadSplash(unsigned int index)
     msg.text.data[2] = index;
     LCR_PrepWriteCmd(&msg, SPLASH_LOAD);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetSplashIndex(unsigned int *pIndex)
+int LCR_GetSplashIndex(unsigned int *pIndex, hid_device* devHandle)
 /**
  * (I2C: 0x7F)
  * (USB: CMD2: 0x1A, CMD3: 0x39)
@@ -2082,7 +2082,7 @@ int LCR_GetSplashIndex(unsigned int *pIndex)
 
     LCR_PrepReadCmd(SPLASH_LOAD);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pIndex = msg.text.data[0];
@@ -2091,7 +2091,7 @@ int LCR_GetSplashIndex(unsigned int *pIndex)
     return -1;
 }
 
-int LCR_SetDisplay(rectangle croppedArea, rectangle displayArea)
+int LCR_SetDisplay(rectangle croppedArea, rectangle displayArea, hid_device* devHandle)
 /**
  * (I2C: 0x7E)
  * (USB: CMD2: 0x10, CMD3: 0x00)
@@ -2141,10 +2141,10 @@ int LCR_SetDisplay(rectangle croppedArea, rectangle displayArea)
 
     LCR_PrepWriteCmd(&msg, DISP_CONFIG);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetDisplay(rectangle *pCroppedArea, rectangle *pDisplayArea)
+int LCR_GetDisplay(rectangle *pCroppedArea, rectangle *pDisplayArea, hid_device* devHandle)
 /**
  * (I2C: 0x7E)
  * (USB: CMD2: 0x10, CMD3: 0x00)
@@ -2172,7 +2172,7 @@ int LCR_GetDisplay(rectangle *pCroppedArea, rectangle *pDisplayArea)
 
     LCR_PrepReadCmd(DISP_CONFIG);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         pCroppedArea->firstPixel = msg.text.data[0] | msg.text.data[1] << 8;
@@ -2189,7 +2189,7 @@ int LCR_GetDisplay(rectangle *pCroppedArea, rectangle *pDisplayArea)
     return -1;
 }
 
-int LCR_SetTPGColor(unsigned short redFG, unsigned short greenFG, unsigned short blueFG, unsigned short redBG, unsigned short greenBG, unsigned short blueBG)
+int LCR_SetTPGColor(unsigned short redFG, unsigned short greenFG, unsigned short blueFG, unsigned short redBG, unsigned short greenBG, unsigned short blueBG, hid_device* devHandle)
 /**
  * (I2C: 0x1A)
  * (USB: CMD2: 0x12, CMD3: 0x04)
@@ -2239,10 +2239,10 @@ int LCR_SetTPGColor(unsigned short redFG, unsigned short greenFG, unsigned short
 
     LCR_PrepWriteCmd(&msg, TPG_COLOR);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetTPGColor(unsigned short *pRedFG, unsigned short *pGreenFG, unsigned short *pBlueFG, unsigned short *pRedBG, unsigned short *pGreenBG, unsigned short *pBlueBG)
+int LCR_GetTPGColor(unsigned short *pRedFG, unsigned short *pGreenFG, unsigned short *pBlueFG, unsigned short *pRedBG, unsigned short *pGreenBG, unsigned short *pBlueBG, hid_device* devHandle)
 /**
  * (I2C: 0x1A)
  * (USB: CMD2: 0x12, CMD3: 0x04)
@@ -2279,7 +2279,7 @@ int LCR_GetTPGColor(unsigned short *pRedFG, unsigned short *pGreenFG, unsigned s
 
     LCR_PrepReadCmd(TPG_COLOR);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pRedFG = msg.text.data[0] | msg.text.data[1] << 8;
@@ -2294,7 +2294,7 @@ int LCR_GetTPGColor(unsigned short *pRedFG, unsigned short *pGreenFG, unsigned s
     return -1;
 }
 
-int LCR_ClearPatLut(void)
+int LCR_ClearPatLut()
 /**
  * This API does not send any commands to the controller.It clears the locally (in the GUI program) stored pattern LUT.
  * See table 2-65 in programmer's guide for detailed desciprtion of pattern LUT entries.
@@ -2410,7 +2410,7 @@ int LCR_AddToPatLut(int patNum, int ExpUs, BOOL ClearPat, int BitDepth, int LEDS
 }
 
 
-int LCR_OpenMailbox(int MboxNum)
+int LCR_OpenMailbox(int MboxNum, hid_device* devHandle)
 /**
  * (I2C: 0x77)
  * (USB: CMD2: 0x1A, CMD3: 0x33)
@@ -2430,10 +2430,10 @@ int LCR_OpenMailbox(int MboxNum)
     msg.text.data[2] = MboxNum;
     LCR_PrepWriteCmd(&msg, MBOX_CONTROL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_CloseMailbox(void)
+int LCR_CloseMailbox(hid_device* devHandle)
 /**
  * (I2C: 0x77)
  * (USB: CMD2: 0x1A, CMD3: 0x33)
@@ -2451,10 +2451,10 @@ int LCR_CloseMailbox(void)
     msg.text.data[2] = 0;
     LCR_PrepWriteCmd(&msg, MBOX_CONTROL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_MailboxSetAddr(int Addr)
+int LCR_MailboxSetAddr(int Addr, hid_device* devHandle)
 /**
  * (I2C: 0x76)
  * (USB: CMD2: 0x1A, CMD3: 0x32)
@@ -2476,10 +2476,10 @@ int LCR_MailboxSetAddr(int Addr)
     msg.text.data[3] = 0x0;
     LCR_PrepWriteCmd(&msg, MBOX_ADDRESS);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SendPatLut(void)
+int LCR_SendPatLut(hid_device* devHandle)
 /**
  * (I2C: 0x78)
  * (USB: CMD2: 0x1A, CMD3: 0x34)
@@ -2503,14 +2503,14 @@ int LCR_SendPatLut(void)
         for (j = 0; j < 12; j++)
             msg.text.data[2 + j] = PatLut[j][i];
 
-        if (LCR_SendMsg(&msg) < 0)
+        if (LCR_SendMsg(&msg,devHandle) < 0)
             return -2;
     }
 
     return 0;
 }
 
-int LCR_PatternDisplay(int Action)
+int LCR_PatternDisplay(int Action, hid_device* devHandle)
 /**
  * (I2C: 0x65)
  * (USB: CMD2: 0x1A, CMD3: 0x24)
@@ -2533,10 +2533,10 @@ int LCR_PatternDisplay(int Action)
     msg.text.data[2] = Action;
     LCR_PrepWriteCmd(&msg, PAT_START_STOP);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetPatternConfig(unsigned int numLutEntries, unsigned int repeat)
+int LCR_SetPatternConfig(unsigned int numLutEntries, unsigned int repeat, hid_device* devHandle)
 /* (I2C: 0x75)
  * (USB: CMD2: 0x1A, CMD3: 0x31)
  * This API controls the execution of patterns stored in the lookup table.
@@ -2565,10 +2565,10 @@ int LCR_SetPatternConfig(unsigned int numLutEntries, unsigned int repeat)
     msg.text.data[7] = (repeat >> 24) & 0xFF;
     LCR_PrepWriteCmd(&msg, PAT_CONFIG);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetPatternConfig(unsigned int *pNumLutEntries, BOOL *pRepeat, unsigned int *pNumPatsForTrigOut2, unsigned int *pNumSplash)
+int LCR_GetPatternConfig(unsigned int *pNumLutEntries, BOOL *pRepeat, unsigned int *pNumPatsForTrigOut2, unsigned int *pNumSplash, hid_device* devHandle)
 /**
  * (I2C: 0x75)
  * (USB: CMD2: 0x1A, CMD3: 0x31)
@@ -2592,7 +2592,7 @@ int LCR_GetPatternConfig(unsigned int *pNumLutEntries, BOOL *pRepeat, unsigned i
 
     LCR_PrepReadCmd(PAT_CONFIG);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pNumLutEntries = msg.text.data[0] + 1; /* +1 because the firmware gives 0-based indices (0 means 1) */
@@ -2604,7 +2604,7 @@ int LCR_GetPatternConfig(unsigned int *pNumLutEntries, BOOL *pRepeat, unsigned i
     return -1;
 }
 
-int LCR_SetTrigIn1Config(BOOL invert, unsigned int trigDelay)
+int LCR_SetTrigIn1Config(BOOL invert, unsigned int trigDelay, hid_device* devHandle)
 /**
  * (I2C: 0x79)
  * (USB: CMD2: 0x1A, CMD3: 0x35)
@@ -2627,10 +2627,10 @@ int LCR_SetTrigIn1Config(BOOL invert, unsigned int trigDelay)
     msg.text.data[4] = invert;
     LCR_PrepWriteCmd(&msg, TRIG_IN1_CTL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetTrigIn1Config(BOOL *pInvert, unsigned int *pTrigDelay)
+int LCR_GetTrigIn1Config(BOOL *pInvert, unsigned int *pTrigDelay, hid_device* devHandle)
 /**
  * (I2C: 0x79)
  * (USB: CMD2: 0x1A, CMD3: 0x35)
@@ -2650,7 +2650,7 @@ int LCR_GetTrigIn1Config(BOOL *pInvert, unsigned int *pTrigDelay)
 
     LCR_PrepReadCmd(TRIG_IN1_CTL);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         
@@ -2661,7 +2661,7 @@ int LCR_GetTrigIn1Config(BOOL *pInvert, unsigned int *pTrigDelay)
     return -1;
 }
 
-int LCR_SetTrigIn2Config(BOOL invert)
+int LCR_SetTrigIn2Config(BOOL invert, hid_device* devHandle)
 /**
  * (I2C: 0x7A)
  * (USB: CMD2: 0x1A, CMD3: 0x36)
@@ -2684,10 +2684,10 @@ int LCR_SetTrigIn2Config(BOOL invert)
     msg.text.data[2] = invert;
     LCR_PrepWriteCmd(&msg, TRIG_IN2_CTL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetTrigIn2Config(BOOL *pInvert)
+int LCR_GetTrigIn2Config(BOOL *pInvert, hid_device* devHandle)
 /**
  * (I2C: 0x7A)
  * (USB: CMD2: 0x1A, CMD3: 0x36)
@@ -2709,7 +2709,7 @@ int LCR_GetTrigIn2Config(BOOL *pInvert)
 
     LCR_PrepReadCmd(TRIG_IN2_CTL);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -2719,7 +2719,7 @@ int LCR_GetTrigIn2Config(BOOL *pInvert)
     return -1;
 }
 
-int LCR_SetTrigOutConfig(unsigned int trigOutNum, BOOL invert, short rising, short falling)
+int LCR_SetTrigOutConfig(unsigned int trigOutNum, BOOL invert, short rising, short falling, hid_device* devHandle)
 /**
  * (I2C: 0x6A)
  * (USB: CMD2: 0x1A, CMD3: 0x1D)
@@ -2752,10 +2752,10 @@ int LCR_SetTrigOutConfig(unsigned int trigOutNum, BOOL invert, short rising, sho
     else if(trigOutNum==2)
         LCR_PrepWriteCmd(&msg, TRIG_OUT2_CTL);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetTrigOutConfig(unsigned int trigOutNum, BOOL *pInvert, short *pRising, short *pFalling)
+int LCR_GetTrigOutConfig(unsigned int trigOutNum, BOOL *pInvert, short *pRising, short *pFalling, hid_device* devHandle)
 /**
  * (I2C: 0x6A)
  * (USB: CMD2: 0x1A, CMD3: 0x1D)
@@ -2781,7 +2781,7 @@ int LCR_GetTrigOutConfig(unsigned int trigOutNum, BOOL *pInvert, short *pRising,
     else if(trigOutNum==2)
         LCR_PrepReadCmd(TRIG_OUT2_CTL);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pInvert = (msg.text.data[0] != 0);
@@ -2794,7 +2794,7 @@ int LCR_GetTrigOutConfig(unsigned int trigOutNum, BOOL *pInvert, short *pRising,
 }
 
 
-int LCR_SetInvertData(BOOL invert)
+int LCR_SetInvertData(BOOL invert, hid_device* devHandle)
 /**
  * (I2C: 0x74)
  * (USB: CMD2: 0x1A, CMD3: 0x30)
@@ -2818,10 +2818,10 @@ int LCR_SetInvertData(BOOL invert)
     msg.text.data[2] = invert;
     LCR_PrepWriteCmd(&msg, INVERT_DATA);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetInvertData(BOOL *pInvert)
+int LCR_GetInvertData(BOOL *pInvert, hid_device* devHandle)
 /**
  * (I2C: 0x74)
  * (USB: CMD2: 0x1A, CMD3: 0x30)
@@ -2843,7 +2843,7 @@ int LCR_GetInvertData(BOOL *pInvert)
     hidMessageStruct msg;
     LCR_PrepReadCmd(INVERT_DATA);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pInvert = msg.text.data[0];
@@ -2852,7 +2852,7 @@ int LCR_GetInvertData(BOOL *pInvert)
     return -1;
 }
 
-int LCR_SetPWMConfig(unsigned int channel, unsigned int pulsePeriod, unsigned int dutyCycle)
+int LCR_SetPWMConfig(unsigned int channel, unsigned int pulsePeriod, unsigned int dutyCycle, hid_device* devHandle)
 /**
  * (I2C: 0x41)
  * (USB: CMD2: 0x1A, CMD3: 0x11)
@@ -2886,10 +2886,10 @@ int LCR_SetPWMConfig(unsigned int channel, unsigned int pulsePeriod, unsigned in
 
     LCR_PrepWriteCmd(&msg, PWM_SETUP);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetPWMConfig(unsigned int channel, unsigned int *pPulsePeriod, unsigned int *pDutyCycle)
+int LCR_GetPWMConfig(unsigned int channel, unsigned int *pPulsePeriod, unsigned int *pDutyCycle, hid_device* devHandle)
 /**
  * (I2C: 0x41)
  * (USB: CMD2: 0x1A, CMD3: 0x11)
@@ -2915,7 +2915,7 @@ int LCR_GetPWMConfig(unsigned int channel, unsigned int *pPulsePeriod, unsigned 
     hidMessageStruct msg;
 
     LCR_PrepReadCmdWithParam(PWM_SETUP, (unsigned char)channel);
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pPulsePeriod = msg.text.data[1] | msg.text.data[2] << 8 | msg.text.data[3] << 16 | msg.text.data[4] << 24;
@@ -2925,7 +2925,7 @@ int LCR_GetPWMConfig(unsigned int channel, unsigned int *pPulsePeriod, unsigned 
     return -1;
 }
 
-int LCR_SetPWMEnable(unsigned int channel, BOOL Enable)
+int LCR_SetPWMEnable(unsigned int channel, BOOL Enable, hid_device* devHandle)
 /**
  * (I2C: 0x40)
  * (USB: CMD2: 0x1A, CMD3: 0x10)
@@ -2959,10 +2959,10 @@ int LCR_SetPWMEnable(unsigned int channel, BOOL Enable)
     msg.text.data[2] = value;
     LCR_PrepWriteCmd(&msg, PWM_ENABLE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetPWMEnable(unsigned int channel, BOOL *pEnable)
+int LCR_GetPWMEnable(unsigned int channel, BOOL *pEnable, hid_device* devHandle)
 /**
  * (I2C: 0x40)
  * (USB: CMD2: 0x1A, CMD3: 0x10)
@@ -2985,7 +2985,7 @@ int LCR_GetPWMEnable(unsigned int channel, BOOL *pEnable)
 
     LCR_PrepReadCmdWithParam(PWM_ENABLE, (unsigned char)channel);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         if(msg.text.data[0] & BIT7)
@@ -2998,7 +2998,7 @@ int LCR_GetPWMEnable(unsigned int channel, BOOL *pEnable)
     return -1;
 }
 
-int LCR_SetPWMCaptureConfig(unsigned int channel, BOOL enable, unsigned int sampleRate)
+int LCR_SetPWMCaptureConfig(unsigned int channel, BOOL enable, unsigned int sampleRate, hid_device* devHandle)
 /**
  * (I2C: 0x43)
  * (USB: CMD2: 0x1A, CMD3: 0x12)
@@ -3032,10 +3032,10 @@ int LCR_SetPWMCaptureConfig(unsigned int channel, BOOL enable, unsigned int samp
     msg.text.data[6] = sampleRate >> 24;
     LCR_PrepWriteCmd(&msg, PWM_CAPTURE_CONFIG);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetPWMCaptureConfig(unsigned int channel, BOOL *pEnabled, unsigned int *pSampleRate)
+int LCR_GetPWMCaptureConfig(unsigned int channel, BOOL *pEnabled, unsigned int *pSampleRate, hid_device* devHandle)
 /**
  * (I2C: 0x43)
  * (USB: CMD2: 0x1A, CMD3: 0x12)
@@ -3058,7 +3058,7 @@ int LCR_GetPWMCaptureConfig(unsigned int channel, BOOL *pEnabled, unsigned int *
 
     LCR_PrepReadCmdWithParam(PWM_CAPTURE_CONFIG, (unsigned char)channel);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         if(msg.text.data[0] & BIT7)
@@ -3073,7 +3073,7 @@ int LCR_GetPWMCaptureConfig(unsigned int channel, BOOL *pEnabled, unsigned int *
     return -1;
 }
 
-int LCR_PWMCaptureRead(unsigned int channel, unsigned int *pLowPeriod, unsigned int *pHighPeriod)
+int LCR_PWMCaptureRead(unsigned int channel, unsigned int *pLowPeriod, unsigned int *pHighPeriod, hid_device* devHandle)
 /**
  * (I2C: 0x4E)
  * (USB: CMD2: 0x1A, CMD3: 0x13)
@@ -3096,7 +3096,7 @@ int LCR_PWMCaptureRead(unsigned int channel, unsigned int *pLowPeriod, unsigned 
 
     LCR_PrepReadCmdWithParam(PWM_CAPTURE_READ, (unsigned char)channel);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pLowPeriod = msg.text.data[1] | msg.text.data[2] << 8;
@@ -3106,7 +3106,7 @@ int LCR_PWMCaptureRead(unsigned int channel, unsigned int *pLowPeriod, unsigned 
     return -1;
 }
 
-int LCR_SetGPIOConfig(unsigned int pinNum, BOOL dirOutput, BOOL outTypeOpenDrain, BOOL pinState)
+int LCR_SetGPIOConfig(unsigned int pinNum, BOOL dirOutput, BOOL outTypeOpenDrain, BOOL pinState, hid_device* devHandle)
 /**
  * (I2C: 0x44)
  * (USB: CMD2: 0x1A, CMD3: 0x38)
@@ -3141,10 +3141,10 @@ int LCR_SetGPIOConfig(unsigned int pinNum, BOOL dirOutput, BOOL outTypeOpenDrain
     msg.text.data[3] = value;
     LCR_PrepWriteCmd(&msg, GPIO_CONFIG);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetGPIOConfig(unsigned int pinNum, BOOL *pDirOutput, BOOL *pOutTypeOpenDrain, BOOL *pState)
+int LCR_GetGPIOConfig(unsigned int pinNum, BOOL *pDirOutput, BOOL *pOutTypeOpenDrain, BOOL *pState, hid_device* devHandle)
 /**
  * (I2C: 0x44)
  * (USB: CMD2: 0x1A, CMD3: 0x38)
@@ -3169,7 +3169,7 @@ int LCR_GetGPIOConfig(unsigned int pinNum, BOOL *pDirOutput, BOOL *pOutTypeOpenD
 
     LCR_PrepReadCmdWithParam(GPIO_CONFIG, (unsigned char)pinNum);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pDirOutput = ((msg.text.data[0] & BIT1) == BIT1);
@@ -3181,7 +3181,7 @@ int LCR_GetGPIOConfig(unsigned int pinNum, BOOL *pDirOutput, BOOL *pOutTypeOpenD
     return -1;
 }
 
-int LCR_SetGeneralPurposeClockOutFreq(unsigned int clkId, BOOL enable, unsigned int clkDivider)
+int LCR_SetGeneralPurposeClockOutFreq(unsigned int clkId, BOOL enable, unsigned int clkDivider, hid_device* devHandle)
 /**
  * (I2C: 0x48)
  * (USB: CMD2: 0x08, CMD3: 0x07)
@@ -3207,10 +3207,10 @@ int LCR_SetGeneralPurposeClockOutFreq(unsigned int clkId, BOOL enable, unsigned 
     msg.text.data[4] = clkDivider;
     LCR_PrepWriteCmd(&msg, GPCLK_CONFIG);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetGeneralPurposeClockOutFreq(unsigned int clkId, BOOL *pEnabled, unsigned int *pClkDivider)
+int LCR_GetGeneralPurposeClockOutFreq(unsigned int clkId, BOOL *pEnabled, unsigned int *pClkDivider, hid_device* devHandle)
 /**
  * (I2C: 0x48)
  * (USB: CMD2: 0x08, CMD3: 0x07)
@@ -3233,7 +3233,7 @@ int LCR_GetGeneralPurposeClockOutFreq(unsigned int clkId, BOOL *pEnabled, unsign
 
     LCR_PrepReadCmdWithParam(GPCLK_CONFIG, (unsigned char)clkId);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pEnabled = msg.text.data[1];
@@ -3243,7 +3243,7 @@ int LCR_GetGeneralPurposeClockOutFreq(unsigned int clkId, BOOL *pEnabled, unsign
     return -1;
 }
 
-int LCR_SetLEDPWMInvert(BOOL invert)
+int LCR_SetLEDPWMInvert(BOOL invert, hid_device* devHandle)
 /**
  * (I2C: 0x0B)
  * (USB: CMD2: 0x1A, CMD3: 0x05)
@@ -3263,10 +3263,10 @@ int LCR_SetLEDPWMInvert(BOOL invert)
     msg.text.data[2] = invert;
     LCR_PrepWriteCmd(&msg, PWM_INVERT);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetLEDPWMInvert(BOOL *inverted)
+int LCR_GetLEDPWMInvert(BOOL *inverted, hid_device* devHandle)
 /**
  * (I2C: 0x0B)
  * (USB: CMD2: 0x1A, CMD3: 0x05)
@@ -3285,7 +3285,7 @@ int LCR_GetLEDPWMInvert(BOOL *inverted)
 
     LCR_PrepReadCmd(PWM_INVERT);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *inverted = (msg.text.data[0] != 0);
@@ -3294,7 +3294,7 @@ int LCR_GetLEDPWMInvert(BOOL *inverted)
     return -1;
 }
 
-int LCR_I2CConfigure(unsigned int port, unsigned int addm, unsigned int clk)
+int LCR_I2CConfigure(unsigned int port, unsigned int addm, unsigned int clk, hid_device* devHandle)
 /**
  * (I2C: 0x4E)
  * (USB: CMD2: 0x1A, CMD3: 0x4E)
@@ -3323,10 +3323,10 @@ int LCR_I2CConfigure(unsigned int port, unsigned int addm, unsigned int clk)
     msg.text.data[5] = (unsigned char)(clk >> 16);
     msg.text.data[6] = (unsigned char)(clk >> 24);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_WriteI2CPassThrough(unsigned int port, unsigned int devadd, unsigned char* wdata, unsigned int nwbytes)
+int LCR_WriteI2CPassThrough(unsigned int port, unsigned int devadd, unsigned char* wdata, unsigned int nwbytes, hid_device* devHandle)
 /**
  * (I2C: 0x4F)
  * (USB: CMD2: 0x1A, CMD3: 0x4F)
@@ -3362,10 +3362,10 @@ int LCR_WriteI2CPassThrough(unsigned int port, unsigned int devadd, unsigned cha
         msg.text.data[i] = wdata[x++];
     }
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_ReadI2CPassThrough(unsigned int port, unsigned int devadd, unsigned char* wdata, unsigned int nwbytes, unsigned int nrbytes, unsigned char* rdata)
+int LCR_ReadI2CPassThrough(unsigned int port, unsigned int devadd, unsigned char* wdata, unsigned int nwbytes, unsigned int nrbytes, unsigned char* rdata, hid_device* devHandle)
 /**
  * (I2C: 0x4F)
  * (USB: CMD2: 0x1A, CMD3: 0x4F)
@@ -3411,7 +3411,7 @@ int LCR_ReadI2CPassThrough(unsigned int port, unsigned int devadd, unsigned char
     OutputBuffer[0]=0; // First byte is the report number
     memcpy(&OutputBuffer[1], &msg, (sizeof(msg.head)+ msg.head.length));
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         nrbytes &= 0x3F;
@@ -3424,7 +3424,7 @@ int LCR_ReadI2CPassThrough(unsigned int port, unsigned int devadd, unsigned char
     return -1;
 }
 
-int LCR_InitPatternMemLoad(BOOL master, unsigned short imageNum, unsigned int size)
+int LCR_InitPatternMemLoad(BOOL master, unsigned short imageNum, unsigned int size, hid_device* devHandle)
 {
     hidMessageStruct msg;
 
@@ -3440,10 +3440,10 @@ int LCR_InitPatternMemLoad(BOOL master, unsigned short imageNum, unsigned int si
     else
         LCR_PrepWriteCmd(&msg, PATMEM_LOAD_INIT_SLAVE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_pattenMemLoad(BOOL master, unsigned char *pByteArray, int size)
+int LCR_pattenMemLoad(BOOL master, unsigned char *pByteArray, int size, hid_device* devHandle)
 {
     hidMessageStruct msg;
     int retval;
@@ -3481,20 +3481,20 @@ int LCR_pattenMemLoad(BOOL master, unsigned char *pByteArray, int size)
         LCR_PrepWriteCmd(&msg, PATMEM_LOAD_DATA_SLAVE);
     }
 
-    retval = LCR_SendMsg(&msg);
+    retval = LCR_SendMsg(&msg,devHandle);
     if(retval > 0)
         return dataLen;
 
     return -1;
 }
 
-int LCR_getBatchFileName(unsigned char id, char *batchFileName)
+int LCR_getBatchFileName(unsigned char id, char *batchFileName, hid_device* devHandle)
 {
     hidMessageStruct msg;
 
     LCR_PrepReadCmdWithParam(BATCHFILE_NAME, id);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
 		int i;
         memcpy(&msg, InputBuffer, 65);
@@ -3512,17 +3512,17 @@ int LCR_getBatchFileName(unsigned char id, char *batchFileName)
     return -1;
 }
 
-int LCR_executeBatchFile(unsigned char id)
+int LCR_executeBatchFile(unsigned char id, hid_device* devHandle)
 {
     hidMessageStruct msg;
 
     msg.text.data[2] = id;
     LCR_PrepWriteCmd(&msg, BATCHFILE_EXECUTE);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_enableDebug()
+int LCR_enableDebug(hid_device* devHandle)
 {
     hidMessageStruct msg;
 
@@ -3533,11 +3533,11 @@ int LCR_enableDebug()
     msg.text.data[6] = 0x01;
     LCR_PrepWriteCmd(&msg, DEBUG);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 
 }
 
-int LCR_ExecuteRawCommand(uint16 USBCmd, uint08 *Data, int Length)
+int LCR_ExecuteRawCommand(uint16 USBCmd, uint08 *Data, int Length, hid_device* devHandle)
 {
 	int i;
     hidMessageStruct msg;
@@ -3555,7 +3555,7 @@ int LCR_ExecuteRawCommand(uint16 USBCmd, uint08 *Data, int Length)
 
     msg.head.length = Length + 2;
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
 void API_SetDataCallback(API_DataCallback_t *Callback, void *Param)
@@ -3628,7 +3628,7 @@ int API_GetCommandName(unsigned char i2cCommand, char const **command)
 }
 
 
-int LCR_ReadErrorCode(unsigned int *pCode)
+int LCR_ReadErrorCode(unsigned int *pCode, hid_device* devHandle)
 /**
  * (I2C: 0x32)
  * (USB: CMD2: 0x01, CMD3: 0x00)
@@ -3645,7 +3645,7 @@ int LCR_ReadErrorCode(unsigned int *pCode)
 
     LCR_PrepReadCmd(READ_ERROR_CODE);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
         *pCode = msg.text.data[0];
@@ -3654,7 +3654,7 @@ int LCR_ReadErrorCode(unsigned int *pCode)
     return -1;
 }
 
-int LCR_ReadErrorString(char *errStr)
+int LCR_ReadErrorString(char *errStr, hid_device* devHandle)
 /**
  * (I2C: 0x33)
  * (USB: CMD2: 0x01, CMD3: 0x01)
@@ -3673,7 +3673,7 @@ int LCR_ReadErrorString(char *errStr)
 
     LCR_PrepReadCmd(READ_ERROR_MSG);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 128);
 
@@ -3688,7 +3688,7 @@ int LCR_ReadErrorString(char *errStr)
     return -1;
 }
 
-int LCR_GetFrmwVersion(unsigned int *pFrmwType, char *pFrmwTag)
+int LCR_GetFrmwVersion(unsigned int *pFrmwType, char *pFrmwTag, hid_device* devHandle)
 /**
  * (I2C: 0x12)
  * (USB: CMD2: 0x02, CMD3: 0x06)
@@ -3710,7 +3710,7 @@ int LCR_GetFrmwVersion(unsigned int *pFrmwType, char *pFrmwTag)
 
     LCR_PrepReadCmd(READ_FRMW_VERSION);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         memcpy(&msg, InputBuffer, 65);
 
@@ -3727,7 +3727,7 @@ int LCR_GetFrmwVersion(unsigned int *pFrmwType, char *pFrmwTag)
     return -1;
 }
 
-int LCR_GetDMDBlocks(int *startBlock, int *numBlocks)
+int LCR_GetDMDBlocks(int *startBlock, int *numBlocks, hid_device* devHandle)
 /**
  * (I2C: 0x60)
  * (USB: CMD2: 0x1A, CMD3: 0x40)
@@ -3746,7 +3746,7 @@ int LCR_GetDMDBlocks(int *startBlock, int *numBlocks)
 
     LCR_PrepReadCmd(DMD_BLOCKS);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         *startBlock = InputBuffer[4];
         *numBlocks = InputBuffer[5];
@@ -3759,7 +3759,7 @@ int LCR_GetDMDBlocks(int *startBlock, int *numBlocks)
     return -1;
 }
 
-int LCR_SetDMDBlocks(int startBlock, int numBlocks)
+int LCR_SetDMDBlocks(int startBlock, int numBlocks, hid_device* devHandle)
 /**
  * (I2C: 0x60)
  * (USB: CMD2: 0x1A, CMD3: 0x40)
@@ -3781,10 +3781,10 @@ int LCR_SetDMDBlocks(int startBlock, int numBlocks)
 
     LCR_PrepWriteCmd(&msg, DMD_BLOCKS);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_SetMinLEDPulseWidth(int pulseWidthUS)
+int LCR_SetMinLEDPulseWidth(int pulseWidthUS, hid_device* devHandle)
 /**
  * (I2C: 0x62)
  * (USB: CMD2: 0x1A, CMD3: 0x41)
@@ -3806,10 +3806,10 @@ int LCR_SetMinLEDPulseWidth(int pulseWidthUS)
 
     LCR_PrepWriteCmd(&msg, LED_PULSE_WIDTH);
 
-    return LCR_SendMsg(&msg);
+    return LCR_SendMsg(&msg,devHandle);
 }
 
-int LCR_GetMinLEDPulseWidth(int *pulseWidthUS)
+int LCR_GetMinLEDPulseWidth(int *pulseWidthUS, hid_device* devHandle)
 /**
  * (I2C: 0x62)
  * (USB: CMD2: 0x1A, CMD3: 0x41)
@@ -3825,7 +3825,7 @@ int LCR_GetMinLEDPulseWidth(int *pulseWidthUS)
 {
     LCR_PrepReadCmd(LED_PULSE_WIDTH);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         *pulseWidthUS = MAKE_WORD16(InputBuffer[5], InputBuffer[4]);
         return 0;
@@ -3836,7 +3836,7 @@ int LCR_GetMinLEDPulseWidth(int *pulseWidthUS)
     return -1;
 }
 
-int LCR_GetMinPatExposure(int minExposureUS[8])
+int LCR_GetMinPatExposure(int minExposureUS[8], hid_device* devHandle)
 /**
  * (I2C: 0x63)
  * (USB: CMD2: 0x1A, CMD3: 0x42)
@@ -3855,7 +3855,7 @@ int LCR_GetMinPatExposure(int minExposureUS[8])
 {
     LCR_PrepReadCmd(MIN_EXPOSURE);
 
-    if(LCR_Read() > 0)
+    if(LCR_Read(devHandle) > 0)
     {
         int index = 4;
         int i;

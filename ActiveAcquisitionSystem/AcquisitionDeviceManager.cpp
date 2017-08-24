@@ -5,6 +5,7 @@
 
 #include "Texas/HiresLib/usb.h"
 #include "Texas/HiresLib/API.h"
+#include "DLPProjector.h"
 
 
 using namespace AVT::VmbAPI;
@@ -30,6 +31,56 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 	}
 	endAPIs();
 }
+int AcquisitionDeviceManager::detectDLPs()
+{
+	USB_Init();
+	if (dlps.size()==0)
+	{
+		struct hid_device_info* devs=USB_GetHIDs();
+		struct hid_device_info* cur_dev = devs;
+		while (cur_dev) {
+			printf("DLP Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls",
+				cur_dev->vendor_id, cur_dev->product_id, cur_dev->path, cur_dev->serial_number);
+			printf("\n");
+			printf("  Manufacturer: %ls\n", cur_dev->manufacturer_string);
+			printf("  Product:      %ls\n", cur_dev->product_string);
+			printf("\n");
+			hid_device *hid=hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
+			DLPProjector *dlp=new DLPProjector(hid);
+			if (setDLPStatus(dlp))
+			{
+				dlps.push_back(dlp);
+			}
+			cur_dev = cur_dev->next;
+			//TODO Review, is that enough??
+		}
+		hid_free_enumeration(devs);		
+	}
+	return 0;
+}
+
+bool AcquisitionDeviceManager::setDLPStatus(DLPProjector *dlp)
+{
+	//TODO Review... is here open for sure??
+	uchar HWStatus, SysStatus, MainStatus;
+	BootLoaderStaus BLStatus;
+	int statusLCR = LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus);
+	if (statusLCR == 0)
+	{
+		dlp->setStatus(statusLCR, HWStatus, SysStatus, MainStatus);
+		return true;
+	}
+	else if (LCR_GetBLStatus(&BLStatus) == 0)
+	{
+		//This means the device is in boot mode
+		//TODO Review... do something else?
+	}
+	else
+	{
+		USB_Close(dlp->getHidDevice());
+	}
+	return false;
+}
 
 
 bool AcquisitionDeviceManager::initializeAPIs()
@@ -42,8 +93,8 @@ bool AcquisitionDeviceManager::initializeAPIs()
 	edsWrapper = new EDSWrapper();
 
 	//texas dlp
-	USB_Init();
-	//TODO LOOK HERE, Complete to detect and complete info from DLPS!!
+	detectDLPs();
+	
 
 	return true;
 
