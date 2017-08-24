@@ -53,7 +53,6 @@ typedef struct{
 */
 
 void USB_SetFakeConnection(BOOL enable);//todo remove, deprecated and useless for this application.
-int USB_Open(hid_device *DeviceHandle);
 //BOOL USB_IsConnected(hid_device *DeviceHandle);
 int USB_Write(uint08 *Data, hid_device *DeviceHandle);
 int USB_Read(uint08 *Data, hid_device *DeviceHandle);
@@ -61,7 +60,6 @@ int USB_Close(hid_device *DeviceHandle);
 int USB_Init();
 int USB_Exit();
 
-struct hid_device_info * USB_GetHIDs();
 
 #ifdef __cplusplus
 }

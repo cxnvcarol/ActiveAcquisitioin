@@ -20,7 +20,7 @@ public:
 	~AVTCamera();
 
 	bool loadSettings(std::string configPath);	
-	int takeSinglePicture();//TODO Review, should it be virtual?
+	int takeSinglePicture();//Review, should it be virtual?
 
 	CameraPtr getAVTPointer() { return pCam; }
 	void setName(string n) {name = n; }

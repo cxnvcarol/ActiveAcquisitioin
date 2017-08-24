@@ -183,7 +183,7 @@ int mainAVT(int argc, char *argv[])//SingleAVTCapture
 		}
 		//TODO: Register slave projectors as observers of main projector. (Applied when using a second projector as a mask! (DMD Mask!!))
 		////WF: 5. Play synchronized projections:
-		//TODO: x completeness:: read and use # of repetitions as parameter of the program.
+		//TODO: x completeness:: read and use # of repetitions as parameter of the program. (inf+100)
 		mainProjector.playProjectionSequence(1);		
 	}
 	

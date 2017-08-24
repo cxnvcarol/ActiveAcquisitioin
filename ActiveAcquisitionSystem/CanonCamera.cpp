@@ -27,7 +27,7 @@ void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)
 			LOGEXEC("CanonCamera serial>>%s", serial);
 			dev_id = serial;
 			printf("\n\n\n");
-			//TODO Complete other important properties!
+			//Review Complete other important properties!
 		}
 		
 	}

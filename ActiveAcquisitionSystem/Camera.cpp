@@ -46,7 +46,6 @@ void ActiveCamera::setOutputFolder(std::string folder)
 }
 
 bool ActiveCamera::notifyStopProjectionSequence() {
-	//TODO Evaluate need of this fn! (inf) --> needed when integrated with GUI to handle multiple capture-runs into the user-session
 	if (playingProjectionSequence)
 	{
 		playingProjectionSequence = false;
@@ -57,7 +56,7 @@ bool ActiveCamera::notifyStopProjectionSequence() {
 };
 
 
-bool ActiveCamera::notifyStartProjectionSequence()//TODO Review: verify workflow. do I need the reference to the projector
+bool ActiveCamera::notifyStartProjectionSequence()//Review: verify workflow. do I need the reference to the projector?
 {
 	if (playingProjectionSequence)
 	{

@@ -54,7 +54,7 @@ AVTCamera::AVTCamera(CameraPtr avtCam):pCam(avtCam), settingsLoaded(false)
 		pCam->GetFeatureByName("DeviceID",feature);
 
 		feature->GetValue(dev_id);
-		//TODO set name and other features (inf)
+		//Review set name and other features (inf)
 	}
 	pCam->Close();
 #ifdef AVT_DEBUG
@@ -231,6 +231,7 @@ int AVTCamera::takeSinglePicture()
 	FeaturePtr pFeat;
 	VmbErrorType err = pCam->GetFeatureByName("AcquisitionStart", pFeat);
 	err = pFeat->RunCommand();//TODO In principle I should make sure of setting the correct feature to SingleShot before running the command. (3)
+	//TODO Also check if the hardware trigger is enabled. if so, should I stop here?
 		
 	if (VmbErrorSuccess != err)
 	{
@@ -249,12 +250,11 @@ int AVTCamera::takeSinglePicture()
 		} while (false == bIsCommandDone);
 	}
 	LOGEXEC("picture taken without issues");
-
 	err = pCam->GetFeatureByName("AcquisitionStop", pFeat);
 	err = pFeat->RunCommand();
 	if (VmbErrorSuccess != err)
 	{
-		LOGERR("error in stoping: ");
+		LOGERR("error in stoping acquisition: ");
 		return err;
 	}
 	else {

@@ -18,6 +18,13 @@ AcquisitionDeviceManager::AcquisitionDeviceManager()
 }
 AcquisitionDeviceManager::~AcquisitionDeviceManager()
 {
+	//release dlp related resources:
+	for (DLPProjector* dlp : dlps)
+	{
+		USB_Close(dlp->getHidDevice());
+	}
+	USB_Exit();
+
 	//release memory, close api's objects
 	try {
 		for(ActiveCamera* c: cameraList)
@@ -29,14 +36,17 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 	{
 		LOGERR("oh! not closing camera");
 	}
+	
+
+
 	endAPIs();
 }
 int AcquisitionDeviceManager::detectDLPs()
 {
-	USB_Init();
+	
 	if (dlps.size()==0)
 	{
-		struct hid_device_info* devs=USB_GetHIDs();
+		struct hid_device_info* devs= hid_enumerate(MY_VID, MY_PID);
 		struct hid_device_info* cur_dev = devs;
 		while (cur_dev) {
 			printf("DLP Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls",
@@ -46,10 +56,13 @@ int AcquisitionDeviceManager::detectDLPs()
 			printf("  Product:      %ls\n", cur_dev->product_string);
 			printf("\n");
 			hid_device *hid=hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
-			DLPProjector *dlp=new DLPProjector(hid);
-			if (setDLPStatus(dlp))
+			if (hid != NULL)
 			{
-				dlps.push_back(dlp);
+				DLPProjector *dlp = new DLPProjector(hid);
+				if (setDLPStatus(dlp))
+				{
+					dlps.push_back(dlp);
+				}
 			}
 			cur_dev = cur_dev->next;
 			//TODO Review, is that enough??
@@ -61,7 +74,6 @@ int AcquisitionDeviceManager::detectDLPs()
 
 bool AcquisitionDeviceManager::setDLPStatus(DLPProjector *dlp)
 {
-	//TODO Review... is here open for sure??
 	uchar HWStatus, SysStatus, MainStatus;
 	BootLoaderStaus BLStatus;
 	int statusLCR = LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus);
@@ -73,7 +85,7 @@ bool AcquisitionDeviceManager::setDLPStatus(DLPProjector *dlp)
 	else if (LCR_GetBLStatus(&BLStatus) == 0)
 	{
 		//This means the device is in boot mode
-		//TODO Review... do something else?
+		//Review... do something else?
 	}
 	else
 	{
@@ -86,15 +98,15 @@ bool AcquisitionDeviceManager::setDLPStatus(DLPProjector *dlp)
 bool AcquisitionDeviceManager::initializeAPIs()
 {
 	//vimba
-	sistema = &AVT::VmbAPI::VimbaSystem::GetInstance();
-	err = sistema->Startup();
+	vimbaSys = &AVT::VmbAPI::VimbaSystem::GetInstance();
+	err = vimbaSys->Startup();
 
 	//canon
 	edsWrapper = new EDSWrapper();
 
 	//texas dlp
-	detectDLPs();
-	
+	USB_Init();
+	detectDLPs();	
 
 	return true;
 
@@ -104,7 +116,8 @@ void AcquisitionDeviceManager::endAPIs()
 	//to be called at the end of the session
 	//return true;
 	try {
-		sistema->Shutdown();
+		vimbaSys->Shutdown();
+		//review End edsdk??
 	}
 	catch(exception e)
 	{ 
@@ -160,8 +173,6 @@ vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras()
 		canon.setEdsCameraRef(edsWrapper->getCamera(i));
 		cameraList.push_back(&canon);
 	}
-	
-
 	numCams = cameraList.size();
 	return cameraList;
 }
@@ -173,7 +184,7 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 	int count = 0;
 	if (!vimbaError)
 	{
-		sistema->GetCameras(cameras);
+		vimbaSys->GetCameras(cameras);
 		count = cameras.size();
 		qDebug("Num AVT cameras: %d\n", count);
 		avtList.resize(cameras.size());

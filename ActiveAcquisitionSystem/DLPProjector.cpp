@@ -25,7 +25,7 @@ void DLPProjector::playProjectionSequence(int n)
 
 void DLPProjector::registerCameraObserver(ActiveCamera * cam)
 {
-	//TODO are cameras triggered by hardware? then do nothing. Add to list if not.
+	//TODO are cameras triggered by hardware? then do nothing. Add to list if not (or add anyway and do the check during AVT Triggering??.
 }
 
 void DLPProjector::loadProjectionSettings(const QString projectionsConfig)

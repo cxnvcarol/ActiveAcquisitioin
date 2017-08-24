@@ -68,35 +68,7 @@ int USB_Exit(void)
     return hid_exit();
 }
 
-struct hid_device_info * USB_GetHIDs()
-{
-	return hid_enumerate(MY_VID, MY_PID);//TODO LOOK HERE!! Review and continue
 
-	//DeviceHandle = hid_open(MY_VID, MY_PID, NULL);//TODO Use hid_enumarate first!... receive index by parameter
-	//return NULL;
-}
-
-/**
- * Open a new USB connection with the EVM system
- *
- * @return 0 on success, -1 on failure
- */
-int USB_Open(hid_device *DeviceHandle)
-{
-    if(FakeConnection == FALSE)
-    {
-        // Open the device using the VID, PID,
-        // and optionally the Serial number.
-
-        if(DeviceHandle == NULL)
-        {
-			//USBConnected = FALSE;
-            return -1;
-        }
-    }
-	//USBConnected = TRUE;
-    return 0;
-}
 
 //reusable structs
 static hidMessageStruct dummyMsg;
