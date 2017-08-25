@@ -30,11 +30,56 @@ void DLPProjector::registerCameraObserver(ActiveCamera * cam)
 
 void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 {
+	//TODO LOOK HERE! Load settings for the dlp: understand QT format and send commands to the DLP! with current settings!!
 	//TODO read DLP Config txt convention. later take care of convertion with my own.
+	//1. Read text file, split each line, save projection in array.
+	QFile f(projectionsConfig);
+	if (f.open(QIODevice::ReadOnly))
+	{
+		QTextStream in(&f);
+		QString line = in.readLine();
+		QStringList  fields = line.split(",");
+		if (fields.size() != 1)//"Normal mode" always for the pattern mode
+		{
+			return;// TODO LOOK HERE... instead of returning, redirect to the "simple settings parser" and configure with default values!
+		}
+		while (!in.atEnd()) {
+			line = in.readLine();
+			fields = line.split(",");
+			if (fields.size() != 7)
+			{
+				LOGERR("ProjectionsSettings file format is not recognized - line: %s", line);
+				throw "ProjectionsSettings file format is not recognized";
+			}
+			//projections.
+			int index = indexOfProjection(fields[0]);//TODO read dlp order here!. Save other settings to load later to the DLP
+			if (index < 0)
+			{
+				throw ("incorrect projection setting in line: " + line);
+			}
+			bool ok;
+			long us = fields[1].toLong(&ok);
+			if (!ok)
+			{
+				throw ("incorrect projection setting in line: " + line);
+			}
+			bool camTrigger = fields[2].toInt(&ok);
+			if (!ok)
+			{
+				throw ("incorrect projection setting in line: " + line);
+			}
+			projectionsSequence.push_back({ index,us,camTrigger });
+
+
+		}
+		f.close();
+	}
+
 
 	//wf: load images to the dlp and set the sequence play
 	//KEY PARAMETERS: # OF BITS, COLOR OF PROJECTION (if pictures are not grayscale I should convert them.
 }
+//TODO override method to load folder with pictures!
 
 void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uchar MainStatus)
 {

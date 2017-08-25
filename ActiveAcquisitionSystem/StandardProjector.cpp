@@ -143,8 +143,6 @@ void StandardProjector::loadProjectionSettings(const QString projectionsConfig)
 				throw "incorrect number of arguments for the sequence projection";
 			}
 			//projections.
-			Projection *found;
-			//std::find(projections.begin(), projections.end(), found);
 			int index = indexOfProjection(fields[0]);
 			if (index < 0)
 			{

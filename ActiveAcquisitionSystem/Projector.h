@@ -38,8 +38,8 @@ public:
 
 	virtual void playProjectionSequence(int n);//plays already loaded sequence
 protected:
-	std::vector<ProjectedImg> projections;
-	std::vector<Projection> projectionsSequence;
+	std::vector<ProjectedImg> projections;//loaded from specified folder
+	std::vector<Projection> projectionsSequence;//laoded from configuration text file
 	bool playingSequence;
 
 	std::vector<ActiveCamera *> observerCams;
