@@ -49,7 +49,7 @@
 ****************************************************************************/
 
 #include "StandardProjector.h"
-#include "debugMacros.h"
+
 
 StandardProjector::StandardProjector()
 	: imageLabel(new QLabel)

@@ -17,6 +17,11 @@ public:
 
 	hid_device* getHidDevice() { return hidHandle; }
 
+
+	static bool dLPToSimpleProjectionsSettings(QString filePathIn, QString filePathOut);
+	static bool simpleToDLPProjectionsSettings(QString filePathIn, QString filePathOut);
+
+
 private:
 	hid_device* hidHandle;
 

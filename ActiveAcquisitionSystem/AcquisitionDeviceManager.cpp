@@ -25,7 +25,7 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 	}
 	USB_Exit();
 
-	//release memory, close api's objects
+	//avt release memory, close api's objects
 	try {
 		for(ActiveCamera* c: cameraList)
 		{

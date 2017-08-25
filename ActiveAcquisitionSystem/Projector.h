@@ -4,6 +4,8 @@
 #include <QtWidgets>
 #include <QImage>
 #include "Camera.h"
+#include "debugMacros.h"
+
 
 struct ProjectedImg {
 	QString name;

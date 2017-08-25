@@ -52,3 +52,75 @@ void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uch
 	bool extSourceLocked = MainStatus & BIT3;
 	//TODO Complete, query other properties here
 }
+
+bool DLPProjector::dLPToSimpleProjectionsSettings(QString filePathIn, QString filePathOut)
+{
+	QFile f(filePathIn);
+	QFile outputFile(filePathOut);
+	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		LOGERR("Unable to open file for saving: %s", filePathOut.toStdString().c_str());
+		return false;
+	}
+	QTextStream out(&outputFile);
+	if (f.open(QIODevice::ReadOnly))
+	{
+		QTextStream in(&f);
+		QString line= in.readLine();
+		QStringList  fields = line.split(",");
+		if (fields.size() != 1)//"Normal mode" always for the pattern mode
+		{
+			return false;
+		}
+		while (!in.atEnd()) {
+			line = in.readLine();
+			fields = line.split(",");
+			if (fields.size() != 7)
+			{
+				return false;
+			}
+			out << fields[0] << ",";
+			out << fields[2] << ",";
+			out << fields[6] << "\n";
+		}
+	}
+	outputFile.close();
+	f.close();
+}
+
+bool DLPProjector::simpleToDLPProjectionsSettings(QString filePathIn, QString filePathOut)
+{
+	QFile f(filePathIn);
+	QFile outputFile(filePathOut);
+	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text))
+	{
+		LOGERR("Unable to open file for saving: %s",filePathOut.toStdString().c_str());
+		return false;
+	}
+	QTextStream out(&outputFile);
+	out << "Normal Mode\n";
+	if (f.open(QIODevice::ReadOnly))
+	{
+		QTextStream in(&f);
+		QString line;
+		
+		while (!in.atEnd()) {
+			line = in.readLine();
+			QStringList  fields = line.split(",");
+			if (fields.size() != 3)
+			{
+				return false;
+			}
+			out << fields[0] << ",";
+			out << "8" << ",";
+			out << fields[1] << ",";
+			out << "0" << ",";
+			out << "7" << ",";
+			out << "0" << ",";
+			out << fields[2] << "\n";
+		}
+	}
+	outputFile.close();
+	f.close();
+
+}
