@@ -213,7 +213,7 @@ int LCR_GetMinLEDPulseWidth(int *pulseWidthUS, hid_device *devHandle);
 
 int LCR_GetMinPatExposure(int minExposureUS[8], hid_device *devHandle);
 
-void API_SetDataCallback(API_DataCallback_t *Callback, void *Param);
+//void API_SetDataCallback(API_DataCallback_t *Callback, void *Param);
 int API_GetI2CCommand(char *command, unsigned char *i2cCommand);
 int API_GetUSBCommand(const char *command, uint16 *usbCommand);
 int API_GetCommandLength(unsigned char *cmd, int *len);

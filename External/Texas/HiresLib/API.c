@@ -195,8 +195,8 @@ static unsigned char PatLut[12][512];
 static unsigned int PatLutIndex = 0;
 
 //the following 2 are to fill the BATCH FILE for reuse in the original GUI (Not used here) //TODO Review.. remove??
-static API_DataCallback_t *LCR_DataCallback;
-static void *LCR_CallbackParam;
+//static API_DataCallback_t *LCR_DataCallback;
+//static void *LCR_CallbackParam;
 
 
 int LCR_Write(BOOL ackRequired, hid_device* devHandle)
@@ -282,7 +282,7 @@ int LCR_SendMsg(hidMessageStruct *pMsg, hid_device* devHandle)
             return -1;
         dataBytesSent += USB_MAX_PACKET_SIZE;
     }
-
+	/*
     if (LCR_DataCallback != NULL)
     {
         uint16 i;
@@ -303,6 +303,7 @@ int LCR_SendMsg(hidMessageStruct *pMsg, hid_device* devHandle)
 			}
         }
     }
+	*/
 
     return dataBytesSent+sizeof(pMsg->head);
 }
@@ -3562,12 +3563,13 @@ int LCR_ExecuteRawCommand(uint16 USBCmd, uint08 *Data, int Length, hid_device* d
     return LCR_SendMsg(&msg,devHandle);
 }
 
+/*
 void API_SetDataCallback(API_DataCallback_t *Callback, void *Param)
 {
     LCR_DataCallback = Callback;
 	LCR_CallbackParam = Param;
 }
-
+*/
 int API_GetUSBCommand(char const *command, uint16 *usbCommand)
 {
     uint16 i;

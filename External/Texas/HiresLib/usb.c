@@ -13,41 +13,6 @@
 #include <stdlib.h>
 #include "API.h"
 
-/***************************************************
-*                  GLOBAL VARIABLES //TODO FIX UGLY! -- no multiple devices supported.
-****************************************************/
-/** USB HID Device handler */
-/*
-static hid_device *DeviceHandle;//TODO, it should support more than one device connected (at least - and typically - 2)
-static BOOL USBConnected = FALSE; //< Device connected status >
-*/
-
-
-
-static BOOL FakeConnection = FALSE; /**< Simulated connection *///TODO Review... not used, could be removed but I won't touch it now.
-
-/**
- * Enable/disable simulated connection without HW
- *
- * @param enable TRUE = Enable simulated connection
- *               FALSE = Disable simulated connection
- */
-void USB_SetFakeConnection(BOOL enable)
-{
-    FakeConnection = enable;
-}
-
-/**
- * Check if USB device is conencted.
- *
- * @return TRUE = USB device is connected, FALSE = USB device is not connected
- //
-BOOL USB_IsConnected(hid_device *DeviceHandle)
-{
-    return TRUE;//TODO.. REMOVE, this is deprecated and now useless!!
-}
-*/
-
 /**
  * Initialize USB driver
  *
@@ -68,8 +33,6 @@ int USB_Exit(void)
     return hid_exit();
 }
 
-
-
 //reusable structs
 static hidMessageStruct dummyMsg;
 static unsigned char powermode;
@@ -82,29 +45,6 @@ static unsigned char dispmode;
  */
 int USB_Write(uint08 *Data, hid_device *DeviceHandle )
 {
-    if(FakeConnection == TRUE)
-    {
-        memcpy(&dummyMsg, Data + 1, 16);
-
-		if(dummyMsg.head.flags.rw == 0)
-		{
-			switch(dummyMsg.text.cmd)
-			{
-				case  0x200: // power mode
-					powermode = dummyMsg.text.data[2];
-					break;
-
-				case 0x1A1B:
-					dispmode = dummyMsg.text.data[2];
-					break;
-			}
-		}
-        return 1;
-	}
-
-
-    if(DeviceHandle == NULL)
-        return -1;
 
     /*    for (int i = 0; i < USB_MIN_PACKET_SIZE; i++)
         printf("0x%x ", Data[i]);
@@ -121,26 +61,6 @@ int USB_Write(uint08 *Data, hid_device *DeviceHandle )
  */
 int USB_Read(uint08 *Data, hid_device *DeviceHandle)
 {
-    if(FakeConnection == TRUE)
-    {
-        switch(dummyMsg.text.cmd)
-        {
-        case  0x200: // power mode
-			dummyMsg.text.data[0] = powermode;
-			memcpy(Data, &dummyMsg, 16);
-            break;
-
-        case 0x1A1B:
-			dummyMsg.text.data[0] = dispmode;
-			memcpy(Data, &dummyMsg, 16);
-            break;
-
-        default:
-            memset(Data, 0, 16);
-        }
-        return 1;
-    }
-
     if(DeviceHandle == NULL)
         return -1;
 
@@ -153,10 +73,6 @@ int USB_Read(uint08 *Data, hid_device *DeviceHandle)
  */
 int USB_Close(hid_device *DeviceHandle)
 {
-    if(FakeConnection == FALSE)
-    {
-        hid_close(DeviceHandle);
-		//USBConnected = FALSE;
-    }
+    hid_close(DeviceHandle);
     return 0;
 }
