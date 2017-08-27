@@ -6,6 +6,7 @@
 DLPProjector::DLPProjector()
 {
 	//detect serial id and set it.
+	//call setStatus here?
 }
 
 DLPProjector::DLPProjector(hid_device * hid)
@@ -69,8 +70,6 @@ void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 				throw ("incorrect projection setting in line: " + line);
 			}
 			projectionsSequence.push_back({ index,us,camTrigger });
-
-
 		}
 		f.close();
 	}

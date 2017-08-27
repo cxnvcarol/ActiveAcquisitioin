@@ -188,9 +188,13 @@ static CmdFormat CmdList[] =
 	{ "BL_SET_DNLDSIZE_4BYTE"   , 0x33, 0x0033, 0x04, 0 }
 };
 
+
+/*TODO REVIEW... the following are global variable... they shouldn't (?)... they refer to the pattternModeDesign workflow: LUT Indexes.*/
 static unsigned char seqNum=0;
 static unsigned char PatLut[12][512];
 static unsigned int PatLutIndex = 0;
+
+//the following 2 are to fill the BATCH FILE for reuse in the original GUI (Not used here) //TODO Review.. remove??
 static API_DataCallback_t *LCR_DataCallback;
 static void *LCR_CallbackParam;
 
