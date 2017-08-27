@@ -173,6 +173,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="mainCanonTests.cpp" />
+    <ClCompile Include="mainDLPtest.cpp" />
     <ClCompile Include="Projector.cpp" />
     <ClCompile Include="StandardProjector.cpp" />
     <ClCompile Include="WorkingSession.cpp" />

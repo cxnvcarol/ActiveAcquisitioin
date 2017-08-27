@@ -32,12 +32,11 @@ void DLPProjector::playProjectionSequence(int n)
 
 	if (LCR_SetPatternConfig(dlp_pattern_elements.size(), repeat,hidHandle)<0)
 	{
-		//showError("Error in setting LUT Configuration!");//redo
+		LOGERR("Error in setting LUT Configuration!");
 		return;
 	}
 	if (LCR_PatternDisplay(0x2,hidHandle) < 0)
-		return;
-		//showError("Unable to stat pattern display");//redo
+		LOGERR("Unable to stat pattern display");
 }
 
 void DLPProjector::registerCameraObserver(ActiveCamera * cam)
@@ -46,22 +45,21 @@ void DLPProjector::registerCameraObserver(ActiveCamera * cam)
 }
 void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 {
-	//TODO Class patternElement
 	QFile settingsFile(projectionsConfig);
 	if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
 	{
-		//showStatus("Unable to open the settings file\n");//redo
+		LOGERR("Unable to open the settings file");
 		return;
 	}
 
 	//first clear the existing patterns on window
 
-	//if (dlp_pattern_elements.size() > 0)//redo
-		//dlp_pattern_elements.clear();
+	if (dlp_pattern_elements.size() > 0)
+		dlp_pattern_elements.clear();
 
 	QDir dir = QFileInfo(settingsFile).absoluteDir();
 	QString m_ptnSettingPath = dir.absolutePath();
-	//settings.setValue("PtnSettingPath", m_ptnSettingPath);//redo
+	
 
 	QTextStream in(&settingsFile);
 
@@ -94,7 +92,8 @@ void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 		if (!patternFile.exists())
 		{
 
-			//sprintf(dispStr, "the pattern image file %s does not exist", pFileStr.toStdString().c_str());//redo
+			LOGERR("the pattern image file %s does not exist", pFileStr.toStdString().c_str());
+
 			return;
 		}
 
@@ -115,11 +114,6 @@ void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 
 	}
 	
-	if (dlp_pattern_elements.size() > 0)
-	{
-		//waveWindow->updatePatternList(dlp_pattern_elements);//redo graphical update
-		//waveWindow->draw();
-	}
 	settingsFile.close();
 }
 void DLPProjector::loadProjectionSettings2(const QString projectionsConfig)//TODO Review and remove?
@@ -290,15 +284,15 @@ void DLPProjector::updateLUT()//TODO Call at the end of loadSettingsFile
 	{
 		if (LCR_AddToPatLut(i, dlp_pattern_elements[i].exposure, true, dlp_pattern_elements[i].bits, dlp_pattern_elements[i].color, dlp_pattern_elements[i].trigIn, dlp_pattern_elements[i].darkPeriod, dlp_pattern_elements[i].trigOut2, dlp_pattern_elements[i].splashImageIndex, dlp_pattern_elements[i].splashImageBitPos)<0)
 		{
-			sprintf(errStr, "Unable to add pattern number %d to the LUT", i);
-			//showError(QString::fromLocal8Bit(errStr));//redo
+			LOGERR( "Unable to add pattern number %d to the LUT", i);
+			
 			break;
 		}
 	}
 
 	if (LCR_SendPatLut(hidHandle) < 0)
 	{
-		//showError("Sending pattern LUT failed!");//redo
+		LOGERR("Sending pattern LUT failed!");
 		return;
 	}
 
@@ -310,7 +304,7 @@ void DLPProjector::updateLUT()//TODO Call at the end of loadSettingsFile
 	ret = LCR_SetPatternConfig(dlp_pattern_elements.size(), dlp_pattern_elements.size(),hidHandle);
 	if (ret < 0)
 	{
-		//showError("Sending pattern LUT size failed!");//redo
+		LOGERR("Sending pattern LUT size failed!");
 		return;
 	}
 

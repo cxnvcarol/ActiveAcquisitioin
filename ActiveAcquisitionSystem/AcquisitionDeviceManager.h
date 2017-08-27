@@ -35,6 +35,8 @@ public:
 		
 		return numCams; }
 
+
+	int detectDLPs();
 private:
 	AVT::VmbAPI::VimbaSystem* vimbaSys;
 	VmbErrorType    err;
@@ -46,7 +48,7 @@ private:
 
 	EDSWrapper* edsWrapper;
 
-	int detectDLPs();
+	
 	bool setDLPStatus(DLPProjector *dlp);
 };
 

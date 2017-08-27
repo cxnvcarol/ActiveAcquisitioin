@@ -118,6 +118,9 @@
     <ClCompile Include="..\External\Texas\HiresLib\pattern.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mainDLPtest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">

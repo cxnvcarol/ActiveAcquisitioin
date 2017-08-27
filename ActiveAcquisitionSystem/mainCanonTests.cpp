@@ -31,7 +31,7 @@ using namespace std;
 
 
 
-void main()
+void mainCanonTests()
 {
 	WorkingSession ws;
 	EDSWrapper eds;

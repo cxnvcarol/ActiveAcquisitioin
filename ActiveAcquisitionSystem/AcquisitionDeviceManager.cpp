@@ -61,7 +61,9 @@ int AcquisitionDeviceManager::detectDLPs()
 				DLPProjector *dlp = new DLPProjector(hid);
 				if (setDLPStatus(dlp))
 				{
+					LOGEXEC("dlp status was ok");
 					dlps.push_back(dlp);
+
 				}
 			}
 			cur_dev = cur_dev->next;
@@ -69,7 +71,7 @@ int AcquisitionDeviceManager::detectDLPs()
 		}
 		hid_free_enumeration(devs);		
 	}
-	return 0;
+	return dlps.size();
 }
 
 bool AcquisitionDeviceManager::setDLPStatus(DLPProjector *dlp)
