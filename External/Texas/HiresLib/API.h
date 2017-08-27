@@ -13,6 +13,8 @@
 
 #include "Common.h"
 
+#include "hidapi.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -52,7 +54,6 @@ typedef struct
 typedef void API_DataCallback_t(void *Param, API_CommandInfo_t *CmdInfo);
 
 int LCR_SoftwareReset(hid_device *devHandle);
-
 /* System status commands */
 int LCR_GetStatus(unsigned char *pHWStatus, unsigned char *pSysStatus,
                                                     unsigned char *pMainStatus, hid_device *devHandle);
@@ -112,9 +113,9 @@ int LCR_GetTPGColor(unsigned short *pRedFG, unsigned short *pGreenFG,
 int LCR_LoadSplash(unsigned int index, hid_device *devHandle);
 int LCR_GetSplashIndex(unsigned int *pIndex, hid_device *devHandle);
 
-int LCR_SetLongAxisImageFlip(BOOL);
+int LCR_SetLongAxisImageFlip(BOOL, hid_device *devHandle);
 BOOL LCR_GetLongAxisImageFlip(hid_device *devHandle);
-int LCR_SetShortAxisImageFlip(BOOL);
+int LCR_SetShortAxisImageFlip(BOOL, hid_device *devHandle);
 BOOL LCR_GetShortAxisImageFlip(hid_device *devHandle);
 
 int LCR_SetLedEnables(BOOL SeqCtrl, BOOL Red, BOOL Green, BOOL Blue, hid_device *devHandle);

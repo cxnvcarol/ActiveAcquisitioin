@@ -112,13 +112,7 @@
     <ClCompile Include="..\External\Texas\HiresLib\Error.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\External\Texas\HiresLib\firmware.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\External\Texas\HiresLib\flashimage.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\External\Texas\HiresLib\flashloader.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\External\Texas\HiresLib\pattern.c">
@@ -215,13 +209,7 @@
     <ClInclude Include="..\External\Texas\HiresLib\Error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\External\Texas\HiresLib\firmware.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\External\Texas\HiresLib\flashimage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\External\Texas\HiresLib\flashloader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\External\Texas\HiresLib\pattern.h">

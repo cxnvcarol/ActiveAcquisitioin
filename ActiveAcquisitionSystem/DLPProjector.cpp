@@ -49,7 +49,7 @@ void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 			fields = line.split(",");
 			if (fields.size() != 7)
 			{
-				LOGERR("ProjectionsSettings file format is not recognized - line: %s", line);
+				LOGERR("ProjectionsSettings file format is not recognized - line: %s", line.toStdString().c_str());
 				throw "ProjectionsSettings file format is not recognized";
 			}
 			//projections.
@@ -130,6 +130,7 @@ bool DLPProjector::dLPToSimpleProjectionsSettings(QString filePathIn, QString fi
 	}
 	outputFile.close();
 	f.close();
+	return true;
 }
 
 bool DLPProjector::simpleToDLPProjectionsSettings(QString filePathIn, QString filePathOut)
@@ -166,5 +167,5 @@ bool DLPProjector::simpleToDLPProjectionsSettings(QString filePathIn, QString fi
 	}
 	outputFile.close();
 	f.close();
-
+	return true;
 }

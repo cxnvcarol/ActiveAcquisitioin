@@ -120,7 +120,7 @@ bool CanonCamera::notifyStartProjectionSequence()
 {
 	if(ActiveCamera::notifyStartProjectionSequence())
 	{ 
-		prepareCapture();
+		return prepareCapture()==EDS_ERR_OK;
 	}
 	else { return false; }
 }

@@ -135,9 +135,7 @@
     <ClCompile Include="..\External\Texas\HiresLib\BMPParser.c" />
     <ClCompile Include="..\External\Texas\HiresLib\compress.c" />
     <ClCompile Include="..\External\Texas\HiresLib\Error.c" />
-    <ClCompile Include="..\External\Texas\HiresLib\firmware.c" />
     <ClCompile Include="..\External\Texas\HiresLib\flashimage.c" />
-    <ClCompile Include="..\External\Texas\HiresLib\flashloader.c" />
     <ClCompile Include="..\External\Texas\HiresLib\pattern.c" />
     <ClCompile Include="..\External\Texas\HiresLib\usb.c" />
     <ClCompile Include="AcquisitionDeviceManager.cpp" />
@@ -230,9 +228,7 @@
     <ClInclude Include="..\External\Texas\HiresLib\common.h" />
     <ClInclude Include="..\External\Texas\HiresLib\compress.h" />
     <ClInclude Include="..\External\Texas\HiresLib\Error.h" />
-    <ClInclude Include="..\External\Texas\HiresLib\firmware.h" />
     <ClInclude Include="..\External\Texas\HiresLib\flashimage.h" />
-    <ClInclude Include="..\External\Texas\HiresLib\flashloader.h" />
     <ClInclude Include="..\External\Texas\HiresLib\pattern.h" />
     <ClInclude Include="..\External\Texas\HiresLib\usb.h" />
     <ClInclude Include="..\External\Vimba\VmbImageTransformHelper.hpp" />

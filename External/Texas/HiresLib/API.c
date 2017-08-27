@@ -1262,7 +1262,7 @@ int LCR_GetStatus(unsigned char *pHWStatus, unsigned char *pSysStatus, unsigned 
     return 0;
 }
 
-int LCR_SoftwareReset(hid_device* devHandle)
+int LCR_SoftwareReset(hid_device *devHandle)
 /**
  * Use this API to reset the controller
  *
