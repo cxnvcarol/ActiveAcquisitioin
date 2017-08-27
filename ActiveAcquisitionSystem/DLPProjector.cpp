@@ -9,7 +9,7 @@ DLPProjector::DLPProjector()
 	//call setStatus here?
 }
 
-DLPProjector::DLPProjector(hid_device * hid)
+DLPProjector::DLPProjector(hid_device * hid):m_patternImageChange(false)
 {
 	hidHandle = hid;
 }
@@ -21,15 +21,108 @@ DLPProjector::~DLPProjector()
 
 void DLPProjector::playProjectionSequence(int n)
 {
-	//TODO send command to play sequence n times.
+	//TODO review
+	unsigned int repeat;//TODO review this. How to use it? replace with n param??
+	/*
+	if (ui->repeat_radioButton->isChecked())
+		repeat = 0;
+	else
+		*/
+		repeat = dlp_pattern_elements.size();
+
+	if (LCR_SetPatternConfig(dlp_pattern_elements.size(), repeat,hidHandle)<0)
+	{
+		//showError("Error in setting LUT Configuration!");//redo
+		return;
+	}
+	if (LCR_PatternDisplay(0x2,hidHandle) < 0)
+		return;
+		//showError("Unable to stat pattern display");//redo
 }
 
 void DLPProjector::registerCameraObserver(ActiveCamera * cam)
 {
 	//TODO are cameras triggered by hardware? then do nothing. Add to list if not (or add anyway and do the check during AVT Triggering??.
 }
-
 void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
+{
+	//TODO Class patternElement
+	QFile settingsFile(projectionsConfig);
+	if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+	{
+		//showStatus("Unable to open the settings file\n");//redo
+		return;
+	}
+
+	//first clear the existing patterns on window
+
+	//if (dlp_pattern_elements.size() > 0)//redo
+		//dlp_pattern_elements.clear();
+
+	QDir dir = QFileInfo(settingsFile).absoluteDir();
+	QString m_ptnSettingPath = dir.absolutePath();
+	//settings.setValue("PtnSettingPath", m_ptnSettingPath);//redo
+
+	QTextStream in(&settingsFile);
+
+	QString line;
+
+	
+	line = in.readLine();
+
+	while (!in.atEnd())
+	{
+		PatternElement pattern;
+
+		line = in.readLine();
+
+		if (line == "\n" || line == "") //error checking for empty lines
+			continue;
+
+		QStringList list = line.split(",");
+
+		if (list.size() == 0)
+			continue;
+
+		pattern.name = list[0];
+
+		QString pFileStr = m_ptnSettingPath + "/" + list[0];
+
+		QFile patternFile(pFileStr);
+
+		//check if the pattern image file exists
+		if (!patternFile.exists())
+		{
+
+			//sprintf(dispStr, "the pattern image file %s does not exist", pFileStr.toStdString().c_str());//redo
+			return;
+		}
+
+
+		//backward capability for adding from List
+		//where only the image file is given
+
+		pattern.name = pFileStr;
+		pattern.bits = (list.size() >= 2) ? list[1].toInt() : 1;
+		pattern.exposure = list[2].toInt();//pattern.exposure = (list.size() >= 3) ? list[2].toInt() : GetMinExposure(1);//TODO VERIFY THIS!, check GetMinExposure
+		pattern.darkPeriod = (list.size() >= 4) ? list[3].toInt() : 0;
+		pattern.color = (list.size() >= 5) ? PatternElement::Color(list[4].toInt()) : PatternElement::RED;
+		pattern.trigIn = (list.size() >= 6) ? list[5].toInt() : false;
+		pattern.trigOut2 = (list.size() >= 7) ? list[6].toInt() : true;
+
+		dlp_pattern_elements.push_back(pattern);
+		m_patternImageChange = true;
+
+	}
+	
+	if (dlp_pattern_elements.size() > 0)
+	{
+		//waveWindow->updatePatternList(dlp_pattern_elements);//redo graphical update
+		//waveWindow->draw();
+	}
+	settingsFile.close();
+}
+void DLPProjector::loadProjectionSettings2(const QString projectionsConfig)//TODO Review and remove?
 {
 	//TODO LOOK HERE! Load settings for the dlp: understand QT format and send commands to the DLP! with current settings!!
 	//TODO read DLP Config txt convention. later take care of convertion with my own.
@@ -168,4 +261,67 @@ bool DLPProjector::simpleToDLPProjectionsSettings(QString filePathIn, QString fi
 	outputFile.close();
 	f.close();
 	return true;
+}
+
+void DLPProjector::updateLUT()//TODO Call at the end of loadSettingsFile
+{
+	int totalSplashImages = 0;
+	int ret;
+	QTime waitEndTime;
+	char errStr[255];
+
+	if (dlp_pattern_elements.size() <= 0)
+	{
+		//showStatus("Error:No pattern sequence to send");
+		return;
+	}
+
+	LCR_ClearPatLut();
+
+	/*
+	if (!m_videoPatternMode)
+	{
+		if (calculateSplashImageDetails(&totalSplashImages))
+			return;
+	}
+	*/
+
+	for (int i = 0; i < dlp_pattern_elements.size(); i++)
+	{
+		if (LCR_AddToPatLut(i, dlp_pattern_elements[i].exposure, true, dlp_pattern_elements[i].bits, dlp_pattern_elements[i].color, dlp_pattern_elements[i].trigIn, dlp_pattern_elements[i].darkPeriod, dlp_pattern_elements[i].trigOut2, dlp_pattern_elements[i].splashImageIndex, dlp_pattern_elements[i].splashImageBitPos)<0)
+		{
+			sprintf(errStr, "Unable to add pattern number %d to the LUT", i);
+			//showError(QString::fromLocal8Bit(errStr));//redo
+			break;
+		}
+	}
+
+	if (LCR_SendPatLut(hidHandle) < 0)
+	{
+		//showError("Sending pattern LUT failed!");//redo
+		return;
+	}
+
+	/*//redo
+	if (ui->repeat_radioButton->isChecked())
+		ret = LCR_SetPatternConfig(dlp_pattern_elements.size(), 0);
+	else
+		*/
+	ret = LCR_SetPatternConfig(dlp_pattern_elements.size(), dlp_pattern_elements.size(),hidHandle);
+	if (ret < 0)
+	{
+		//showError("Sending pattern LUT size failed!");//redo
+		return;
+	}
+
+	//TODO reviewpatternMemory_radioButton=on the fly mode, but splash imgs are 0!
+	/*if (ui->patternMemory_radioButton->isChecked() && m_patternImageChange)
+	{
+		if (updatePatternMemory(totalSplashImages, false) == 0)
+		{
+			m_patternImageChange = false;
+		}
+	}
+	*/
+
 }

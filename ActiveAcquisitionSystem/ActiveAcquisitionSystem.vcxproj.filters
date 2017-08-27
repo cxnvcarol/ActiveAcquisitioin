@@ -215,6 +215,9 @@
     <ClInclude Include="..\External\Texas\HiresLib\pattern.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\External\Texas\patternelement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ActiveAcquisitionSystem.rc" />

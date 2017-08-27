@@ -231,6 +231,7 @@
     <ClInclude Include="..\External\Texas\HiresLib\flashimage.h" />
     <ClInclude Include="..\External\Texas\HiresLib\pattern.h" />
     <ClInclude Include="..\External\Texas\HiresLib\usb.h" />
+    <ClInclude Include="..\External\Texas\patternelement.h" />
     <ClInclude Include="..\External\Vimba\VmbImageTransformHelper.hpp" />
     <ClInclude Include="AcquisitionDeviceManager.h" />
     <ClInclude Include="AVTCamera.h" />
