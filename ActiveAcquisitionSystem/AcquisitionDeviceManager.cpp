@@ -76,13 +76,13 @@ bool AcquisitionDeviceManager::setDLPStatus(DLPProjector *dlp)
 {
 	uchar HWStatus, SysStatus, MainStatus;
 	BootLoaderStaus BLStatus;
-	int statusLCR = LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus);
+	int statusLCR = LCR_GetStatus(&HWStatus, &SysStatus, &MainStatus,dlp->getHidDevice());
 	if (statusLCR == 0)
 	{
 		dlp->setStatus(statusLCR, HWStatus, SysStatus, MainStatus);
 		return true;
 	}
-	else if (LCR_GetBLStatus(&BLStatus) == 0)
+	else if (LCR_GetBLStatus(&BLStatus, dlp->getHidDevice()) == 0)
 	{
 		//This means the device is in boot mode
 		//Review... do something else?
