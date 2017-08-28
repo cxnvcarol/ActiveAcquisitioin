@@ -127,8 +127,6 @@ int mainAVT(int argc, char *argv[])//SingleAVTCapture
 	
 	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
 
-	//TODO BIG! Support DLP Projector through USB!!
-
 	////WF: 2. Initialize & configure desired projectors (extra screens)
 	//TODO Create as many standardProjectors as configured by parameter. countProjectors (?)
 	//TODO Use upper projector for general case (or not?) -- hopefully not need, but... https://stackoverflow.com/questions/30150115/cant-cast-superclass-to-subclass

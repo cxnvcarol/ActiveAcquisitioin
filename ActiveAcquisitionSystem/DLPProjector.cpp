@@ -23,7 +23,6 @@ DLPProjector::~DLPProjector()
 
 void DLPProjector::playProjectionSequence(int n)
 {
-	//TODO review
 	unsigned int repeat;//TODO review this. How to use it? replace with n param??
 	/*
 	if (ui->repeat_radioButton->isChecked())
@@ -129,7 +128,7 @@ void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 		f.close();
 		if (fields.size() == 1)//"Normal mode" always for the pattern mode
 		{
-			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway?? (certainly yes)
+			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway?? (certainly yes to use as hdmi eventually)
 			if (LCR_SetMode(0x3,hidHandle) < 0)
 			{
 				LOGERR("Unable to switch to pattern from Memory mode");
@@ -151,7 +150,7 @@ void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 	}
 
 }
-//TODO Review: override method to load folder with pictures!... or not?
+//TODO Review: override method to load folder with pictures!... or not? - for memory pattern mode, so the LUT load doesn't take that long!
 
 void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uchar MainStatus)
 {
@@ -294,7 +293,7 @@ void DLPProjector::updateLUT()
 		return;
 	}
 
-	//TODO reviewpatternMemory_radioButton=on the fly mode, but splash imgs are 0!
+	//review. NO SPLASH IMAGES ARE CONSIDERED SO FAR. patternMemory_radioButton=on the fly mode, but splash imgs are 0!
 	/*if (ui->patternMemory_radioButton->isChecked() && m_patternImageChange)
 	{
 		if (updatePatternMemory(totalSplashImages, false) == 0)

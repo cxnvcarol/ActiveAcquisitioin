@@ -31,11 +31,12 @@ struct PatternElement
     bool trigIn;
     bool trigOut2;
     bool selected;
-
+	/*
     QColor getColor()//review... necessary?
     {
         return QColor((color&1)*255, (color>>1&1)*255, (color>>2&1)*255);
     }
+	*/
 
     PatternElement()
     {

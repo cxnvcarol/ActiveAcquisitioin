@@ -65,6 +65,7 @@ int AcquisitionDeviceManager::detectDLPs()
 					dlps.push_back(dlp);
 
 				}
+				else delete dlp;
 			}
 			cur_dev = cur_dev->next;
 			//TODO Review, is that enough??
