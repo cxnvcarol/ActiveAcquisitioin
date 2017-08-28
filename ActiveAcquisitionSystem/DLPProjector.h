@@ -8,18 +8,20 @@ class DLPProjector :
 {
 public:
 	DLPProjector();
-	DLPProjector(hid_device* hid);
+	DLPProjector(hid_device* hid, std::string path);
 	~DLPProjector();
 
 	void playProjectionSequence(int n);
 	void registerCameraObserver(ActiveCamera * cam);
 	void loadProjectionSettings(const QString projectionsConfig);
 
-	void loadProjectionSettings2(const QString projectionsConfig);
+	void loadDLPProjectionsSettings(const QString projectionsConfig);
 
 	void setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uchar MainStatus);
 
 	hid_device* getHidDevice() { return hidHandle; }
+
+	std::string getDev_id() { return pathHid; }
 
 
 	static bool dLPToSimpleProjectionsSettings(QString filePathIn, QString filePathOut);
@@ -34,6 +36,7 @@ private:
 	bool m_patternImageChange;//todo revieew.. for what?
 
 	void updateLUT();
+	std::string pathHid;
 
 };
 

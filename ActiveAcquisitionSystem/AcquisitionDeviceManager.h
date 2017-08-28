@@ -35,15 +35,17 @@ public:
 		
 		return numCams; }
 
-
 	int detectDLPs();
+
+	std::vector<DLPProjector*> getDLPs() {
+		return dlps;
+	};
 private:
 	AVT::VmbAPI::VimbaSystem* vimbaSys;
 	VmbErrorType    err;
 	std::vector<ActiveCamera*> cameraList;
 	std::vector<Projector*> projectors;//TODO... remove this and separate btn screen and dlp projectors?? 
 	std::vector<DLPProjector*> dlps;
-	DLPProjector** dlpsOo;
 	int numCams;
 
 	EDSWrapper* edsWrapper;

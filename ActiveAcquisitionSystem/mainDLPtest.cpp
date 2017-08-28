@@ -19,8 +19,20 @@ void main()
 
 	int count=manager.detectDLPs();
 
-	printf("# of dlps: %d\n\nEnter to close", count);
-
+	printf("# of dlps: %d\n\nEnter to continue", count);
 	cin.get();
+	std::vector<DLPProjector*> ds=manager.getDLPs();
+	for (DLPProjector* d : ds)
+	{
+		d->loadProjectionsFolder("C:\\Users\\naranjo\\Pictures\\dlptest");
+		d->loadProjectionSettings("C:\\Users\\naranjo\\Pictures\\dlptest\\tankTest.txt");
+	}
+	for (DLPProjector* d : ds)
+	{
+		d->playProjectionSequence(1);
+	}
+	printf("\napparently sequence started\nEnter to close");
+	cin.get();
+	
 
 }

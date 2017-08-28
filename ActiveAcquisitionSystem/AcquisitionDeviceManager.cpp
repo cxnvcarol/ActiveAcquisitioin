@@ -55,10 +55,11 @@ int AcquisitionDeviceManager::detectDLPs()
 			printf("  Manufacturer: %ls\n", cur_dev->manufacturer_string);
 			printf("  Product:      %ls\n", cur_dev->product_string);
 			printf("\n");
-			hid_device *hid=hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
+			//hid_device *hid=hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
+			hid_device *hid = hid_open_path(cur_dev->path);
 			if (hid != NULL)
 			{
-				DLPProjector *dlp = new DLPProjector(hid);
+				DLPProjector *dlp = new DLPProjector(hid, cur_dev->path);
 				if (setDLPStatus(dlp))
 				{
 					LOGEXEC("dlp status was ok");
@@ -108,7 +109,7 @@ bool AcquisitionDeviceManager::initializeAPIs()
 
 	//texas dlp
 	USB_Init();
-	detectDLPs();	
+	//detectDLPs();
 
 	return true;
 

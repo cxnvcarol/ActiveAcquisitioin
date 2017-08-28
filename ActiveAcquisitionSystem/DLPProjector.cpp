@@ -9,10 +9,12 @@ DLPProjector::DLPProjector()
 	//call setStatus here?
 }
 
-DLPProjector::DLPProjector(hid_device * hid):m_patternImageChange(false)
+DLPProjector::DLPProjector(hid_device * hid, std::string path):m_patternImageChange(false)
 {
 	hidHandle = hid;
+	pathHid = path;
 }
+
 
 
 DLPProjector::~DLPProjector()
@@ -43,7 +45,7 @@ void DLPProjector::registerCameraObserver(ActiveCamera * cam)
 {
 	//TODO are cameras triggered by hardware? then do nothing. Add to list if not (or add anyway and do the check during AVT Triggering??.
 }
-void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
+void DLPProjector::loadDLPProjectionsSettings(const QString projectionsConfig)
 {
 	QFile settingsFile(projectionsConfig);
 	if (!settingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -116,56 +118,35 @@ void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 	
 	settingsFile.close();
 }
-void DLPProjector::loadProjectionSettings2(const QString projectionsConfig)//TODO Review and remove?
+void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 {
-	//TODO LOOK HERE! Load settings for the dlp: understand QT format and send commands to the DLP! with current settings!!
-	//TODO read DLP Config txt convention. later take care of convertion with my own.
-	//1. Read text file, split each line, save projection in array.
 	QFile f(projectionsConfig);
 	if (f.open(QIODevice::ReadOnly))
 	{
 		QTextStream in(&f);
 		QString line = in.readLine();
 		QStringList  fields = line.split(",");
-		if (fields.size() != 1)//"Normal mode" always for the pattern mode
-		{
-			return;// TODO LOOK HERE... instead of returning, redirect to the "simple settings parser" and configure with default values!
-		}
-		while (!in.atEnd()) {
-			line = in.readLine();
-			fields = line.split(",");
-			if (fields.size() != 7)
-			{
-				LOGERR("ProjectionsSettings file format is not recognized - line: %s", line.toStdString().c_str());
-				throw "ProjectionsSettings file format is not recognized";
-			}
-			//projections.
-			int index = indexOfProjection(fields[0]);//TODO read dlp order here!. Save other settings to load later to the DLP
-			if (index < 0)
-			{
-				throw ("incorrect projection setting in line: " + line);
-			}
-			bool ok;
-			long us = fields[1].toLong(&ok);
-			if (!ok)
-			{
-				throw ("incorrect projection setting in line: " + line);
-			}
-			bool camTrigger = fields[2].toInt(&ok);
-			if (!ok)
-			{
-				throw ("incorrect projection setting in line: " + line);
-			}
-			projectionsSequence.push_back({ index,us,camTrigger });
-		}
 		f.close();
+		if (fields.size() == 1)//"Normal mode" always for the pattern mode
+		{
+			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway?? (certainly yes)
+			updateLUT();
+		}
+		else if (fields.size() == 3)
+		{
+			Projector::loadProjectionSettings(projectionsConfig);//use standar gral load
+
+		}
+		else{
+			LOGERR("Configuration file format not recognized");
+		}
+	}
+	else {
+		LOGERR("Unable to open configuration file for the projector");
 	}
 
-
-	//wf: load images to the dlp and set the sequence play
-	//KEY PARAMETERS: # OF BITS, COLOR OF PROJECTION (if pictures are not grayscale I should convert them.
 }
-//TODO override method to load folder with pictures!
+//TODO Review: override method to load folder with pictures!... or not?
 
 void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uchar MainStatus)
 {
@@ -257,7 +238,7 @@ bool DLPProjector::simpleToDLPProjectionsSettings(QString filePathIn, QString fi
 	return true;
 }
 
-void DLPProjector::updateLUT()//TODO Call at the end of loadSettingsFile
+void DLPProjector::updateLUT()
 {
 	int totalSplashImages = 0;
 	int ret;
@@ -266,7 +247,7 @@ void DLPProjector::updateLUT()//TODO Call at the end of loadSettingsFile
 
 	if (dlp_pattern_elements.size() <= 0)
 	{
-		//showStatus("Error:No pattern sequence to send");
+		LOGERR("No pattern sequence to send");
 		return;
 	}
 
