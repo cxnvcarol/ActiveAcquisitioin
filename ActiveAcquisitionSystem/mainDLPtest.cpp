@@ -24,8 +24,8 @@ void main()
 	std::vector<DLPProjector*> ds=manager.getDLPs();
 	for (DLPProjector* d : ds)
 	{
-		d->loadProjectionsFolder("C:\\Users\\naranjo\\Pictures\\dlptest");
-		d->loadProjectionSettings("C:\\Users\\naranjo\\Pictures\\dlptest\\tankTest.txt");
+		d->loadProjectionsFolder("dlptest");
+		d->loadProjectionSettings("dlptest\\tankTest.txt");
 	}
 	for (DLPProjector* d : ds)
 	{

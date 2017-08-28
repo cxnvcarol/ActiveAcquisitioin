@@ -43,7 +43,6 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 }
 int AcquisitionDeviceManager::detectDLPs()
 {
-	
 	if (dlps.size()==0)
 	{
 		struct hid_device_info* devs= hid_enumerate(MY_VID, MY_PID);
@@ -109,7 +108,6 @@ bool AcquisitionDeviceManager::initializeAPIs()
 
 	//texas dlp
 	USB_Init();
-	//detectDLPs();
 
 	return true;
 

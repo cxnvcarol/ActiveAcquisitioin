@@ -130,6 +130,11 @@ void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
 		if (fields.size() == 1)//"Normal mode" always for the pattern mode
 		{
 			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway?? (certainly yes)
+			if (LCR_SetMode(0x3,hidHandle) < 0)
+			{
+				LOGERR("Unable to switch to pattern from Memory mode");
+				return;
+			}
 			updateLUT();
 		}
 		else if (fields.size() == 3)
