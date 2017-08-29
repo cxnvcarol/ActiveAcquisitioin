@@ -36,10 +36,9 @@ void Projector::registerCameraObserver(ActiveCamera * cam)
 	throw "not implemented";
 }
 
-void Projector::loadProjectionSettings(const QString projectionsConfig)
+void Projector::loadProjectionSettings(const char * projectionsConfig)
 {
 	throw "not implemented";
-
 }
 
 int Projector::loadProjectionsFolder(const QString & folderPath)
@@ -58,7 +57,6 @@ int Projector::loadProjectionsFolder(const QString & folderPath)
 			QString imageFile = fileinfo.absoluteFilePath();
 			QStringList list = imageFile.split(QRegExp("[\\/]+"));
 
-			//imageFile is the image path, just put your load image code here
 			QImageReader reader(imageFile);
 			QImage newImage = reader.read();
 			projections.push_back({ list[list.size() - 1],imageFile,newImage });

@@ -34,7 +34,7 @@ public:
 	int loadProjectionsFolder(const QString &folderPath);
 
 	virtual void registerCameraObserver(ActiveCamera * cam);
-	virtual void loadProjectionSettings(const QString projectionsConfig);//Loading custom settings format so far.//TODO Examine previous DLP Format!
+	virtual void loadProjectionSettings(const char* projectionsConfig);//Loading custom settings format so far.//TODO Examine previous DLP Format!
 
 	virtual void playProjectionSequence(int n);//plays already loaded sequence
 protected:

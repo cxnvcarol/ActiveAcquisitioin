@@ -121,6 +121,9 @@
     <ClCompile Include="mainDLPtest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ParameterParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">
@@ -219,6 +222,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\External\Texas\patternelement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParameterParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -75,6 +75,11 @@ int AcquisitionDeviceManager::detectDLPs()
 	return dlps.size();
 }
 
+void AcquisitionDeviceManager::addStandardProjector(StandardProjector * p)
+{
+	standardProjectors.push_back(p);
+}
+
 bool AcquisitionDeviceManager::setDLPStatus(DLPProjector *dlp)
 {
 	uchar HWStatus, SysStatus, MainStatus;
@@ -130,7 +135,8 @@ void AcquisitionDeviceManager::endAPIs()
 
 void AcquisitionDeviceManager::detectProjectors()
 {
-	//TODO Implement: detect # of screens (each is a projector) + DLPs connected (inf-1)
+	throw "not implemented. Most likely deprecated: use other methods";
+	//TODO Implement: detect # of screens (each is a projector) + DLPs connected (inf-1). Remove?
 }
 std::vector<ActiveCamera*> AcquisitionDeviceManager::getCameras()
 {
@@ -149,13 +155,14 @@ ActiveCamera* AcquisitionDeviceManager::getCamera(int index)
 	throw "NO CAMERA";
 }
 
-std::vector<Projector*> AcquisitionDeviceManager::getProjectors()
-{
-	return projectors;
-}
 Projector* AcquisitionDeviceManager::getProjector(string dev_id)
 {
 	return NULL;
+}
+
+std::vector<StandardProjector*> AcquisitionDeviceManager::getStandardProjectors()
+{
+	return standardProjectors;
 }
 
 vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras()

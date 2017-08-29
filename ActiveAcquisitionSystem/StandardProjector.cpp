@@ -127,7 +127,7 @@ void StandardProjector::registerCameraObserver(ActiveCamera * cam)
 	observerCams.push_back(cam);
 }
 
-void StandardProjector::loadProjectionSettings(const QString projectionsConfig)
+void StandardProjector::loadProjectionSettings(const char* projectionsConfig)
 {
 	//1. Read text file, split each line, save projection in array.
 	QFile f(projectionsConfig);
@@ -209,15 +209,20 @@ void StandardProjector::advanceProjectionSequence()
 }
 
 
-void StandardProjector::showInFullProjection(int selectedScreen)
+void StandardProjector::showInFullProjection()
 {
 	showFullScreen();
-	int screenCount = QApplication::desktop()->screenCount();
-	if (selectedScreen >= screenCount)
-	{
-		printf("\n[WARNING!] Selected screen not available, displaying in screen #%d\n",screenCount-1);
-		selectedScreen = screenCount - 1;
-	}
-	QRect rec = QApplication::desktop()->screenGeometry(selectedScreen);
+	
+	QRect rec = QApplication::desktop()->screenGeometry(screenIndex);
 	setGeometry(rec);
+}
+void StandardProjector::setScreenIndex(int ind) {
+	screenIndex = ind; 
+
+	int screenCount = QApplication::desktop()->screenCount();
+	if (screenIndex >= screenCount)
+	{
+		printf("\n[WARNING!] Selected screen %d not available, switching to screen #%d\n", screenIndex, screenCount - 1);
+		screenIndex = screenCount - 1;
+	}
 }
