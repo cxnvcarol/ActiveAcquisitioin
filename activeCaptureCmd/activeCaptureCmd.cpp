@@ -56,8 +56,8 @@ int mainUseCase1(int argc, char *argv[])
 	mainProjector.showInFullProjection();
 	
 	////WF: 3. Detect all avt cameras, configure with passed configuration file & prepare for capturing
-	//TODO... Should I ignore not configured cameras? (some can be detected in the network but far away from my experimental setup, therefore: unnecessary bandwith load & resources usage).
-	std::vector<ActiveCamera*> cameraList = mng->detectAllCameras();
+	//NOTE: It includes only specified cameras if it's explicit by parameter (some can be detected in the network but far away from my experimental setup, therefore: unnecessary bandwith load & resources usage).
+	std::vector<ActiveCamera*> cameraList = parser.onlyIncludedAvtSpecified ? mng->detectAllCameras(parser.onlyIncludedAvt): mng->detectAllCameras();
 	if (cameraList.size() == 0)
 	{
 		printf("\nno AVT Cameras detected. Enter to continue");

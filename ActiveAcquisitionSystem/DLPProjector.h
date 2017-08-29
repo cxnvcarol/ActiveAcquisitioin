@@ -33,7 +33,7 @@ private:
 
 	std::vector<PatternElement> dlp_pattern_elements;
 
-	bool m_patternImageChange;//todo revieew.. for what?
+	bool m_patternImageChange;//todo review.. for what is being used?
 
 	void updateLUT();
 	std::string pathHid;

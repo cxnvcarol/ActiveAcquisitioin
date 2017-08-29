@@ -20,7 +20,6 @@ public:
 	~AcquisitionDeviceManager();
 	bool initializeAPIs();
 	void endAPIs();
-	void detectProjectors();//TODO Remove?
 	
 	std::vector<ActiveCamera*> getCameras();
 	ActiveCamera* getCamera(std::string dev_id);
@@ -49,7 +48,6 @@ private:
 	AVT::VmbAPI::VimbaSystem* vimbaSys;
 	VmbErrorType    err;
 	std::vector<ActiveCamera*> cameraList;
-	//std::vector<Projector*> projectors;//TODO... remove this and separate btn screen and dlp projectors?? 
 
 	std::vector<StandardProjector*> standardProjectors;
 	std::vector<DLPProjector*> dlps;

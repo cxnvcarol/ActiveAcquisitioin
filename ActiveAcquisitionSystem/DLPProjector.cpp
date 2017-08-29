@@ -23,20 +23,16 @@ DLPProjector::~DLPProjector()
 
 void DLPProjector::playProjectionSequence(int n)
 {
-	unsigned int repeat;//TODO review this. How to use it? replace with n param??
-	/*
-	if (ui->repeat_radioButton->isChecked())
-		repeat = 0;
-	else
-		*/
-		repeat = dlp_pattern_elements.size();
+	//Review... no repeated sequence considered for the DLP!! (param n ignored)
 
-	//TODO LOOK HERE: This could be before in settings load
-	if (LCR_SetPatternConfig(dlp_pattern_elements.size(), repeat,hidHandle)<0)
+	//review. the following commented was already done in the updateLUT() method. No need to call it here again, right?
+	/*
+	if (LCR_SetPatternConfig(dlp_pattern_elements.size(), dlp_pattern_elements.size(),hidHandle)<0)
 	{
 		LOGERR("Error in setting LUT Configuration!");
 		return;
 	}
+	*/
 	if (LCR_PatternDisplay(0x2,hidHandle) < 0)
 		LOGERR("Unable to stat pattern display");
 }
@@ -170,7 +166,7 @@ void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uch
 	bool sequencerRunState = MainStatus & BIT1;
 	bool videoState = !(MainStatus & BIT2);
 	bool extSourceLocked = MainStatus & BIT3;
-	//TODO Complete, query other properties here
+	//TODO Complete: query other properties here and saved them or print them for the user information.
 }
 
 bool DLPProjector::dLPToSimpleProjectionsSettings(QString filePathIn, QString filePathOut)
@@ -266,14 +262,6 @@ void DLPProjector::updateLUT()
 
 	LCR_ClearPatLut();
 
-	/*
-	if (!m_videoPatternMode)
-	{
-		if (calculateSplashImageDetails(&totalSplashImages))
-			return;
-	}
-	*/
-
 	for (int i = 0; i < dlp_pattern_elements.size(); i++)
 	{
 		if (LCR_AddToPatLut(i, dlp_pattern_elements[i].exposure, true, dlp_pattern_elements[i].bits, dlp_pattern_elements[i].color, dlp_pattern_elements[i].trigIn, dlp_pattern_elements[i].darkPeriod, dlp_pattern_elements[i].trigOut2, dlp_pattern_elements[i].splashImageIndex, dlp_pattern_elements[i].splashImageBitPos)<0)
@@ -289,20 +277,14 @@ void DLPProjector::updateLUT()
 		LOGERR("Sending pattern LUT failed!");
 		return;
 	}
-
-	/*//redo
-	if (ui->repeat_radioButton->isChecked())
-		ret = LCR_SetPatternConfig(dlp_pattern_elements.size(), 0);
-	else
-		*/
 	ret = LCR_SetPatternConfig(dlp_pattern_elements.size(), dlp_pattern_elements.size(),hidHandle);
 	if (ret < 0)
 	{
 		LOGERR("Sending pattern LUT size failed!");
 		return;
 	}
-
 	//review. NO SPLASH IMAGES ARE CONSIDERED SO FAR. patternMemory_radioButton=on the fly mode, but splash imgs are 0!
+	//TODO REVIEW IMPORTANT: I think the following considers the "Pre-stored" pattern mode (i.e., to rely on pre-loaded images on the firmware)
 	/*if (ui->patternMemory_radioButton->isChecked() && m_patternImageChange)
 	{
 		if (updatePatternMemory(totalSplashImages, false) == 0)

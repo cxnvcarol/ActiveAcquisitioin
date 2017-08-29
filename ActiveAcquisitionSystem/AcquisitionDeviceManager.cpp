@@ -132,11 +132,6 @@ void AcquisitionDeviceManager::endAPIs()
 
 }
 
-void AcquisitionDeviceManager::detectProjectors()
-{
-	throw "not implemented. Most likely deprecated: use other methods";
-	//TODO Implement: detect # of screens (each is a projector) + DLPs connected (inf-1). Remove?
-}
 std::vector<ActiveCamera*> AcquisitionDeviceManager::getCameras()
 {
 	return cameraList;
@@ -225,10 +220,10 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras(std::vector<string
 #endif // AVT_DEBUG
 			for (int i = 0;i < count; i++)
 			{
-				//TODO Review it works fine.
+				//TODO Review if it works fine.
 				AVTCamera* avt = new AVTCamera(cameras[i]);
 				string camID=avt->getDevId();
-				//if (onlyInclude.find)
+
 				auto it = find_if(onlyInclude.begin(), onlyInclude.end(), [&camID](string obj) {return obj == camID;});
 
 				if (it != onlyInclude.end())//i.e. found

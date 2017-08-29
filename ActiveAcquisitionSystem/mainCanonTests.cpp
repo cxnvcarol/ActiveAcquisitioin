@@ -64,11 +64,11 @@ void mainCanonTests()
 		printf("\ngetTV: %d with error %ld\n\n", tv, e);
 
 		printf("\nclosesession:%d\n\n", EdsCloseSession(*c));
-		//kEdsPropID_SaveTo///TODO, use this?
+		//kEdsPropID_SaveTo///TODO, review use this property?
 		/*
 		CanonCamera* canon = new CanonCamera(c);
 		//gral wf: identify, load settings, set outputfolder, takesinglepicture, (callback: savepicture)
-		canon->setOutputFolder("C:\\Users\\naranjo\\Pictures\\canonTest");//TODO Test with fixed path, remove later.
+		canon->setOutputFolder("C:\\Users\\naranjo\\Pictures\\canonTest");//Test with fixed path, remove later.
 		//canon->takeSinglePicture();
 
 		*/
