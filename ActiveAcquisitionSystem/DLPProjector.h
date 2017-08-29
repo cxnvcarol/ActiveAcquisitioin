@@ -13,7 +13,7 @@ public:
 
 	void playProjectionSequence(int n);
 	void registerCameraObserver(ActiveCamera * cam);
-	void loadProjectionSettings(const QString projectionsConfig);
+	void loadProjectionSettings(const char* projectionsConfig);
 
 	void loadDLPProjectionsSettings(const QString projectionsConfig);
 

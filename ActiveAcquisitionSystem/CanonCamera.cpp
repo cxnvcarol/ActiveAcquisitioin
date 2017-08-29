@@ -161,7 +161,7 @@ EdsError CanonCamera::downloadImage(EdsDirectoryItemRef directoryItem)
 	if (err == EDS_ERR_OK)
 	{
 		//char* filename = dirItemInfo.szFileName;
-		std::string savepath = outputFolder + "/" + QString("%1").arg(indexPicture, 2, 10, QChar('0')).toStdString() + ".png";//this is 2 digits for the picture name in base 10
+		std::string savepath = outputFolder + "/" + QString("%1").arg(indexPicture, 3, 10, QChar('0')).toStdString() + ".png";//this is 2 digits for the picture name in base 10
 		LOGEXEC("saved at: %s", savepath.c_str());
 		err = EdsCreateFileStream(dirItemInfo.szFileName,
 			kEdsFileCreateDisposition_CreateAlways,

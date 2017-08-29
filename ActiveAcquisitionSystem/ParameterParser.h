@@ -17,6 +17,10 @@ public:
 	string outputFolder = ".";
 	vector<string> cameraConfigXml;//Review, should I limit the # cameras?
 	vector<string>  cameraConfigId;
+	vector<string> onlyIncludedAvt;
+	bool onlyIncludedAvtSpecified = false;
+
+
 	vector<string> projectionsFolder;//Path to the folder with pngs to be projected. Unlimited # of projectors(gral case) but in practice we have max 2 projs!! (projector + mask)
 	vector<string> projectionsConfig;//text files with configuration of time x each projection.
 	vector<int> projectedScreen;// = { 1,2 };//screen identfier, 2nd and 3rd screen by default.
@@ -26,7 +30,8 @@ private:
 		DEFAULT,
 		CAMERA_CONFIGS,
 		PROJECTION_CONFIGS,
-		OUTPUT_FOLDER
+		OUTPUT_FOLDER,
+		ONLY_INCLUDE_AVT
 	};
 
 	

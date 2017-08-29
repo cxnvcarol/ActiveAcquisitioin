@@ -30,7 +30,10 @@ public:
 	std::vector<StandardProjector*> getStandardProjectors();
 
 	std::vector<AVTCamera*> detectAVTCameras();
+	std::vector<AVTCamera*> detectAVTCameras(std::vector<string> onlyInclude);
+	std::vector<CanonCamera*> detectCanonCameras();
 	std::vector<ActiveCamera*> detectAllCameras();
+	std::vector<ActiveCamera*> detectAllCameras(std::vector<string> onlyInclude);
 	static bool testValidCameraPtr(AVT::VmbAPI::CameraPtr sh);
 
 	int getCountCameras() { return numCams; }

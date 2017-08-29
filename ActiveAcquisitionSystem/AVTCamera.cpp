@@ -202,7 +202,7 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 				printf("error converting image %d\n", error);
 				return error;
 			}
-			string pName = outputFolder + "/" + QString("%1").arg(indexPicture, 2,10, QChar('0')).toStdString() + ".png";//this is 2 digits for the picture name in base 10
+			string pName = outputFolder + "/" + QString("%1").arg(indexPicture, 3,10, QChar('0')).toStdString() + ".png";//this is 2 digits for the picture name in base 10
 			
 			convertedImage.save(QString(pName.c_str()), "PNG");
 			indexPicture++;

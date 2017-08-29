@@ -124,6 +124,9 @@
     <ClCompile Include="ParameterParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mainScreenProjectorTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="ActiveAcquisitionSystem.h">

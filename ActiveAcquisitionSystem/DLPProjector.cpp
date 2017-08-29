@@ -31,6 +31,7 @@ void DLPProjector::playProjectionSequence(int n)
 		*/
 		repeat = dlp_pattern_elements.size();
 
+	//TODO LOOK HERE: This could be before in settings load
 	if (LCR_SetPatternConfig(dlp_pattern_elements.size(), repeat,hidHandle)<0)
 	{
 		LOGERR("Error in setting LUT Configuration!");
@@ -68,12 +69,14 @@ void DLPProjector::loadDLPProjectionsSettings(const QString projectionsConfig)
 
 	
 	line = in.readLine();
+	while (line.startsWith("#")) { line = in.readLine(); }
 
 	while (!in.atEnd())
 	{
 		PatternElement pattern;
 
 		line = in.readLine();
+		if (line.startsWith("#")) { continue; }
 
 		if (line == "\n" || line == "") //error checking for empty lines
 			continue;
@@ -117,19 +120,20 @@ void DLPProjector::loadDLPProjectionsSettings(const QString projectionsConfig)
 	
 	settingsFile.close();
 }
-void DLPProjector::loadProjectionSettings(const QString projectionsConfig)
+void DLPProjector::loadProjectionSettings(const char* projectionsConfig)
 {
 	QFile f(projectionsConfig);
 	if (f.open(QIODevice::ReadOnly))
 	{
 		QTextStream in(&f);
 		QString line = in.readLine();
+		while (line.startsWith("#")) { line = in.readLine(); }
 		QStringList  fields = line.split(",");
 		f.close();
 		if (fields.size() == 1)//"Normal mode" always for the pattern mode
 		{
 			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway?? (certainly yes to use as hdmi eventually)
-			if (LCR_SetMode(0x3,hidHandle) < 0)
+			if (LCR_SetMode(0x3,hidHandle) < 0)//=set on-the-fly mode
 			{
 				LOGERR("Unable to switch to pattern from Memory mode");
 				return;
@@ -183,6 +187,7 @@ bool DLPProjector::dLPToSimpleProjectionsSettings(QString filePathIn, QString fi
 	{
 		QTextStream in(&f);
 		QString line= in.readLine();
+		while (line.startsWith("#")) { line = in.readLine(); }
 		QStringList  fields = line.split(",");
 		if (fields.size() != 1)//"Normal mode" always for the pattern mode
 		{
@@ -190,10 +195,12 @@ bool DLPProjector::dLPToSimpleProjectionsSettings(QString filePathIn, QString fi
 		}
 		while (!in.atEnd()) {
 			line = in.readLine();
+			if (line.startsWith("#")) {	continue;}
 			fields = line.split(",");
 			if (fields.size() != 7)
 			{
-				return false;
+				LOGERR("expecting 7 comma-separated values");
+				continue;
 			}
 			out << fields[0] << ",";
 			out << fields[2] << ",";
@@ -223,10 +230,12 @@ bool DLPProjector::simpleToDLPProjectionsSettings(QString filePathIn, QString fi
 		
 		while (!in.atEnd()) {
 			line = in.readLine();
+			if (line.startsWith("#")) { continue; }
 			QStringList  fields = line.split(",");
 			if (fields.size() != 3)
 			{
-				return false;
+				LOGERR("expecting 3 comma-separated values");
+				continue;
 			}
 			out << fields[0] << ",";
 			out << "8" << ",";

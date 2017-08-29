@@ -49,7 +49,7 @@
 ****************************************************************************/
 
 #include "StandardProjector.h"
-
+using namespace std;
 
 StandardProjector::StandardProjector()
 	: imageLabel(new QLabel)
@@ -129,6 +129,11 @@ void StandardProjector::registerCameraObserver(ActiveCamera * cam)
 
 void StandardProjector::loadProjectionSettings(const char* projectionsConfig)
 {
+	if (projections.empty())
+	{
+		LOGERR("No projections folder loaded yet");
+		return;
+	}
 	//1. Read text file, split each line, save projection in array.
 	QFile f(projectionsConfig);
 	if (f.open(QIODevice::ReadOnly))
@@ -137,31 +142,37 @@ void StandardProjector::loadProjectionSettings(const char* projectionsConfig)
 		QString line;
 		while (!in.atEnd()) {
 			line = in.readLine();
+			if (line.startsWith("#")) { continue; }
+			printf("%s\n",line.toStdString().c_str());
 			QStringList  fields = line.split(",");
 			if (fields.size() != 3)
 			{
-				throw "incorrect number of arguments for the sequence projection";
+				LOGERR("incorrect number of arguments for the sequence projection");
+				continue;
 			}
 			//projections.
 			int index = indexOfProjection(fields[0]);
 			if (index < 0)
 			{
-				throw ("incorrect projection setting in line: " + line);
+				LOGERR ("incorrect projection setting in line: %s", line);
+				continue;
+
 			}
-			bool ok;
+			bool ok=true;
 			long us = fields[1].toLong(&ok);
+			
 			if (!ok)
 			{
-				throw ("incorrect projection setting in line: " + line);
+				LOGERR("incorrect projection setting in line: %s", line);
+				continue;
 			}
 			bool camTrigger = fields[2].toInt(&ok);
 			if (!ok)
 			{
-				throw ("incorrect projection setting in line: " + line);
+				LOGERR("incorrect projection setting in line: %s", line);
+				continue;
 			}
 			projectionsSequence.push_back({ index,us,camTrigger });
-
-
 		}
 		f.close();
 	}
@@ -184,8 +195,10 @@ void StandardProjector::advanceProjectionSequence()
 	}
 	Projection projection = projectionsSequence[currentProjectionIndex];
 	
-	LOGEXEC("setting the next projection..%d", currentProjectionIndex);
-	setImage(projections[projectionsSequence[currentProjectionIndex].ProjectedImgIndex].image);
+	
+	int idx = projectionsSequence[currentProjectionIndex].ProjectedImgIndex;
+	LOGEXEC("setting the next projection..%d, index %d", currentProjectionIndex,idx);
+	setImage(projections[idx].image);
 
 	bool trigger = projection.triggerCam;
 	if (trigger)

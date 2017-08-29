@@ -1,7 +1,7 @@
 #include "ParameterParser.h"
 #include "debugMacros.h"
 #include <qdir.h>
-
+#include <qstring.h>
 
 
 static void printHelp()
@@ -58,6 +58,10 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 			{
 				paramCase = ParamCase::OUTPUT_FOLDER;
 			}
+			else if (!_strnicmp("-i", argv[i], 2))
+			{
+				paramCase = ParamCase::ONLY_INCLUDE_AVT;
+			}
 			countParamCase = 0;
 			continue;
 		}
@@ -103,6 +107,19 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 			if (!QDir(outputFolder.c_str()).exists())
 			{
 				QDir().mkdir(outputFolder.c_str());
+			}
+
+			break;
+		case ParamCase::ONLY_INCLUDE_AVT:
+			QStringList list=QString(param.c_str()).split(",");
+			for (QString avtID : list)
+			{
+				onlyIncludedAvt.push_back(avtID.toStdString());
+			}
+
+			if (!onlyIncludedAvt.empty())
+			{
+				onlyIncludedAvtSpecified = true;
 			}
 
 			break;

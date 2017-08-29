@@ -12,8 +12,7 @@ using namespace AVT::VmbAPI;
 using namespace std;
 
 AcquisitionDeviceManager::AcquisitionDeviceManager()
-{
-	
+{	
 	initializeAPIs();
 }
 AcquisitionDeviceManager::~AcquisitionDeviceManager()
@@ -173,17 +172,79 @@ vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras()
 		cameraList.push_back(c);
 	}	
 	
-	int canonsCount = edsWrapper->getCameraCount();
-	
-	for (int i = 0;i < canonsCount;i++)
+	for (CanonCamera* c : detectCanonCameras())
 	{
-		//CanonCamera* canon=new CanonCamera(edsWrapper->getCamera(i));
-		CanonCamera canon;
-		canon.setEdsCameraRef(edsWrapper->getCamera(i));
-		cameraList.push_back(&canon);
+		cameraList.push_back(c);
 	}
 	numCams = cameraList.size();
 	return cameraList;
+}
+
+std::vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras(std::vector<string> onlyInclude)
+{
+	if (onlyInclude.empty())
+	{
+		return detectAllCameras();
+	}
+	else {
+		//review: is this the most efficient?	
+		for (AVTCamera* c : detectAVTCameras(onlyInclude))
+		{
+			cameraList.push_back(c);
+		}
+
+		for (CanonCamera* c : detectCanonCameras())
+		{
+			cameraList.push_back(c);
+		}
+		numCams = cameraList.size();
+		return cameraList;
+	}
+}
+
+vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras(std::vector<string> onlyInclude)
+{
+	if (onlyInclude.empty())
+	{
+		return detectAVTCameras();
+	}
+	AVT::VmbAPI::CameraPtrVector cameras;
+	vector<AVTCamera*> avtList;
+	int count = 0;
+	if (!vimbaError)
+	{
+		vimbaSys->GetCameras(cameras);
+		count = cameras.size();
+		LOGEXEC("Num total AVT cameras: %d\n", count);
+
+		CameraPtr sh;
+		if (count > 0)
+		{
+#ifdef AVT_DEBUG
+			testValidCameraPtr(cameras[0]);
+#endif // AVT_DEBUG
+			for (int i = 0;i < count; i++)
+			{
+				//TODO Review it works fine.
+				AVTCamera* avt = new AVTCamera(cameras[i]);
+				string camID=avt->getDevId();
+				//if (onlyInclude.find)
+				auto it = find_if(onlyInclude.begin(), onlyInclude.end(), [&camID](string obj) {return obj == camID;});
+
+				if (it != onlyInclude.end())//i.e. found
+				{
+					avt->getDevId();
+					avtList.push_back(avt);
+				}
+				else {
+					delete avt;
+				}
+
+				
+			}
+		}
+	}
+	return avtList;
 }
 
 vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
@@ -211,6 +272,20 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras()
 		}		
 	}
 	return avtList;
+}
+
+std::vector<CanonCamera*> AcquisitionDeviceManager::detectCanonCameras()
+{
+	std::vector<CanonCamera*> canons;
+	int canonsCount = edsWrapper->getCameraCount();
+
+	for (int i = 0;i < canonsCount;i++)
+	{
+		CanonCamera canon;
+		canon.setEdsCameraRef(edsWrapper->getCamera(i));
+		canons.push_back(&canon);
+	}
+	return canons;
 }
 
 bool AcquisitionDeviceManager::testValidCameraPtr(CameraPtr sh)
