@@ -107,10 +107,6 @@ int mainUseCase1(int argc, char *argv[])
 		mainProjector.playProjectionSequence(1);		
 	}
 	
-	//TODO safe termination of program:
-	//CMD CLOSE:http://www.cplusplus.com/reference/cstdlib/atexit/
-	//QT Window close:https://stackoverflow.com/questions/8165487/how-to-do-cleaning-up-on-exit-in-qt
-	//int result = 0;
 	printf("\n\njust before executing!\n\n");
 	int result = a.exec();	
 	

@@ -91,6 +91,9 @@ private:
 	QTimer  *projectionTimer;
 	int currentProjectionIndex;
 	int screenIndex;
+
+protected:
+	void keyPressEvent(QKeyEvent *ev);
 };
 
 #endif

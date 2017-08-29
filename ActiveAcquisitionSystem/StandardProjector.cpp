@@ -108,6 +108,15 @@ void StandardProjector::setImage(const QImage &newImage)
 	LOGEXEC("just painted");
 }
 
+void StandardProjector::keyPressEvent(QKeyEvent * ev)
+{
+	if (ev->key() == Qt::Key_Escape)
+	{
+		close();
+	}
+
+}
+
 void StandardProjector::playProjectionSequence(int n)
 {
 	if (!playingSequence)
@@ -154,7 +163,7 @@ void StandardProjector::loadProjectionSettings(const char* projectionsConfig)
 			int index = indexOfProjection(fields[0]);
 			if (index < 0)
 			{
-				LOGERR ("incorrect projection setting in line: %s", line);
+				LOGERR ("incorrect projection setting in line: %s", line.toStdString().c_str());
 				continue;
 
 			}
@@ -163,13 +172,13 @@ void StandardProjector::loadProjectionSettings(const char* projectionsConfig)
 			
 			if (!ok)
 			{
-				LOGERR("incorrect projection setting in line: %s", line);
+				LOGERR("incorrect projection setting in line: %s", line.toStdString().c_str());
 				continue;
 			}
 			bool camTrigger = fields[2].toInt(&ok);
 			if (!ok)
 			{
-				LOGERR("incorrect projection setting in line: %s", line);
+				LOGERR("incorrect projection setting in line: %s", line.toStdString().c_str());
 				continue;
 			}
 			projectionsSequence.push_back({ index,us,camTrigger });

@@ -11,10 +11,13 @@ QApplication* a;
 ParameterParser parser;
 AcquisitionDeviceManager *mng;
 
+bool mngDeleted=false;
+
 void atExitFn()
 {
-	if (mng)
+	if (!mngDeleted)
 	{
+		mngDeleted = true;
 		printf("deleting devManager\n\n");
 		delete mng;
 	}
@@ -48,10 +51,6 @@ int main(int argc, char *argv[])
 		p->playProjectionSequence(1);
 	}
 
-	//TODO safe termination of program:
-	//CMD CLOSE:http://www.cplusplus.com/reference/cstdlib/atexit/
-	//QT Window close:https://stackoverflow.com/questions/8165487/how-to-do-cleaning-up-on-exit-in-qt
-	//int result = 0;
 	printf("\n\njust before executing!\n\n");
 	int result = a->exec();
 
@@ -61,5 +60,4 @@ int main(int argc, char *argv[])
 	cin.get();
 	
 	return result;
-
 }
