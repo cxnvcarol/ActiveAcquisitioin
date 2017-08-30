@@ -122,6 +122,8 @@ bool AVTCamera::loadSettings(std::string configXml)
 
 	//  re-load saved settings from file
 	err = pCam->LoadCameraSettings(configXml, &settingsStruct);
+
+	//TODO LOOK HERE! Check sw or hw-sync mode and force features here!
 	if (VmbErrorSuccess != err)
 	{
 		ss.str("");
@@ -308,9 +310,63 @@ VmbErrorType AVTCamera::prepareCapture(void)
 		LOGEXEC("not opening");
 		return error;
 	}
-
-
 	FeaturePtr pFeature;
+	if (VmbErrorSuccess == pCam->GetFeatureByName("AcquisitionMode", pFeature))
+	{
+		if (VmbErrorSuccess != pFeature->SetValue("SingleFrame"))
+		{
+			LOGERR("unable to set SingleFrame mode for the avt camera %s", dev_id);
+		}
+	}
+
+	
+	//TODO LOOK HERE! Force the triggersource, review if working fine. (i.e, triggerselector, triggermode, triggersource... which is the right order??
+	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSelector", pFeature))
+	{
+		if (VmbErrorSuccess != pFeature->SetValue("FrameStart"))
+		{
+			LOGERR("unable to set triggerselector to framestart for the avt camera %s", dev_id.c_str());
+		}
+	}
+
+	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerMode", pFeature))
+	{
+		if (VmbErrorSuccess != pFeature->SetValue("Off"))
+		{
+			LOGERR("unable to set triggermode off for the avt camera %s", dev_id.c_str());
+		}
+	}
+	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSelector", pFeature))
+	{
+		if (VmbErrorSuccess != pFeature->SetValue("AcquisitionStart"))
+		{
+			LOGERR("unable to set triggerselector to acquisitionstart for the avt camera %s", dev_id.c_str());
+		}
+	}
+
+	if (syncmode == SyncMode::SOFTWARE_MODE)
+	{
+		if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSource", pFeature))
+		{
+			if (VmbErrorSuccess != pFeature->SetValue("Software"))
+			{
+				LOGERR("unable to set triggersource to Software for the avt camera %s", dev_id.c_str());
+			}
+		}
+	}
+	else if (syncmode == SyncMode::HARDWARE_MODE)
+	{
+		if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSource", pFeature))
+		{
+			if (VmbErrorSuccess != pFeature->SetValue("Line1"))
+			{
+				LOGERR("unable to set triggersource to Line1 for the avt camera %s", dev_id.c_str());
+			}
+		}
+	}
+	//end looking here.
+
+
 	VmbInt64_t nPayload = 0;
 	vector <FramePtr> frames;
 	error = pCam->GetFeatureByName("PayloadSize", pFeature);

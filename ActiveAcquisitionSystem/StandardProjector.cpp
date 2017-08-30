@@ -128,7 +128,7 @@ void StandardProjector::playProjectionSequence(int n)
 		}
 		playingSequence = true;		
 		currentProjectionIndex = 0;
-		advanceProjectionSequence();//first call triggers the following timed projections.
+		advanceProjectionSequence();//first call starts the following timed projections.
 	}
 }
 void StandardProjector::registerCameraObserver(ActiveCamera * cam)
@@ -225,9 +225,10 @@ void StandardProjector::advanceProjectionSequence()
 		}
 	}
 
-	long tms = projectionsSequence[currentProjectionIndex].usTime / 1000;
-	projectionTimer->start(tms);
+	long tms = projectionsSequence[currentProjectionIndex].usTime / 1000;//precision is at best in ms for StandardProjectors.
 	currentProjectionIndex++;
+	projectionTimer->start(tms);//timer is attached to this method again.
+	
 }
 
 

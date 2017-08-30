@@ -62,68 +62,91 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 			{
 				paramCase = ParamCase::ONLY_INCLUDE_AVT;
 			}
+			else if (!_strnicmp("-s", argv[i], 2))
+			{
+				paramCase = ParamCase::SYNC_MODE;
+			}
 			countParamCase = 0;
 			continue;
 		}
 		string param(argv[i]);
 
 		switch (paramCase)
-		{
-		case ParamCase::DEFAULT:
-			printf("Wrong arguments");
-			printHelp();
-			break;
-
-
-		case ParamCase::CAMERA_CONFIGS:
-			switch (countParamCase)
+		{		
+			case ParamCase::SYNC_MODE:
 			{
-			case 0:
-				cameraConfigXml.push_back(param);
-			case 1:
-				cameraConfigId.push_back(param);
-			}
-			break;
-		case ParamCase::PROJECTION_CONFIGS:
-			switch (countParamCase)
-			{
-			case 0:
-				//projectionsFolder[countProjectors - 1] = param;
-				projectionsFolder.push_back(param);
+				if (param.find("h") != std::string::npos || param.find("H") != std::string::npos || param == "1")
+				{
+					hwSyncMode = true;
+				}
+				else {
+					hwSyncMode = false;//default mode: software sync
+				}
 				break;
-			case 1:
-				//projectionsConfig[countProjectors - 1] = param;
-				projectionsConfig.push_back(param);
+			}
+
+			case ParamCase::CAMERA_CONFIGS:
+			{
+				switch (countParamCase)
+				{
+				case 0:
+					cameraConfigXml.push_back(param);
+				case 1:
+					cameraConfigId.push_back(param);
+				}
 				break;
-			case 2:
-				int screenIndex = (atoi(argv[i]));
-				//projectedScreen[countProjectors - 1] = screenIndex;
-				projectedScreen.push_back(screenIndex);
 			}
-			break;
-		case ParamCase::OUTPUT_FOLDER:
-			outputFolder = param;
-
-			if (!QDir(outputFolder.c_str()).exists())
+			case ParamCase::PROJECTION_CONFIGS:
 			{
-				QDir().mkdir(outputFolder.c_str());
+				switch (countParamCase)
+				{
+				case 0:
+					//projectionsFolder[countProjectors - 1] = param;
+					projectionsFolder.push_back(param);
+					break;
+				case 1:
+					//projectionsConfig[countProjectors - 1] = param;
+					projectionsConfig.push_back(param);
+					break;
+				case 2:
+					int screenIndex = (atoi(argv[i]));
+					//projectedScreen[countProjectors - 1] = screenIndex;
+					projectedScreen.push_back(screenIndex);
+				}
+				break;
 			}
-
-			break;
-		case ParamCase::ONLY_INCLUDE_AVT:
-			QStringList list=QString(param.c_str()).split(",");
-			for (QString avtID : list)
+			case ParamCase::OUTPUT_FOLDER:
 			{
-				onlyIncludedAvt.push_back(avtID.toStdString());
-			}
+				outputFolder = param;
 
-			if (!onlyIncludedAvt.empty())
+				if (!QDir(outputFolder.c_str()).exists())
+				{
+					QDir().mkdir(outputFolder.c_str());
+				}
+
+				break;
+			}
+			case ParamCase::ONLY_INCLUDE_AVT:
 			{
-				onlyIncludedAvtSpecified = true;
+				QStringList list = QString(param.c_str()).split(",");
+				for (QString avtID : list)
+				{
+					onlyIncludedAvt.push_back(avtID.toStdString());
+				}
+
+				if (!onlyIncludedAvt.empty())
+				{
+					onlyIncludedAvtSpecified = true;
+				}
+
+				break;
 			}
-
-			break;
-
+			case ParamCase::DEFAULT:
+			{
+				printf("Wrong arguments");
+				printHelp();
+				break;
+			}		
 		}
 		countParamCase++;
 

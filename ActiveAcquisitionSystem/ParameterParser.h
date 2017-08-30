@@ -10,7 +10,7 @@ public:
 	void parseParameters(int argc, char *argv[]);
 
 
-	//Review better practice: encapsulate members by making them private and provide getters and setters.
+	//TODO Review better practice: encapsulate members by making them private and provide getters and setters.
 	int countProjectors;//TODO Review.. separate count btn standard and dlp projectors??
 	int countCameraConfigs;
 	
@@ -19,6 +19,7 @@ public:
 	vector<string>  cameraConfigId;
 	vector<string> onlyIncludedAvt;
 	bool onlyIncludedAvtSpecified = false;
+	bool hwSyncMode = false;//software synchronization by default.
 
 
 	vector<string> projectionsFolder;//Path to the folder with pngs to be projected. Unlimited # of projectors(gral case) but in practice we have max 2 projs!! (projector + mask)
@@ -31,7 +32,8 @@ private:
 		CAMERA_CONFIGS,
 		PROJECTION_CONFIGS,
 		OUTPUT_FOLDER,
-		ONLY_INCLUDE_AVT
+		ONLY_INCLUDE_AVT,
+		SYNC_MODE
 	};
 
 	
