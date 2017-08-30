@@ -53,7 +53,6 @@
 
 #include <QMainWindow>
 #include "Projector.h"
-#include "Camera.h"
 
 class QAction;
 class QLabel;

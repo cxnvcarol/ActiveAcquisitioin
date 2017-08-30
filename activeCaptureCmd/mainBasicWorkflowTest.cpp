@@ -1,11 +1,11 @@
-// activeCaptureCmd.cpp : Defines the entry point for the console application.
+//Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
 #include <QtWidgets/QApplication>
 #include "StandardProjector.h"
 #include "AcquisitionDeviceManager.h"
-#include "activeCaptureCmd.h"
+//#include "activeCaptureCmd.h"
 #include "ParameterParser.h"
 
 using namespace std;
@@ -34,7 +34,7 @@ WORKFLOW:
 3. Run synchronized acquisition: When
 
 */
-int mainUseCase1(int argc, char *argv[])
+int mainUseCase1(int argc, char *argv[])//test with one standard projector and mixed multiple cameras.
 {
 	QApplication a(argc, argv);
 

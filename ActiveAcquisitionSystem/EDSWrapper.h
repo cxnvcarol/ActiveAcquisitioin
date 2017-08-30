@@ -4,7 +4,7 @@ EDS Canon DLSR cameras
 #include "EDSDK\EDSDK.h"
 #include <map>
 
-#include "Camera.h"
+//#include "Camera.h"
 using namespace std;
 class EDSWrapper
 {

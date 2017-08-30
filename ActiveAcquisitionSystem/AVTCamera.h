@@ -2,7 +2,7 @@
 
 #define FRAME_BUFFER_COUNT 5
 
-#include "Camera.h"
+#include "ActiveCamera.h"
 #include "VimbaCPP/Include/VimbaCPP.h"
 #include <qimage.h>
 #include "Projector.h"

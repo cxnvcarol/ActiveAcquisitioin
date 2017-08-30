@@ -1,6 +1,6 @@
 #pragma once
 #include "VimbaCPP/Include/VimbaCPP.h"
-#include "Camera.h"
+#include "ActiveCamera.h"
 #include "AVTCamera.h"
 //#include "Projector.h"
 #include "StandardProjector.h"

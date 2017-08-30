@@ -55,9 +55,6 @@
     <ClCompile Include="AVTCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EDSWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,16 +76,10 @@
     <ClCompile Include="AcquisitionDeviceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\activeCaptureCmd\activeCaptureCmd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FrameObserverAVT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CanonCamera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="mainCanonTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DLPProjector.cpp">
@@ -124,7 +115,19 @@
     <ClCompile Include="ParameterParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mainScreenProjectorTests.cpp">
+    <ClCompile Include="..\activeCaptureCmd\mainBasicWorkflowTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mainCanonTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mainScreenProjectorTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ActiveCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -150,9 +153,6 @@
       <Filter>Generated Files</Filter>
     </ClInclude>
     <ClInclude Include="AVTCamera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EDSWrapper.h">
@@ -228,6 +228,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ParameterParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ActiveCamera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

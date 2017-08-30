@@ -1,5 +1,5 @@
 #pragma once
-#include "Camera.h"
+#include "ActiveCamera.h"
 #include "EDSDK\EDSDK.h"
 
 class CanonCamera :

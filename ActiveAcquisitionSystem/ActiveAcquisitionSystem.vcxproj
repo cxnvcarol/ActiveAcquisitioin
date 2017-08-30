@@ -129,7 +129,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\activeCaptureCmd\activeCaptureCmd.cpp" />
+    <ClCompile Include="..\activeCaptureCmd\mainBasicWorkflowTest.cpp" />
     <ClCompile Include="..\External\Texas\HiresLib\API.c" />
     <ClCompile Include="..\External\Texas\HiresLib\batchfile.c" />
     <ClCompile Include="..\External\Texas\HiresLib\BMPParser.c" />
@@ -141,7 +141,7 @@
     <ClCompile Include="AcquisitionDeviceManager.cpp" />
     <ClCompile Include="ActiveAcquisitionSystem.cpp" />
     <ClCompile Include="AVTCamera.cpp" />
-    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ActiveCamera.cpp" />
     <ClCompile Include="CanonCamera.cpp" />
     <ClCompile Include="DLPProjector.cpp" />
     <ClCompile Include="EDSWrapper.cpp" />
@@ -172,9 +172,10 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="mainCanonTests.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="mainCanonTest.cpp" />
     <ClCompile Include="mainDLPtest.cpp" />
-    <ClCompile Include="mainScreenProjectorTests.cpp" />
+    <ClCompile Include="mainScreenProjectorTest.cpp" />
     <ClCompile Include="ParameterParser.cpp" />
     <ClCompile Include="Projector.cpp" />
     <ClCompile Include="StandardProjector.cpp" />
@@ -238,7 +239,7 @@
     <ClInclude Include="..\External\Vimba\VmbImageTransformHelper.hpp" />
     <ClInclude Include="AcquisitionDeviceManager.h" />
     <ClInclude Include="AVTCamera.h" />
-    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ActiveCamera.h" />
     <ClInclude Include="CanonCamera.h" />
     <ClInclude Include="debugMacros.h" />
     <ClInclude Include="DLPProjector.h" />

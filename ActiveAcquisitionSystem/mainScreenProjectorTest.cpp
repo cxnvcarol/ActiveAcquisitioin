@@ -23,7 +23,7 @@ void atExitFn()
 	}
 }
 
-int main(int argc, char *argv[])
+int mainStdProjector(int argc, char *argv[])
 {
 	atexit(atExitFn);
 	a= new QApplication(argc, argv);

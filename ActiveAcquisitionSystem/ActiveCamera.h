@@ -2,7 +2,7 @@
 #include <string>
 #include "debugMacros.h"
 
-struct CameraSettings {
+struct CameraSettings {//review... delete? it was meant to be used in the most general case, but the settings files are used directly for the avt, while the canons are set manually.
 
 };
 

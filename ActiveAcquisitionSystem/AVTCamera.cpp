@@ -315,7 +315,7 @@ VmbErrorType AVTCamera::prepareCapture(void)
 	{
 		if (VmbErrorSuccess != pFeature->SetValue("SingleFrame"))
 		{
-			LOGERR("unable to set SingleFrame mode for the avt camera %s", dev_id);
+			LOGERR("unable to set SingleFrame mode for the avt camera %s", dev_id.c_str());
 		}
 	}
 

@@ -3,7 +3,7 @@
 #include <vector>
 #include <QtWidgets>
 #include <QImage>
-#include "Camera.h"
+#include "ActiveCamera.h"
 #include "debugMacros.h"
 
 

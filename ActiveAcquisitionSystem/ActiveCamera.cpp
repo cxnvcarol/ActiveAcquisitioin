@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "ActiveCamera.h"
 #include <string>
 using namespace std;
 #include <QDir>
