@@ -62,10 +62,12 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 			{
 				paramCase = ParamCase::ONLY_INCLUDE_AVT;
 			}
+			/*
 			else if (!_strnicmp("-s", argv[i], 2))
 			{
 				paramCase = ParamCase::SYNC_MODE;
 			}
+			*/
 			countParamCase = 0;
 			continue;
 		}
@@ -73,6 +75,7 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 
 		switch (paramCase)
 		{		
+			/*
 			case ParamCase::SYNC_MODE:
 			{
 				if (param.find("h") != std::string::npos || param.find("H") != std::string::npos || param == "1")
@@ -84,7 +87,7 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 				}
 				break;
 			}
-
+			*/
 			case ParamCase::CAMERA_CONFIGS:
 			{
 				switch (countParamCase)
@@ -109,9 +112,12 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 					projectionsConfig.push_back(param);
 					break;
 				case 2:
-					int screenIndex = (atoi(argv[i]));
+					//int screenIndex = (atoi(argv[i]));
 					//projectedScreen[countProjectors - 1] = screenIndex;
-					projectedScreen.push_back(screenIndex);
+					//projectedScreen.push_back(screenIndex);
+					refToProjector.push_back(argv[i]);
+				case 3:
+					mainProjectorRef = refToProjector[refToProjector.size() - 1];
 				}
 				break;
 			}
@@ -150,6 +156,11 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 		}
 		countParamCase++;
 
+	}
+
+	if (mainProjectorRef.empty()&&countProjectors>0)
+	{
+		mainProjectorRef = refToProjector[0];
 	}
 
 }

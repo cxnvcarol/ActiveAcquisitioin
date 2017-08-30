@@ -11,10 +11,10 @@ DLPProjector::DLPProjector()
 
 DLPProjector::DLPProjector(hid_device * hid, std::string path):m_patternImageChange(false)
 {
+	
 	hidHandle = hid;
 	pathHid = path;
 }
-
 
 
 DLPProjector::~DLPProjector()
@@ -24,7 +24,6 @@ DLPProjector::~DLPProjector()
 void DLPProjector::playProjectionSequence(int n)
 {
 	//Review... no repeated sequence considered for the DLP!! (param n ignored)
-
 	//review. the following commented was already done in the updateLUT() method. No need to call it here again, right?
 	/*
 	if (LCR_SetPatternConfig(dlp_pattern_elements.size(), dlp_pattern_elements.size(),hidHandle)<0)
@@ -40,6 +39,7 @@ void DLPProjector::playProjectionSequence(int n)
 void DLPProjector::registerCameraObserver(ActiveCamera * cam)
 {
 	//TODO are cameras triggered by hardware? then do nothing. Add to list if not (or add anyway and do the check during AVT Triggering??.
+	observerCams.push_back(cam);
 }
 void DLPProjector::loadDLPProjectionsSettings(const QString projectionsConfig)
 {
@@ -245,6 +245,14 @@ bool DLPProjector::simpleToDLPProjectionsSettings(QString filePathIn, QString fi
 	outputFile.close();
 	f.close();
 	return true;
+}
+
+void DLPProjector::notifyPlayToObservers()
+{
+	for (ActiveCamera* ci : observerCams)
+	{
+		ci->notifyStartProjectionSequence();
+	}
 }
 
 void DLPProjector::updateLUT()

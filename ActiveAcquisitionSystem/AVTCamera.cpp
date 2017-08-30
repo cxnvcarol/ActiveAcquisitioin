@@ -41,6 +41,7 @@ AVTCamera::AVTCamera()
 
 AVTCamera::AVTCamera(CameraPtr avtCam):pCam(avtCam), settingsLoaded(false)
 {
+	hwTriggerSupported = true;
 	outputFolder = ".";
 	playingProjectionSequence = false;
 	indexPicture = 0;
@@ -123,7 +124,6 @@ bool AVTCamera::loadSettings(std::string configXml)
 	//  re-load saved settings from file
 	err = pCam->LoadCameraSettings(configXml, &settingsStruct);
 
-	//TODO LOOK HERE! Check sw or hw-sync mode and force features here!
 	if (VmbErrorSuccess != err)
 	{
 		ss.str("");
@@ -318,8 +318,6 @@ VmbErrorType AVTCamera::prepareCapture(void)
 			LOGERR("unable to set SingleFrame mode for the avt camera %s", dev_id.c_str());
 		}
 	}
-
-	
 	//TODO LOOK HERE! Force the triggersource, review if working fine. (i.e, triggerselector, triggermode, triggersource... which is the right order??
 	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSelector", pFeature))
 	{

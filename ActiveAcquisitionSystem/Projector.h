@@ -37,6 +37,10 @@ public:
 	virtual void loadProjectionSettings(const char* projectionsConfig);//Loading custom settings format so far.//TODO Examine previous DLP Format!
 
 	virtual void playProjectionSequence(int n);//plays already loaded sequence
+
+	virtual void notifyPlayToObservers();
+
+	virtual bool triggersByHardware();
 protected:
 	std::vector<ProjectedImg> projections;//loaded from specified folder
 	std::vector<Projection> projectionsSequence;//laoded from configuration text file
@@ -44,6 +48,7 @@ protected:
 
 	std::vector<ActiveCamera *> observerCams;
 	int nObservers;
+
 	
 
 

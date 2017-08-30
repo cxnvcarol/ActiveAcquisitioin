@@ -38,6 +38,11 @@ std::string ActiveCamera::getDevId()
 	return dev_id;
 }
 
+bool ActiveCamera::supportsHardwareTrigger()
+{
+	return hwTriggerSupported;
+}
+
 void ActiveCamera::setOutputFolder(std::string folder)
 {
 	outputFolder = folder;

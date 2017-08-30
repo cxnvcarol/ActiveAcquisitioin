@@ -122,13 +122,17 @@ void StandardProjector::playProjectionSequence(int n)
 	if (!playingSequence)
 	{
 		LOGEXEC("playProjectionSequence called, repeat for %d times", n);//TODO Fix, n repetitions is ignored.
-		for (ActiveCamera* ci : observerCams)
-		{
-			ci->notifyStartProjectionSequence();
-		}
+		
 		playingSequence = true;		
 		currentProjectionIndex = 0;
 		advanceProjectionSequence();//first call starts the following timed projections.
+	}
+}
+void StandardProjector::notifyPlayToObservers()
+{
+	for (ActiveCamera* ci : observerCams)
+	{
+		ci->notifyStartProjectionSequence();
 	}
 }
 void StandardProjector::registerCameraObserver(ActiveCamera * cam)
@@ -138,6 +142,7 @@ void StandardProjector::registerCameraObserver(ActiveCamera * cam)
 
 void StandardProjector::loadProjectionSettings(const char* projectionsConfig)
 {
+	//TODO LOOK HERE: if the file is not compliant try to convert it from the dlp format
 	if (projections.empty())
 	{
 		LOGERR("No projections folder loaded yet");

@@ -7,6 +7,7 @@ CanonCamera::CanonCamera()
 CanonCamera::CanonCamera(EdsCameraRef  *camera)
 {
 	setEdsCameraRef(camera);
+	hwTriggerSupported = false;
 }
 
 void CanonCamera::setEdsCameraRef(EdsCameraRef* camref)

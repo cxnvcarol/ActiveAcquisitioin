@@ -24,7 +24,9 @@ public:
 
 	vector<string> projectionsFolder;//Path to the folder with pngs to be projected. Unlimited # of projectors(gral case) but in practice we have max 2 projs!! (projector + mask)
 	vector<string> projectionsConfig;//text files with configuration of time x each projection.
-	vector<int> projectedScreen;// = { 1,2 };//screen identfier, 2nd and 3rd screen by default.
+	//vector<int> projectedScreen;// = { 1,2 };//screen identfier, 2nd and 3rd screen by default.
+	vector<string> refToProjector;
+	string mainProjectorRef;
 private:
 
 	enum class ParamCase {
@@ -33,7 +35,7 @@ private:
 		PROJECTION_CONFIGS,
 		OUTPUT_FOLDER,
 		ONLY_INCLUDE_AVT,
-		SYNC_MODE
+		//SYNC_MODE
 	};
 
 	

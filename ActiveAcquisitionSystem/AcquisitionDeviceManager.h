@@ -44,6 +44,19 @@ public:
 	};
 
 	void addStandardProjector(StandardProjector* p);
+
+	/*
+	StandardProjector* getFirstStdProjector() {
+		return standardProjectors.empty() ? NULL : standardProjectors[0];
+	}
+	*/
+
+	void setMainProjector(Projector* p) {
+		mainProjector = p;
+	};
+	Projector* getMainProjector() {
+		return mainProjector;
+	};
 private:
 	AVT::VmbAPI::VimbaSystem* vimbaSys;
 	VmbErrorType    err;
@@ -55,5 +68,7 @@ private:
 	EDSWrapper* edsWrapper;
 	
 	bool setDLPStatus(DLPProjector *dlp);
+
+	Projector* mainProjector;
 };
 

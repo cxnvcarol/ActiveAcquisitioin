@@ -27,6 +27,13 @@ public:
 	static bool dLPToSimpleProjectionsSettings(QString filePathIn, QString filePathOut);
 	static bool simpleToDLPProjectionsSettings(QString filePathIn, QString filePathOut);
 
+	void notifyPlayToObservers();
+
+
+	bool triggersByHardware()
+	{
+		return true;
+	}
 
 private:
 	hid_device* hidHandle;

@@ -68,3 +68,13 @@ void Projector::playProjectionSequence(int n)
 {
 	throw "not implemented";
 }
+
+void Projector::notifyPlayToObservers()
+{
+	LOGERR("Not implemented");
+}
+
+bool Projector::triggersByHardware()
+{
+	return false;//by default
+}

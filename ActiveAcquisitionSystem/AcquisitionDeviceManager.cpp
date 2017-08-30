@@ -151,6 +151,21 @@ ActiveCamera* AcquisitionDeviceManager::getCamera(int index)
 
 Projector* AcquisitionDeviceManager::getProjector(string dev_id)
 {
+	for (DLPProjector* P : dlps)
+	{
+		if (P->getDev_id() == dev_id)
+		{
+			return P;
+		}
+	}
+
+	for (StandardProjector* P : standardProjectors)
+	{
+		if (P->getDev_id() == dev_id)
+		{
+			return P;
+		}
+	}
 	return NULL;
 }
 
@@ -166,12 +181,13 @@ vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras()
 	{
 		cameraList.push_back(c);
 	}	
-	
+	int avtsCount = cameraList.size();
 	for (CanonCamera* c : detectCanonCameras())
 	{
 		cameraList.push_back(c);
 	}
 	numCams = cameraList.size();
+	LOGEXEC("In total there are %d canons and %d avts", numCams-avtsCount,avtsCount);
 	return cameraList;
 }
 
@@ -187,12 +203,14 @@ std::vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras(std::vecto
 		{
 			cameraList.push_back(c);
 		}
+		int avtsCount = cameraList.size();
 
 		for (CanonCamera* c : detectCanonCameras())
 		{
 			cameraList.push_back(c);
 		}
 		numCams = cameraList.size();
+		LOGEXEC("In total there are %d canons and %d avts", numCams - avtsCount, avtsCount);
 		return cameraList;
 	}
 }

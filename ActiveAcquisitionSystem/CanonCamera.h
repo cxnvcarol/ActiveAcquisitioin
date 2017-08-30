@@ -19,6 +19,8 @@ public:
 
 	int prepareCapture();
 
+	
+
 private:
 	EdsCameraRef* camera;
 

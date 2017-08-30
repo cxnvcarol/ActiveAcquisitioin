@@ -80,6 +80,13 @@ public:
 
 	void setScreenIndex(int ind);
 
+	void notifyPlayToObservers();
+
+	bool triggersByHardware()
+	{
+		return true;
+	}
+
 public slots:
 	void advanceProjectionSequence();
 

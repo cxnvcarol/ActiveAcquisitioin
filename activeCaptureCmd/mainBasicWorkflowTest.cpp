@@ -52,7 +52,7 @@ int mainUseCase1(int argc, char *argv[])//test with one standard projector and m
 	StandardProjector mainProjector;//important to call in main function (or keep the reference to mainProjector)
 	int c = mainProjector.loadProjectionsFolder(parser.projectionsFolder[0].c_str());
 	mainProjector.loadProjectionSettings(parser.projectionsConfig[0].c_str());
-	mainProjector.setScreenIndex(parser.projectedScreen[0]);
+	mainProjector.setScreenIndex(atoi(parser.refToProjector[0].c_str()));
 	mainProjector.showInFullProjection();
 	
 	////WF: 3. Detect all avt cameras, configure with passed configuration file & prepare for capturing
