@@ -78,6 +78,8 @@ public:
 	void registerCameraObserver(ActiveCamera * cam);
 	void loadProjectionSettings(const char* projectionsConfig);
 
+	void loadSimpleFormatSettings(const char* projectionsConfig);
+	
 	void setScreenIndex(int ind);
 
 	void notifyPlayToObservers();

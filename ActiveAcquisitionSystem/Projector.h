@@ -41,6 +41,11 @@ public:
 	virtual void notifyPlayToObservers();
 
 	virtual bool triggersByHardware();
+
+
+	static bool dLPToSimpleProjectionsSettings(QString filePathIn, QString filePathOut);
+	static bool simpleToDLPProjectionsSettings(QString filePathIn, QString filePathOut);
+
 protected:
 	std::vector<ProjectedImg> projections;//loaded from specified folder
 	std::vector<Projection> projectionsSequence;//laoded from configuration text file

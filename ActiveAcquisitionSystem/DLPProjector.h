@@ -24,9 +24,6 @@ public:
 	std::string getDev_id() { return pathHid; }
 
 
-	static bool dLPToSimpleProjectionsSettings(QString filePathIn, QString filePathOut);
-	static bool simpleToDLPProjectionsSettings(QString filePathIn, QString filePathOut);
-
 	void notifyPlayToObservers();
 
 

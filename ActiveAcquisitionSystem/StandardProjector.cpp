@@ -142,56 +142,82 @@ void StandardProjector::registerCameraObserver(ActiveCamera * cam)
 
 void StandardProjector::loadProjectionSettings(const char* projectionsConfig)
 {
-	//TODO LOOK HERE: if the file is not compliant try to convert it from the dlp format
 	if (projections.empty())
 	{
 		LOGERR("No projections folder loaded yet");
 		return;
 	}
-	//1. Read text file, split each line, save projection in array.
 	QFile f(projectionsConfig);
 	if (f.open(QIODevice::ReadOnly))
 	{
 		QTextStream in(&f);
-		QString line;
-		while (!in.atEnd()) {
-			line = in.readLine();
-			if (line.startsWith("#")) { continue; }
-			printf("%s\n",line.toStdString().c_str());
-			QStringList  fields = line.split(",");
-			if (fields.size() != 3)
-			{
-				LOGERR("incorrect number of arguments for the sequence projection");
-				continue;
-			}
-			//projections.
-			int index = indexOfProjection(fields[0]);
-			if (index < 0)
-			{
-				LOGERR ("incorrect projection setting in line: %s", line.toStdString().c_str());
-				continue;
-
-			}
-			bool ok=true;
-			long us = fields[1].toLong(&ok);
-			
-			if (!ok)
-			{
-				LOGERR("incorrect projection setting in line: %s", line.toStdString().c_str());
-				continue;
-			}
-			bool camTrigger = fields[2].toInt(&ok);
-			if (!ok)
-			{
-				LOGERR("incorrect projection setting in line: %s", line.toStdString().c_str());
-				continue;
-			}
-			projectionsSequence.push_back({ index,us,camTrigger });
-		}
+		QString line = in.readLine();
+		while (line.startsWith("#")) { line = in.readLine(); }
+		QStringList  fields = line.split(",");
 		f.close();
+		if (fields.size() == 3)//"Normal mode" always for the pattern mode
+		{
+			loadSimpleFormatSettings(projectionsConfig);
+		}
+		else//then DLP format
+		{
+			//use standar gral load//TODO Improve: saving a new file shouldn-t be necessary
+			QString converted = QString(projectionsConfig).replace(".proj", "-conv.txt");
+			dLPToSimpleProjectionsSettings(projectionsConfig, converted);
+			loadSimpleFormatSettings(converted.toStdString().c_str());
+		}
 	}
+	else {
+		LOGERR("Unable to open configuration file for the projector");
+	}
+	
 }
 
+void StandardProjector::loadSimpleFormatSettings(const char* projectionsConfig)
+{
+//1. Read text file, split each line, save projection in array.
+QFile f(projectionsConfig);
+if (f.open(QIODevice::ReadOnly))
+{
+	QTextStream in(&f);
+	QString line;
+	while (!in.atEnd()) {
+		line = in.readLine();
+		if (line.startsWith("#")) { continue; }
+		printf("%s\n", line.toStdString().c_str());
+		QStringList  fields = line.split(",");
+		if (fields.size() != 3)
+		{
+			LOGERR("incorrect number of arguments for the sequence projection");
+			continue;
+		}
+		//projections.
+		int index = indexOfProjection(fields[0]);
+		if (index < 0)
+		{
+			LOGERR("incorrect projection setting in line: %s", line.toStdString().c_str());
+			continue;
+
+		}
+		bool ok = true;
+		long us = fields[1].toLong(&ok);
+
+		if (!ok)
+		{
+			LOGERR("incorrect projection setting in line: %s", line.toStdString().c_str());
+			continue;
+		}
+		bool camTrigger = fields[2].toInt(&ok);
+		if (!ok)
+		{
+			LOGERR("incorrect projection setting in line: %s", line.toStdString().c_str());
+			continue;
+		}
+		projectionsSequence.push_back({ index,us,camTrigger });
+	}
+	f.close();
+}
+}
 void StandardProjector::advanceProjectionSequence()
 {
 	if (currentProjectionIndex == projectionsSequence.size())

@@ -115,6 +115,14 @@ void DLPProjector::loadDLPProjectionsSettings(const QString projectionsConfig)
 	}
 	
 	settingsFile.close();
+
+
+	if (LCR_SetMode(0x3, hidHandle) < 0)//=set on-the-fly mode
+	{
+		LOGERR("Unable to switch to pattern from Memory mode");
+		return;
+	}
+	updateLUT();
 }
 void DLPProjector::loadProjectionSettings(const char* projectionsConfig)
 {
@@ -129,16 +137,13 @@ void DLPProjector::loadProjectionSettings(const char* projectionsConfig)
 		if (fields.size() == 1)//"Normal mode" always for the pattern mode
 		{
 			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway?? (certainly yes to use as hdmi eventually)
-			if (LCR_SetMode(0x3,hidHandle) < 0)//=set on-the-fly mode
-			{
-				LOGERR("Unable to switch to pattern from Memory mode");
-				return;
-			}
-			updateLUT();
 		}
 		else if (fields.size() == 3)
 		{
-			Projector::loadProjectionSettings(projectionsConfig);//use standar gral load
+			//use standar gral load//TODO Improve: saving a new file shouldn-t be necessary
+			QString converted = QString(projectionsConfig).replace(".txt", "-conv.proj");
+			simpleToDLPProjectionsSettings(projectionsConfig, converted);
+			loadDLPProjectionsSettings(converted);
 
 		}
 		else{
@@ -167,84 +172,6 @@ void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uch
 	bool videoState = !(MainStatus & BIT2);
 	bool extSourceLocked = MainStatus & BIT3;
 	//TODO Complete: query other properties here and saved them or print them for the user information.
-}
-
-bool DLPProjector::dLPToSimpleProjectionsSettings(QString filePathIn, QString filePathOut)
-{
-	QFile f(filePathIn);
-	QFile outputFile(filePathOut);
-	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		LOGERR("Unable to open file for saving: %s", filePathOut.toStdString().c_str());
-		return false;
-	}
-	QTextStream out(&outputFile);
-	if (f.open(QIODevice::ReadOnly))
-	{
-		QTextStream in(&f);
-		QString line= in.readLine();
-		while (line.startsWith("#")) { line = in.readLine(); }
-		QStringList  fields = line.split(",");
-		if (fields.size() != 1)//"Normal mode" always for the pattern mode
-		{
-			return false;
-		}
-		while (!in.atEnd()) {
-			line = in.readLine();
-			if (line.startsWith("#")) {	continue;}
-			fields = line.split(",");
-			if (fields.size() != 7)
-			{
-				LOGERR("expecting 7 comma-separated values");
-				continue;
-			}
-			out << fields[0] << ",";
-			out << fields[2] << ",";
-			out << fields[6] << "\n";
-		}
-	}
-	outputFile.close();
-	f.close();
-	return true;
-}
-
-bool DLPProjector::simpleToDLPProjectionsSettings(QString filePathIn, QString filePathOut)
-{
-	QFile f(filePathIn);
-	QFile outputFile(filePathOut);
-	if (!outputFile.open(QIODevice::WriteOnly | QIODevice::Text))
-	{
-		LOGERR("Unable to open file for saving: %s",filePathOut.toStdString().c_str());
-		return false;
-	}
-	QTextStream out(&outputFile);
-	out << "Normal Mode\n";
-	if (f.open(QIODevice::ReadOnly))
-	{
-		QTextStream in(&f);
-		QString line;
-		
-		while (!in.atEnd()) {
-			line = in.readLine();
-			if (line.startsWith("#")) { continue; }
-			QStringList  fields = line.split(",");
-			if (fields.size() != 3)
-			{
-				LOGERR("expecting 3 comma-separated values");
-				continue;
-			}
-			out << fields[0] << ",";
-			out << "8" << ",";
-			out << fields[1] << ",";
-			out << "0" << ",";
-			out << "7" << ",";
-			out << "0" << ",";
-			out << fields[2] << "\n";
-		}
-	}
-	outputFile.close();
-	f.close();
-	return true;
 }
 
 void DLPProjector::notifyPlayToObservers()
