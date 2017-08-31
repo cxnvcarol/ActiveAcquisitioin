@@ -10,10 +10,10 @@ DLPProjector::DLPProjector()
 }
 
 DLPProjector::DLPProjector(hid_device * hid, std::string path):m_patternImageChange(false)
-{
-	
+{	
 	hidHandle = hid;
 	pathHid = path;
+	dev_id = pathHid;
 }
 
 

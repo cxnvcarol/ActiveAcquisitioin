@@ -114,7 +114,6 @@ void StandardProjector::keyPressEvent(QKeyEvent * ev)
 	{
 		close();
 	}
-
 }
 
 void StandardProjector::playProjectionSequence(int n)
@@ -184,7 +183,7 @@ if (f.open(QIODevice::ReadOnly))
 	while (!in.atEnd()) {
 		line = in.readLine();
 		if (line.startsWith("#")) { continue; }
-		printf("%s\n", line.toStdString().c_str());
+		LOGEXEC("loading %s", line.toStdString().c_str());
 		QStringList  fields = line.split(",");
 		if (fields.size() != 3)
 		{
@@ -214,6 +213,7 @@ if (f.open(QIODevice::ReadOnly))
 			continue;
 		}
 		projectionsSequence.push_back({ index,us,camTrigger });
+		LOGEXEC("projection load ok");
 	}
 	f.close();
 }
@@ -271,7 +271,8 @@ void StandardProjector::showInFullProjection()
 	setGeometry(rec);
 }
 void StandardProjector::setScreenIndex(int ind) {
-	screenIndex = ind; 
+	screenIndex = ind;
+	dev_id= std::to_string(ind);
 
 	int screenCount = QApplication::desktop()->screenCount();
 	if (screenIndex >= screenCount)

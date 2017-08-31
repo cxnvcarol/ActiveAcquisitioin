@@ -42,35 +42,36 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 }
 int AcquisitionDeviceManager::detectDLPs()
 {
-	if (dlps.size()==0)
-	{
-		struct hid_device_info* devs= hid_enumerate(MY_VID, MY_PID);
-		struct hid_device_info* cur_dev = devs;
-		while (cur_dev) {
-			printf("DLP Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls",
-				cur_dev->vendor_id, cur_dev->product_id, cur_dev->path, cur_dev->serial_number);
-			printf("\n");
-			printf("  Manufacturer: %ls\n", cur_dev->manufacturer_string);
-			printf("  Product:      %ls\n", cur_dev->product_string);
-			printf("\n");
-			//hid_device *hid=hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
-			hid_device *hid = hid_open_path(cur_dev->path);
-			if (hid != NULL)
+	dlps.clear();
+	
+	struct hid_device_info* devs= hid_enumerate(MY_VID, MY_PID);
+	struct hid_device_info* cur_dev = devs;
+	while (cur_dev) {
+		printf("DLP Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls",
+			cur_dev->vendor_id, cur_dev->product_id, cur_dev->path, cur_dev->serial_number);
+		printf("\n");
+		printf("  Manufacturer: %ls\n", cur_dev->manufacturer_string);
+		printf("  Product:      %ls\n", cur_dev->product_string);
+		printf("\n");
+		//hid_device *hid=hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
+		hid_device *hid = hid_open_path(cur_dev->path);
+		if (hid != NULL)
+		{
+			DLPProjector *dlp = new DLPProjector(hid, cur_dev->path);
+			if (setDLPStatus(dlp))
 			{
-				DLPProjector *dlp = new DLPProjector(hid, cur_dev->path);
-				if (setDLPStatus(dlp))
-				{
-					LOGEXEC("dlp status was ok");
-					dlps.push_back(dlp);
+				LOGEXEC("dlp status was ok");
+				dlps.push_back(dlp);
 
-				}
-				else delete dlp;
 			}
-			cur_dev = cur_dev->next;
-			//TODO Review, is that enough??
+			else delete dlp;
 		}
-		hid_free_enumeration(devs);		
+		cur_dev = cur_dev->next;
+		//TODO Review, is that enough??
 	}
+	hid_free_enumeration(devs);		
+	
+	LOGEXEC("%d DLP devices found", dlps.size());
 	return dlps.size();
 }
 
@@ -210,7 +211,7 @@ std::vector<ActiveCamera*> AcquisitionDeviceManager::detectAllCameras(std::vecto
 			cameraList.push_back(c);
 		}
 		numCams = cameraList.size();
-		LOGEXEC("In total there are %d canons and %d avts", numCams - avtsCount, avtsCount);
+		LOGEXEC("In total there are %d canons and %d avts included", numCams - avtsCount, avtsCount);
 		return cameraList;
 	}
 }

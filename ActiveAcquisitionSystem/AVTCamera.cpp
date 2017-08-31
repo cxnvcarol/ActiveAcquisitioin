@@ -154,15 +154,12 @@ bool AVTCamera::loadSettings(std::string configXml)
 	}
 
 	ss.str("");
-	ss << "--> Feature values have been loaded from given XML file '" << configXml << "'";
+	ss << "--> Feature values have been loaded from given XML file '" << configXml << "' to camera id "<<dev_id.c_str();
 	std::cout << ss.str() << std::endl;
 
 	pCam->Close();
 
-
 	settingsLoaded = true;
-
-	
 	return true;
 }
 

@@ -54,7 +54,7 @@ protected:
 	std::vector<ActiveCamera *> observerCams;
 	int nObservers;
 
-	
+	std::string dev_id;
 
 
 };

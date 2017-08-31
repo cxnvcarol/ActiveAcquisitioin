@@ -14,14 +14,11 @@ public:
 	void playProjectionSequence(int n);
 	void registerCameraObserver(ActiveCamera * cam);
 	void loadProjectionSettings(const char* projectionsConfig);
-
 	void loadDLPProjectionsSettings(const QString projectionsConfig);
 
 	void setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uchar MainStatus);
 
 	hid_device* getHidDevice() { return hidHandle; }
-
-	std::string getDev_id() { return pathHid; }
 
 
 	void notifyPlayToObservers();

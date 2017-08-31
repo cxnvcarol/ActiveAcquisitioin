@@ -9,6 +9,8 @@ public:
 	~ParameterParser();
 	void parseParameters(int argc, char *argv[]);
 
+	void printHelp();
+
 
 	//TODO Review better practice: encapsulate members by making them private and provide getters and setters.
 	int countProjectors;//TODO Review.. separate count btn standard and dlp projectors??
@@ -27,6 +29,8 @@ public:
 	//vector<int> projectedScreen;// = { 1,2 };//screen identfier, 2nd and 3rd screen by default.
 	vector<string> refToProjector;
 	string mainProjectorRef;
+
+	bool helpPrinted = false;
 private:
 
 	enum class ParamCase {

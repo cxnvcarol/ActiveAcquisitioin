@@ -34,13 +34,18 @@ int main(int argc, char *argv[])
 	parser.parseParameters(argc, argv);
 
 	mng = new AcquisitionDeviceManager();
-	
+	if (parser.helpPrinted)
+	{
+
+		printf("\n\n\nenter to finish!\n\n");
+		fflush(stdout);
+		cin.get();
+		return 0;
+	}
 	//WF: 2. Detect devices
 	std::vector<ActiveCamera*> cameraList = parser.onlyIncludedAvtSpecified ? mng->detectAllCameras(parser.onlyIncludedAvt) : mng->detectAllCameras();
 	int countDLPs=mng->detectDLPs();
 
-
-	Projector *mainProjector;//NULL by default
 
 	////WF: 2.1 Initialize & configure projectors passed by parameter
 	for (int i = 0;i < parser.countProjectors;i++)
@@ -60,7 +65,7 @@ int main(int argc, char *argv[])
 		catch (std::exception const & e)
 		{
 			//if not integer, then is a reference to a dlp projector, or the projector does not exist
-			Projector *p = mng->getProjector(parser.mainProjectorRef);
+			Projector *p = mng->getProjector(parser.refToProjector[i]);
 			if (p != NULL)
 			{
 				p->loadProjectionsFolder(parser.projectionsFolder[i].c_str());
@@ -83,7 +88,8 @@ int main(int argc, char *argv[])
 		//TODO Review, if MainProjector never found should I set it to the first configured? or the first DLP if available? or to the first stdProjector?
 		else mng->setMainProjector(mng->getProjector(parser.refToProjector[0]));
 	}
-	
+
+	Projector *mainProjector= mng->getMainProjector();
 
 	////WF: 3. Configure and prepare cameras (xml files for avts)
 	//NOTE: It includes only specified cameras if it's explicit by parameter (some can be detected in the network but far away from my experimental setup, therefore: unnecessary bandwith load & resources usage).
@@ -105,7 +111,14 @@ int main(int argc, char *argv[])
 				{
 					//WF: 3.1. Load settings for specified camIDs
 					bool res = ((ActiveCamera*)*it)->loadSettings(parser.cameraConfigXml[i]);//WF: 3.1. Load settings for specified ids
-					res ? printf("xml load succeeded with devid\n") : printf("xml settings failed to load with devid");
+					if (res)
+					{
+						printf("xml load succeeded with devid %s\n", ((ActiveCamera*)*it)->getDevId().c_str());
+					}
+					else printf("xml settings failed to load with devid %s\n", ((ActiveCamera*)*it)->getDevId().c_str());
+				}
+				else {
+					LOGEXEC("Camera with id %s not found", camID.c_str());
 				}
 			}
 		}
@@ -115,7 +128,10 @@ int main(int argc, char *argv[])
 			{
 				//WF: 3.1. Load settings for all others
 				bool res = cameraList[i]->loadSettings(parser.cameraConfigXml[0]);
-				res ? printf("file settings load succeeded\n") : LOGEXEC("settings not setted for camera %s", cameraList[i]->getDevId().c_str());
+				if (res)
+				{
+					LOGEXEC("file settings load succeeded with first config file for cam %s", cameraList[i]->getDevId().c_str());
+				}
 			}
 		}
 		for (int i = 0;i < cameraList.size();i++)
@@ -137,6 +153,7 @@ int main(int argc, char *argv[])
 			case C: If std is the master we are in a sw sync mode, in such case, all found cameras are registered
 			*/
 
+			//TODO LOOK HERE!! Breaking here!!!!
 			if (mainProjector != NULL)
 			{
 				if (mainProjector->triggersByHardware())
@@ -176,8 +193,6 @@ int main(int argc, char *argv[])
 	printf("\n\n\nenter to finish!\n\n");
 	fflush(stdout);
 	cin.get();
-	printf("just before delete manager\n\n");
-	delete mng;
 	return result;
 
 }
