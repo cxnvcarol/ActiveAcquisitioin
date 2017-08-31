@@ -38,7 +38,6 @@ void DLPProjector::playProjectionSequence(int n)
 
 void DLPProjector::registerCameraObserver(ActiveCamera * cam)
 {
-	//TODO are cameras triggered by hardware? then do nothing. Add to list if not (or add anyway and do the check during AVT Triggering??.
 	observerCams.push_back(cam);
 }
 void DLPProjector::loadDLPProjectionsSettings(const QString projectionsConfig)
@@ -136,11 +135,11 @@ void DLPProjector::loadProjectionSettings(const char* projectionsConfig)
 		f.close();
 		if (fields.size() == 1)//"Normal mode" always for the pattern mode
 		{
-			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway?? (certainly yes to use as hdmi eventually)
+			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway??
 		}
 		else if (fields.size() == 3)
 		{
-			//use standar gral load//TODO Improve: saving a new file shouldn-t be necessary
+			//use standar gral load//TODO test&Improve: saving a new file shouldn-t be necessary
 			QString converted = QString(projectionsConfig).replace(".txt", "-conv.proj");
 			simpleToDLPProjectionsSettings(projectionsConfig, converted);
 			loadDLPProjectionsSettings(converted);
@@ -155,7 +154,8 @@ void DLPProjector::loadProjectionSettings(const char* projectionsConfig)
 	}
 
 }
-//TODO Review: override method to load folder with pictures!... or not? - for memory pattern mode, so the LUT load doesn't take that long!
+//TODO Review: override method "LoadProjectionsFolder" to load folder with picture to the DLP- for memory pattern mode
+
 
 void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uchar MainStatus)
 {
@@ -171,7 +171,7 @@ void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uch
 	bool sequencerRunState = MainStatus & BIT1;
 	bool videoState = !(MainStatus & BIT2);
 	bool extSourceLocked = MainStatus & BIT3;
-	//TODO Complete: query other properties here and saved them or print them for the user information.
+	//TODO save them or print them for the user information. Or just discard the method (inf)
 }
 
 void DLPProjector::notifyPlayToObservers()
@@ -219,7 +219,7 @@ void DLPProjector::updateLUT()
 		return;
 	}
 	//review. NO SPLASH IMAGES ARE CONSIDERED SO FAR. patternMemory_radioButton=on the fly mode, but splash imgs are 0!
-	//TODO REVIEW IMPORTANT: I think the following considers the "Pre-stored" pattern mode (i.e., to rely on pre-loaded images on the firmware)
+	//TODO REVIEW: I think the following is to consider the "Pre-stored" pattern mode (i.e., to rely on pre-loaded images on the firmware)
 	/*if (ui->patternMemory_radioButton->isChecked() && m_patternImageChange)
 	{
 		if (updatePatternMemory(totalSplashImages, false) == 0)

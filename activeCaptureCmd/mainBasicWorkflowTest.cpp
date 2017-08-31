@@ -46,8 +46,6 @@ int mainUseCase1(int argc, char *argv[])//test with one standard projector and m
 	AcquisitionDeviceManager *mng = new AcquisitionDeviceManager();
 	
 	////WF: 2. Initialize & configure desired projectors (extra screens)
-	//TODO Create 1 or 2 standardProjectors as configured by parameter. countProjectors min 1 and max 2.
-	//TODO Use upper projector for general case (or not?) -- hopefully not need, but... https://stackoverflow.com/questions/30150115/cant-cast-superclass-to-subclass
 	
 	StandardProjector mainProjector;//important to call in main function (or keep the reference to mainProjector)
 	int c = mainProjector.loadProjectionsFolder(parser.projectionsFolder[0].c_str());

@@ -47,27 +47,25 @@ int AcquisitionDeviceManager::detectDLPs()
 	struct hid_device_info* devs= hid_enumerate(MY_VID, MY_PID);
 	struct hid_device_info* cur_dev = devs;
 	while (cur_dev) {
-		printf("DLP Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls",
-			cur_dev->vendor_id, cur_dev->product_id, cur_dev->path, cur_dev->serial_number);
-		printf("\n");
-		printf("  Manufacturer: %ls\n", cur_dev->manufacturer_string);
-		printf("  Product:      %ls\n", cur_dev->product_string);
-		printf("\n");
-		//hid_device *hid=hid_open(cur_dev->vendor_id, cur_dev->product_id, cur_dev->serial_number);
 		hid_device *hid = hid_open_path(cur_dev->path);
 		if (hid != NULL)
 		{
 			DLPProjector *dlp = new DLPProjector(hid, cur_dev->path);
 			if (setDLPStatus(dlp))
 			{
-				LOGEXEC("dlp status was ok");
+				printf("DLP Found\n  type: %04hx %04hx\n  path: %s\n  serial_number: %ls",
+					cur_dev->vendor_id, cur_dev->product_id, cur_dev->path, cur_dev->serial_number);
+				printf("\n");
+				printf("  Manufacturer: %ls\n", cur_dev->manufacturer_string);
+				printf("  Product:      %ls\n", cur_dev->product_string);
+				printf("\n");
+
 				dlps.push_back(dlp);
 
 			}
 			else delete dlp;
 		}
 		cur_dev = cur_dev->next;
-		//TODO Review, is that enough??
 	}
 	hid_free_enumeration(devs);		
 	
@@ -239,7 +237,6 @@ vector<AVTCamera*> AcquisitionDeviceManager::detectAVTCameras(std::vector<string
 #endif // AVT_DEBUG
 			for (int i = 0;i < count; i++)
 			{
-				//TODO Review if it works fine.
 				AVTCamera* avt = new AVTCamera(cameras[i]);
 				string camID=avt->getDevId();
 

@@ -77,20 +77,7 @@ void ParameterParser::parseParameters(int argc, char * argv[])
 		string param(argv[i]);
 
 		switch (paramCase)
-		{		
-			/*
-			case ParamCase::SYNC_MODE:
-			{
-				if (param.find("h") != std::string::npos || param.find("H") != std::string::npos || param == "1")
-				{
-					hwSyncMode = true;
-				}
-				else {
-					hwSyncMode = false;//default mode: software sync
-				}
-				break;
-			}
-			*/
+		{	
 			case ParamCase::CAMERA_CONFIGS:
 			{
 				switch (countParamCase)

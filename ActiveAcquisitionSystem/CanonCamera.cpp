@@ -59,7 +59,7 @@ int CanonCamera::prepareCapture()
 		err = EdsSetPropertyData(*camera, kEdsPropID_SaveTo, 0, sizeof(p), &p);
 	}
 	else { LOGERR("couldn't open camera session: %d",err); }
-	////TODO IMPORTANT Read important properties before capturing!! (needed for further processing!!!) - aperture, exposure time, etc (1)
+	////TODO IMPORTANT Read important properties before capturing!! (needed for further processing!!!) - aperture, exposure time, etc (1) LOOK HERE
 	return err;
 }
 
@@ -67,8 +67,8 @@ int CanonCamera::takeSinglePicture()
 {
 	//PRE: assumed open camera already
 	LOGEXEC("taking canon picture!");
-	//err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);//TODO FIX check camera type and use this command for its supported cams:
-	/*
+	
+	/*//Following Canon models are not supported:
 	EOS-1D
 	Mark III, EOS 40D, EOS - 1Ds Mark III,
 	EOS DIGITAL REBEL Xsi / 450D / Kiss

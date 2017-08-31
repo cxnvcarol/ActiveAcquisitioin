@@ -120,7 +120,7 @@ void StandardProjector::playProjectionSequence(int n)
 {
 	if (!playingSequence)
 	{
-		LOGEXEC("playProjectionSequence called, repeat for %d times", n);//TODO Fix, n repetitions is ignored.
+		LOGEXEC("playProjectionSequence called, repeat for %d times", n);//TODO Fix, n repetitions is ignored. (inf)
 		
 		playingSequence = true;		
 		currentProjectionIndex = 0;
@@ -230,7 +230,7 @@ void StandardProjector::advanceProjectionSequence()
 		}
 		playingSequence = false;
 		LOGEXEC("end of projections");
-		//TODO Fix here, n repetitions is ignored.
+		//TODO Fix here, n repetitions is ignored. (inf)
 		return;
 	}
 	Projection projection = projectionsSequence[currentProjectionIndex];

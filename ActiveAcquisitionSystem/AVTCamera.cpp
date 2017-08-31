@@ -139,7 +139,7 @@ bool AVTCamera::loadSettings(std::string configXml)
 		}
 		cameraFlag = false;
 
-		/*//TODO Review catcherror&logging! (inf-10)
+		/*//TODO Review catcherror&logging! (inf-10).
 		err = sys.Shutdown();
 		if (VmbErrorSuccess != err)
 		{
@@ -222,15 +222,14 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 
 	return false;
 }
-int AVTCamera::takeSinglePicture()
+int AVTCamera::takeSinglePicture()//only used in software synchronization mode (standard projector as master)
 {
 	LOGEXEC("Trying to take picture");
 	//return 0;
 	
 	FeaturePtr pFeat;
 	VmbErrorType err = pCam->GetFeatureByName("AcquisitionStart", pFeat);
-	err = pFeat->RunCommand();//TODO In principle I should make sure of setting the correct feature to SingleShot before running the command. (3)
-	//TODO Also check if the hardware trigger is enabled. if so, should I stop here?
+	err = pFeat->RunCommand();
 		
 	if (VmbErrorSuccess != err)
 	{

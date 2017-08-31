@@ -64,7 +64,7 @@ void mainCanonTests()
 		printf("\ngetTV: %d with error %ld\n\n", tv, e);
 
 		printf("\nclosesession:%d\n\n", EdsCloseSession(*c));
-		//kEdsPropID_SaveTo///TODO, review use this property?
+		
 		/*
 		CanonCamera* canon = new CanonCamera(c);
 		//gral wf: identify, load settings, set outputfolder, takesinglepicture, (callback: savepicture)
@@ -98,7 +98,7 @@ void mainCanonTests()
 				eds.takeSinglePicture(*c);
 				//printf("enter to close");
 				//std::cin.get();
-				//TODO?? USE EdsGetPropertyData to determine the sleep time before closing??
+				//TODO?? USE EdsGetPropertyData to determine a min. sleep time before closing??
 				
 			}
 			std::cin.get();

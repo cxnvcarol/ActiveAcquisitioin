@@ -83,10 +83,13 @@ int main(int argc, char *argv[])
 		
 		if (parser.refToProjector.empty())
 		{
-			LOGERR("No projections settings found. Use the option -p");//TODO review, I should return at this point
+			LOGERR("No projections settings found. Use the option -p");
+			printf("\n\n\nenter to finish!\n\n");
+			fflush(stdout);
+			cin.get();
+			return 0;
 		}
-		//TODO Review, if MainProjector never found should I set it to the first configured? or the first DLP if available? or to the first stdProjector?
-		else mng->setMainProjector(mng->getProjector(parser.refToProjector[0]));
+		else mng->setMainProjector(mng->getProjector(parser.refToProjector[0]));//using first projector as main if not specified in parameters (i.e. 4th field after -p)
 	}
 
 	Projector *mainProjector= mng->getMainProjector();
@@ -146,14 +149,8 @@ int main(int argc, char *argv[])
 			//VmbErrorType err = cameraList[i]->prepareCapture();
 
 			////WF: 4. register cameras as observers of the main projector (if multiple projectors, is either specified by parameter(postion 3 after -p) or the first in the list)
+			
 			//Review: should other projectors be on slave-mode? also observers of the main projector or triggered by hardware?
-
-			//Review: Check possible cases covered: A) 1 or 2 standard projectors B) 1 or 2 dlps by USB C) 1 standard and 1 DLP--> then which one is the master??
-			/*
-			case C: If std is the master we are in a sw sync mode, in such case, all found cameras are registered
-			*/
-
-			//TODO LOOK HERE!! Breaking here!!!!
 			if (mainProjector != NULL)
 			{
 				if (mainProjector->triggersByHardware())

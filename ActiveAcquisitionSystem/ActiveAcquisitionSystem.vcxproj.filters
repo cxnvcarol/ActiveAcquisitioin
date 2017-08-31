@@ -179,9 +179,6 @@
     <ClInclude Include="GeneratedFiles\ui_MainGUI.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\activeCaptureCmd\activeCaptureCmd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\External\Vimba\VmbImageTransformHelper.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

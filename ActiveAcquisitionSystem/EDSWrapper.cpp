@@ -475,6 +475,7 @@ EdsError EDSWrapper::getDCIMFolder(EdsVolumeRef volume, EdsDirectoryItemRef * di
 	return err;
 }
 
+//REVIEW: Deprecated, use the one in CanonCamera. This version of the method is only used for the mainCanonTest (not part of the final solution)
 EdsError EDSWrapper::takeSinglePicture(EdsCameraRef camera)
 {
 	EdsError err = EDS_ERR_OK;
@@ -483,26 +484,14 @@ EdsError EDSWrapper::takeSinglePicture(EdsCameraRef camera)
 	{
 		printf("taking pictre!\n");
 
-		//err = EdsSendCommand(camera, kEdsCameraCommand_TakePicture, 0);//TODO FIX check camera type and use this command for its supported cams:
-		/*
-		EOS-1D
-		Mark III, EOS 40D, EOS - 1Ds Mark III,
-		EOS DIGITAL REBEL Xsi / 450D / Kiss
-		X2, EOS DIGITAL REBEL XS / 1000D /
-		KISS F.
-		*/
+		
 		err = EdsSendCommand(camera, kEdsCameraCommand_PressShutterButton
 			, kEdsCameraCommand_ShutterButton_Completely);
 
-		//LOGERR("resultShutterBtn:%d", err);
 		err = EdsSendCommand(camera, kEdsCameraCommand_PressShutterButton
 			, kEdsCameraCommand_ShutterButton_OFF);
 		printf("shutterOf!\n");
-		//LOGERR("resultShutterBtnOf:%d", err);
-
 	}
-	////
-	// Close session with camera
 	if (err != EDS_ERR_OK) {LOGERR("error taking picture:%d", err);}
 	
 	return err;

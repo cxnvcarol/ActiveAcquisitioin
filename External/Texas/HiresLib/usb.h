@@ -45,14 +45,7 @@ typedef struct
         unsigned char data[HID_MESSAGE_MAX_SIZE];
     }text;
 }hidMessageStruct;
-/*hid_device *DeviceHandle
-typedef struct{
-	hid_device *DeviceHandle;
-	BOOL USBConnected;
-}hidCommDevice;//communication with HID detected device.
-*/
 
-void USB_SetFakeConnection(BOOL enable);//todo remove, deprecated and useless for this application.
 //BOOL USB_IsConnected(hid_device *DeviceHandle);
 int USB_Write(uint08 *Data, hid_device *DeviceHandle);
 int USB_Read(uint08 *Data, hid_device *DeviceHandle);
