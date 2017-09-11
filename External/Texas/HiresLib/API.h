@@ -13,7 +13,7 @@
 
 #include "Common.h"
 
-#include "hidapi.h"
+#include "Texas\hidapi-master\hidapi\hidapi.h"
 
 #ifdef __cplusplus
 extern "C" {

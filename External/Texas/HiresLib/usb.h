@@ -10,7 +10,7 @@
 #define USB_H
 
 #include "common.h"
-#include "hidapi.h"
+#include "Texas\hidapi-master\hidapi\hidapi.h"
 
 #ifdef __cplusplus
 extern "C" {

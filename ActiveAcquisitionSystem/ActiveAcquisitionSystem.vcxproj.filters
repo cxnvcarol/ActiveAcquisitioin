@@ -115,9 +115,6 @@
     <ClCompile Include="ParameterParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\activeCaptureCmd\mainBasicWorkflowTest.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="mainCanonTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -128,6 +125,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ActiveCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mainBasicWorkflowTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

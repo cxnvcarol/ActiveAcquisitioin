@@ -1,0 +1,13 @@
+ActiveAcquisition> develoment env. setup:
+
+1. Pull git (updated version is temporary at https://github.com/cxnvcarol/ActiveAcquisitioin)
+2. Install dependencies:
+- Vimba 2.0 ->set env. variable VIMBA_HOME
+- Install QT 5.x and the extension QT5 for Visual Studio, then select the qt version for the project (see screenshots)
+
+3. build x86 target: the libs included by default are specific for the x86 platform. Replace the EDSDK.lib and hidapi.lib to compile the x64 target.
+4. Before running: copy the dll files to the output_build folder (where the .exe is generated, check for: EDSDK.dll, VimbaCPP.dll,VimbaImageTransform.dll,hidapi.dll. Copy them from the /External folder in the repository)
+
+5. When running outside VS, make sure that also the dlls for QT are available in the execution path)
+
+Check the screenshots to verify the correct configuration steps. Check the dist folder

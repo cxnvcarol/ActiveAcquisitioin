@@ -1,7 +1,8 @@
 //Defines the entry point for the console application.
 //
 
-#include "stdafx.h"
+#include <iostream>
+#include <string>
 #include <QtWidgets/QApplication>
 #include "StandardProjector.h"
 #include "AcquisitionDeviceManager.h"
