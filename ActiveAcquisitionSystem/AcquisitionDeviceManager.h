@@ -18,8 +18,7 @@ class AcquisitionDeviceManager
 public:
 	AcquisitionDeviceManager();
 	~AcquisitionDeviceManager();
-	bool initializeAPIs();
-	void endAPIs();
+	
 	
 	std::vector<ActiveCamera*> getCameras();
 	//ActiveCamera* getCamera(std::string dev_id);//Review: implement! Likely it will be useful
@@ -70,5 +69,8 @@ private:
 	bool setDLPStatus(DLPProjector *dlp);
 
 	Projector* mainProjector;
+
+	bool initializeAPIs();
+	void endAPIs();
 };
 

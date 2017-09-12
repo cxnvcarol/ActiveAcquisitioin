@@ -36,8 +36,6 @@ AcquisitionDeviceManager::~AcquisitionDeviceManager()
 		LOGERR("oh! not closing camera");
 	}
 	
-
-
 	endAPIs();
 }
 int AcquisitionDeviceManager::detectDLPs()
