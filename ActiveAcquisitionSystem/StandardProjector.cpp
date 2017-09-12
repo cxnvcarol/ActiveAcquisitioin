@@ -103,9 +103,12 @@ void StandardProjector::setImage(const QImage &newImage)
 	image = newImage;
 	imageLabel->setPixmap(QPixmap::fromImage(image));
 	imageLabel->adjustSize();
-	imageLabel->update();//check if necessary
+	repaint();
+}
 
-	LOGEXEC("just painted");
+void StandardProjector::paintEvent(QPaintEvent * e)
+{
+	QMainWindow::paintEvent(e);
 }
 
 void StandardProjector::keyPressEvent(QKeyEvent * ev)
@@ -124,7 +127,8 @@ void StandardProjector::playProjectionSequence(int n)
 		
 		playingSequence = true;		
 		currentProjectionIndex = 0;
-		advanceProjectionSequence();//first call starts the following timed projections.
+		projectionTimer->start(0);
+		//advanceProjectionSequence();//first call starts the following timed projections.
 	}
 }
 void StandardProjector::notifyPlayToObservers()
@@ -224,6 +228,8 @@ void StandardProjector::advanceProjectionSequence()
 	{
 		projectionTimer->stop();
 		currentProjectionIndex = 0;
+
+		refresh();
 		for (ActiveCamera* ci : observerCams)
 		{
 			ci->notifyStopProjectionSequence();
@@ -239,9 +245,10 @@ void StandardProjector::advanceProjectionSequence()
 	int idx = projectionsSequence[currentProjectionIndex].ProjectedImgIndex;
 	LOGEXEC("setting the next projection..%d, index %d", currentProjectionIndex,idx);
 	setImage(projections[idx].image);
+	
+	refresh();
 
-	bool trigger = projection.triggerCam;
-	if (trigger)
+	if (projection.triggerCam)
 	{
 		for(ActiveCamera* obs: observerCams)
 		{
@@ -262,7 +269,17 @@ void StandardProjector::advanceProjectionSequence()
 	
 }
 
+void StandardProjector :: refresh()
+{
+	if (parentApp)
+	{
+		try {
+			parentApp->processEvents();
+		}
+		catch (...) { LOGERR("no qt-events processed"); }
 
+	}
+}
 void StandardProjector::showInFullProjection()
 {
 	showFullScreen();

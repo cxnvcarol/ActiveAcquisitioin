@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 			sp->loadProjectionsFolder(parser.projectionsFolder[i].c_str());
 			sp->loadProjectionSettings(parser.projectionsConfig[i].c_str());
 			sp->showInFullProjection();
+			sp->setAppParent(a);
 
 			mng->addStandardProjector(sp);
 		}

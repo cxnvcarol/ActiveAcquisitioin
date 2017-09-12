@@ -43,7 +43,6 @@ bool ActiveCamera::notifyStopProjectionSequence() {
 	if (playingProjectionSequence)
 	{
 		playingProjectionSequence = false;
-		indexPicture = 0;
 		return true;
 	}
 	else return false;//if already stopped

@@ -80,9 +80,9 @@ AVTCamera::AVTCamera(CameraPtr avtCam):pCam(avtCam), settingsLoaded(false)
 AVTCamera::~AVTCamera()
 {
 	printf("del cam\n");
-	VmbError_t error = releaseBuffer();
 
 	try {
+		VmbError_t error = releaseBuffer();
 		pCam->Close();
 	}
 	catch (...)
@@ -194,9 +194,9 @@ bool AVTCamera::setFrame(const AVT::VmbAPI::FramePtr &frame)
 				return error;
 			}
 			string pName = outputFolder + "/" + QString("%1").arg(indexPicture, 3,10, QChar('0')).toStdString() + ".png";//this is 2 digits for the picture name in base 10
-			
-			convertedImage.save(QString(pName.c_str()), "PNG");
 			indexPicture++;
+			convertedImage.save(QString(pName.c_str()), "PNG");
+			
 			LOGEXEC("%s%s", "png saved in ", pName.c_str());
 			qDebug();
 
@@ -307,7 +307,7 @@ VmbErrorType AVTCamera::prepareCapture(void)
 
 	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSelector", pFeature))
 	{
-		if (VmbErrorSuccess != pFeature->SetValue("AcquisitionStop"))
+		if (VmbErrorSuccess != pFeature->SetValue("AcquisitionEnd"))
 		{
 			LOGERR("unable to set triggerselector to AcquisitionStop for the avt camera %s", dev_id.c_str());
 		}
@@ -436,6 +436,7 @@ bool AVTCamera::notifyStopProjectionSequence()
 {
 	if (ActiveCamera::notifyStopProjectionSequence())
 	{
+		Sleep(200);
 		FeaturePtr pFeat;
 		VmbErrorType err = pCam->GetFeatureByName("AcquisitionStop", pFeat);
 		err = pFeat->RunCommand();
@@ -456,8 +457,9 @@ bool AVTCamera::notifyStopProjectionSequence()
 			} while (false == bIsCommandDone);
 		}
 		LOGEXEC("stoping good.");
-
+		Sleep(200);
 		LOGEXEC("about to release AVT buffer");
+		
 		VmbError_t error = releaseBuffer();
 		try {
 			pCam->Close();

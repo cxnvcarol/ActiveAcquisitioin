@@ -63,6 +63,7 @@ class StandardProjector : public QMainWindow, public Projector
 {
 
 public:
+	void refresh();
 	void showInFullProjection();
 	
 	Q_OBJECT
@@ -89,19 +90,26 @@ public:
 		return false;
 	}
 
+	void setAppParent(QApplication*a) {
+		parentApp = a;
+	}
+
 public slots:
 	void advanceProjectionSequence();
 
 private:
 	void setImage(const QImage &newImage);
+	void paintEvent(QPaintEvent * e);
 	QImage image;
 	QLabel *imageLabel;
 	QTimer  *projectionTimer;
 	int currentProjectionIndex;
 	int screenIndex;
-
+	bool paintTriggered = false;
 protected:
 	void keyPressEvent(QKeyEvent *ev);
+
+	QApplication *parentApp;
 };
 
 #endif
