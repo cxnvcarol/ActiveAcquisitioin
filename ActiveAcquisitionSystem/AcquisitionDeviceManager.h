@@ -22,7 +22,7 @@ public:
 	void endAPIs();
 	
 	std::vector<ActiveCamera*> getCameras();
-	ActiveCamera* getCamera(std::string dev_id);
+	//ActiveCamera* getCamera(std::string dev_id);//Review: implement! Likely it will be useful
 	ActiveCamera* getCamera(int index);
 	Projector* getProjector(std::string dev_id);
 	//std::vector<Projector*> getProjectors();

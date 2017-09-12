@@ -337,7 +337,7 @@ EdsCameraRef * EDSWrapper::getCamera(int index)
 	{
 		err = EdsGetChildAtIndex(cameraList, index, camera);
 	}
-	// Release camera list//TODO Review, commented from the original. why to release the camera list??
+	// Release camera list//Review, commented from the original. why to release the camera list??
 	/*
 	if (cameraList != NULL)
 	{

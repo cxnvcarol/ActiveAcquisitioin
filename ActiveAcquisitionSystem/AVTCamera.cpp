@@ -139,15 +139,7 @@ bool AVTCamera::loadSettings(std::string configXml)
 		}
 		cameraFlag = false;
 
-		/*//TODO Review catcherror&logging! (inf-10).
-		err = sys.Shutdown();
-		if (VmbErrorSuccess != err)
-		{
-		ss.str("");
-		ss << "Could not shutdown Vimba [error code: " << err << "]";
-		std::cout << ss.str() << std::endl;
-		}
-		*/
+		
 		apiFlag = false;
 
 		throw std::exception();

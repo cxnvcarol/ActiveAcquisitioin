@@ -105,8 +105,9 @@ bool AcquisitionDeviceManager::initializeAPIs()
 {
 	//vimba
 	vimbaSys = &AVT::VmbAPI::VimbaSystem::GetInstance();
+	//Review: react if err is not 0:
 	err = vimbaSys->Startup();
-
+	
 	//canon
 	edsWrapper = new EDSWrapper();
 
@@ -121,12 +122,16 @@ void AcquisitionDeviceManager::endAPIs()
 	//to be called at the end of the session
 	//return true;
 	try {
-		vimbaSys->Shutdown();
-		//review End edsdk??
+		err=vimbaSys->Shutdown();
+		if (VmbErrorSuccess != err)
+		{
+			LOGERR("Could not shutdown Vimba [error code: %d]", err);
+		}
+		
 	}
 	catch(exception e)
 	{ 
-		printf("oh! not shutting down?");
+		LOGERR("oh! not shutting down?");
 	}
 
 }
@@ -135,17 +140,19 @@ std::vector<ActiveCamera*> AcquisitionDeviceManager::getCameras()
 {
 	return cameraList;
 }
+/*
 ActiveCamera* AcquisitionDeviceManager::getCamera(string dev_id)
 {
 	return NULL;
 }
+*/
 ActiveCamera* AcquisitionDeviceManager::getCamera(int index)
 {
 	if (numCams > index)
 	{
 		return cameraList[index];
 	}
-	throw "NO CAMERA";
+	return NULL;
 }
 
 Projector* AcquisitionDeviceManager::getProjector(string dev_id)

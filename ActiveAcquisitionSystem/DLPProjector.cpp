@@ -102,7 +102,7 @@ void DLPProjector::loadDLPProjectionsSettings(const QString projectionsConfig)
 
 		pattern.name = pFileStr;
 		pattern.bits = (list.size() >= 2) ? list[1].toInt() : 1;
-		pattern.exposure = list[2].toInt();//pattern.exposure = (list.size() >= 3) ? list[2].toInt() : GetMinExposure(1);//TODO VERIFY THIS!, check GetMinExposure
+		pattern.exposure = list[2].toInt();//pattern.exposure = (list.size() >= 3) ? list[2].toInt() : GetMinExposure(1);//TODO VERIFY THIS!, check GetMinExposure method from original GUI source code
 		pattern.darkPeriod = (list.size() >= 4) ? list[3].toInt() : 0;
 		pattern.color = (list.size() >= 5) ? PatternElement::Color(list[4].toInt()) : PatternElement::RED;
 		pattern.trigIn = (list.size() >= 6) ? list[5].toInt() : false;
@@ -135,7 +135,7 @@ void DLPProjector::loadProjectionSettings(const char* projectionsConfig)
 		f.close();
 		if (fields.size() == 1)//"Normal mode" always for the pattern mode
 		{
-			loadDLPProjectionsSettings(projectionsConfig);//TODO Review... should I update my own Projections vector anyway??
+			loadDLPProjectionsSettings(projectionsConfig);//Review... should I update my own Projections vector anyway??
 		}
 		else if (fields.size() == 3)
 		{
@@ -171,7 +171,7 @@ void DLPProjector::setStatus(int statusLCR, uchar SysStatus, uchar HWStatus, uch
 	bool sequencerRunState = MainStatus & BIT1;
 	bool videoState = !(MainStatus & BIT2);
 	bool extSourceLocked = MainStatus & BIT3;
-	//TODO save them or print them for the user information. Or just discard the method (inf)
+	//TODO Review: save them or print them for the user information. Or just discard the method (inf)
 }
 
 void DLPProjector::notifyPlayToObservers()

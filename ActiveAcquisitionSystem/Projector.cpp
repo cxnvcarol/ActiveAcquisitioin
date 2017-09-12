@@ -31,11 +31,6 @@ int Projector::indexOfProjection(const QString imgName)
 }
 
 
-void Projector::registerCameraObserver(ActiveCamera * cam)
-{
-	throw "not implemented";
-}
-
 void Projector::loadProjectionSettings(const char* projectionsConfig)
 {
 	throw "not implemented";
