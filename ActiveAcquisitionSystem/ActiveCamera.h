@@ -18,9 +18,8 @@ public:
 	virtual ~ActiveCamera();
 
 
-	virtual int takeSinglePicture();
+	virtual int takeSinglePicture()=0;
 	virtual void setOutputFolder(std::string folder);
-	virtual bool loadSettings(CameraSettings cs);
 	virtual bool loadSettings(std::string pathToSettings);
 	virtual bool notifyStopProjectionSequence();
 	virtual bool notifyStartProjectionSequence();

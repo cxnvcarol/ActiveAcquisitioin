@@ -15,21 +15,10 @@ ActiveCamera::ActiveCamera()
 ActiveCamera::~ActiveCamera()
 {
 }
-int ActiveCamera::takeSinglePicture()
-{
-	throw "Not implemented";
-}
-
-bool ActiveCamera::loadSettings(CameraSettings cs)//GRAL CASE (makes more sense for canon & nikon)
-{
-	printf("Load settings with CameraSettings object");
-	return false;
-}
-
 
 bool ActiveCamera::loadSettings(std::string pathToSettings)
 {
-	printf("Load settings with file not implemented");
+	LOGERR("Load settings not supported for this type of camera, id: %s",dev_id.c_str());
 	return false;
 }
 

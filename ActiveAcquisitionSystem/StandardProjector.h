@@ -86,7 +86,7 @@ public:
 
 	bool triggersByHardware()
 	{
-		return true;
+		return false;
 	}
 
 public slots:

@@ -26,6 +26,7 @@ public:
 
 	bool triggersByHardware()
 	{
+		//TODO Review: Not necessarily always true: I could diplay the sequence through USB without any (hw) synchronization and trigger the cameras by software every time it should according to the configured time(!?)... Therefore, implement the capturing sequence for "orphaned/independent" Camera.
 		return true;
 	}
 

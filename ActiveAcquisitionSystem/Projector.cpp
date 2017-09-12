@@ -29,13 +29,6 @@ int Projector::indexOfProjection(const QString imgName)
 	}
 	return -1;
 }
-
-
-void Projector::loadProjectionSettings(const char* projectionsConfig)
-{
-	throw "not implemented";
-}
-
 int Projector::loadProjectionsFolder(const QString & folderPath)
 {
 	if (!folderPath.isEmpty())
@@ -58,15 +51,6 @@ int Projector::loadProjectionsFolder(const QString & folderPath)
 		}
 	}
 	return projections.size();
-}
-void Projector::playProjectionSequence(int n)
-{
-	throw "not implemented";
-}
-
-void Projector::notifyPlayToObservers()
-{
-	LOGERR("Not implemented");
 }
 
 bool Projector::triggersByHardware()
