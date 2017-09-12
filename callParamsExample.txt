@@ -1,0 +1,1 @@
+-p C:\Users\3dscanner\Desktop\CamProCam C:\Users\3dscanner\Desktop\CamProCam\simpleFormat.pro 1 -c C:\Users\3dscanner\Desktop\CamProCam\camRightNobigModif.xml 50-0503342072 -c C:\Users\3dscanner\Desktop\CamProCam\camLeftNobigModif.xml 50-0503341845 -o C:\Users\3dscanner\Desktop\CamProCam\output
