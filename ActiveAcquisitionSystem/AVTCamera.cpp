@@ -220,7 +220,7 @@ int AVTCamera::takeSinglePicture()//only used in software synchronization mode (
 	//return 0;
 	
 	FeaturePtr pFeat;
-	VmbErrorType err = pCam->GetFeatureByName("AcquisitionStart", pFeat);
+	VmbErrorType err = pCam->GetFeatureByName("TriggerSoftware", pFeat);
 	err = pFeat->RunCommand();
 		
 	if (VmbErrorSuccess != err)
@@ -240,25 +240,7 @@ int AVTCamera::takeSinglePicture()//only used in software synchronization mode (
 		} while (false == bIsCommandDone);
 	}
 	LOGEXEC("picture taken without issues");
-	err = pCam->GetFeatureByName("AcquisitionStop", pFeat);
-	err = pFeat->RunCommand();
-	if (VmbErrorSuccess != err)
-	{
-		LOGERR("error in stoping acquisition: ");
-		return err;
-	}
-	else {
-		bool bIsCommandDone = false;
-		do
-		{
-			if (VmbErrorSuccess != pFeat->IsCommandDone(bIsCommandDone))
-			{
-				LOGERR("ohoh!");
-				break;
-			}
-		} while (false == bIsCommandDone);
-	}
-	LOGEXEC("stoping good.");
+	
 	return 0;
 	
 }
@@ -301,17 +283,17 @@ VmbErrorType AVTCamera::prepareCapture(void)
 	FeaturePtr pFeature;
 	if (VmbErrorSuccess == pCam->GetFeatureByName("AcquisitionMode", pFeature))
 	{
-		if (VmbErrorSuccess != pFeature->SetValue("SingleFrame"))
+		if (VmbErrorSuccess != pFeature->SetValue("Continuous"))
 		{
-			LOGERR("unable to set SingleFrame mode for the avt camera %s", dev_id.c_str());
+			LOGERR("unable to set Continuous mode for the avt camera %s", dev_id.c_str());
 		}
 	}
-	//TODO LOOK HERE! Force the triggersource, review if working fine. (i.e, triggerselector, triggermode, triggersource... which is the right order??
+	//review in case of bugs... Force the triggersource, review if working fine. (i.e, triggerselector, triggermode, triggersource...  is it the right order??
 	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSelector", pFeature))
 	{
-		if (VmbErrorSuccess != pFeature->SetValue("FrameStart"))
+		if (VmbErrorSuccess != pFeature->SetValue("AcquisitionStart"))
 		{
-			LOGERR("unable to set triggerselector to framestart for the avt camera %s", dev_id.c_str());
+			LOGERR("unable to set triggerselector to AcquisitionStart for the avt camera %s", dev_id.c_str());
 		}
 	}
 
@@ -322,13 +304,39 @@ VmbErrorType AVTCamera::prepareCapture(void)
 			LOGERR("unable to set triggermode off for the avt camera %s", dev_id.c_str());
 		}
 	}
+
 	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSelector", pFeature))
 	{
-		if (VmbErrorSuccess != pFeature->SetValue("AcquisitionStart"))
+		if (VmbErrorSuccess != pFeature->SetValue("AcquisitionStop"))
 		{
-			LOGERR("unable to set triggerselector to acquisitionstart for the avt camera %s", dev_id.c_str());
+			LOGERR("unable to set triggerselector to AcquisitionStop for the avt camera %s", dev_id.c_str());
 		}
 	}
+
+	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerMode", pFeature))
+	{
+		if (VmbErrorSuccess != pFeature->SetValue("Off"))
+		{
+			LOGERR("unable to set triggermode off for the avt camera %s", dev_id.c_str());
+		}
+	}
+
+
+	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerSelector", pFeature))
+	{
+		if (VmbErrorSuccess != pFeature->SetValue("FrameStart"))
+		{
+			LOGERR("unable to set triggerselector to FrameStart for the avt camera %s", dev_id.c_str());
+		}
+	}
+	if (VmbErrorSuccess == pCam->GetFeatureByName("TriggerMode", pFeature))
+	{
+		if (VmbErrorSuccess != pFeature->SetValue("On"))
+		{
+			LOGERR("unable to set FRAMESTART triggermode on for the avt camera %s", dev_id.c_str());
+		}
+	}
+
 
 	if (syncmode == SyncMode::SOFTWARE_MODE)
 	{
@@ -428,6 +436,27 @@ bool AVTCamera::notifyStopProjectionSequence()
 {
 	if (ActiveCamera::notifyStopProjectionSequence())
 	{
+		FeaturePtr pFeat;
+		VmbErrorType err = pCam->GetFeatureByName("AcquisitionStop", pFeat);
+		err = pFeat->RunCommand();
+		if (VmbErrorSuccess != err)
+		{
+			LOGERR("error in stoping acquisition: ");
+			return err;
+		}
+		else {
+			bool bIsCommandDone = false;
+			do
+			{
+				if (VmbErrorSuccess != pFeat->IsCommandDone(bIsCommandDone))
+				{
+					LOGERR("ohoh!");
+					break;
+				}
+			} while (false == bIsCommandDone);
+		}
+		LOGEXEC("stoping good.");
+
 		LOGEXEC("about to release AVT buffer");
 		VmbError_t error = releaseBuffer();
 		try {
@@ -447,6 +476,31 @@ bool AVTCamera::notifyStartProjectionSequence()
 	if (ActiveCamera::notifyStartProjectionSequence())
 	{
 		VmbErrorType err = prepareCapture();
+		if (VmbErrorSuccess != err)
+		{
+			LOGERR("error in preparing acquisition: ");
+			return err;
+		}
+		FeaturePtr pFeat;
+		err = pCam->GetFeatureByName("AcquisitionStart", pFeat);
+		err = pFeat->RunCommand();
+		if (VmbErrorSuccess != err)
+		{
+			LOGERR("error in startnig acquisition: ");
+			return err;
+		}
+		else {
+			bool bIsCommandDone = false;
+			do
+			{
+				if (VmbErrorSuccess != pFeat->IsCommandDone(bIsCommandDone))
+				{
+					LOGERR("ohoh!");
+					break;
+				}
+			} while (false == bIsCommandDone);
+		}
+		LOGEXEC("starting cam good.");
 		if (VmbErrorSuccess != err)
 		{
 			LOGERR("error preparing capture");//: %d\n", err);
